@@ -1,0 +1,87 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+@*Main form*@
+<div class="d-flex justify-content-center align-items-center" style="min-height:60vh;">
+    <div class="card p-4" style="width:400px;">
+        <h2 class="card-title text-center mb-3">Create Account</h2>
+
+        <form method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="Input.FirstName" class="form-label"></label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.LastName" class="form-label"></label>
+                <input asp-for="Input.LastName" class="form-control" />
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Birthday" class="form-label"></label>
+                <input asp-for="Input.Birthday" type="date" class="form-control" />
+                <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" type="email" class="form-control" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label"></label>
+                <input asp-for="Input.Password" type="password" class="form-control" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-control" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.AccountIndex" class="form-label"></label>
+                <input asp-for="Input.AccountIndex" class="form-control" placeholder="6-digit number" />
+                <span asp-validation-for="Input.AccountIndex" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.SelectedCollege" class="form-label"></label>
+                <select asp-for="Input.SelectedCollege" asp-items="Model.CollegeOptions" class="form-select">
+                    <option value="">Select a college</option>
+                </select>
+                <span asp-validation-for="Input.SelectedCollege" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.SelectedDepartment" class="form-label"></label>
+                <select asp-for="Input.SelectedDepartment" asp-items="Model.DepartmentOptions" class="form-select">
+                    <option value="">Select a department</option>
+                </select>
+                <span asp-validation-for="Input.SelectedDepartment" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+
+            <div class="text-center">
+                <a asp-page="/Index">Back to login</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@*Shows client side errors in real time*@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

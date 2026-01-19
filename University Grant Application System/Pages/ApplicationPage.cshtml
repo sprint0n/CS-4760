@@ -1,0 +1,39 @@
+﻿@page
+@model University_Grant_Application_System.Pages.Shared.IndexModel
+@{
+    ViewData["Title"] = "Grant Application";
+}
+
+<div class="container mt-4">
+    <h2>University Grant Application</h2>
+    <hr />
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="ApplicantName" class="form-label"></label>
+            <input asp-for="ApplicantName" class="form-control" />
+            <span asp-validation-for="ApplicantName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="GrantPurpose" class="form-label"></label>
+            <textarea asp-for="GrantPurpose" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="GrantPurpose" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Application</button>
+    </form>
+</div>
+
+@section Scripts {
+    @* This enables client-side validation (errors pop up without refreshing) *@
+    <partial name="_ValidationScriptsPartial" />
+}

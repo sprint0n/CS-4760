@@ -1,0 +1,43 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@*Login form*@
+<div class="d-flex justify-content-center align-items-center" style="min-height:60vh;">
+    <div class="card p-4" style="width:380px;">
+        <h2 class="card-title text-center mb-3">Login</h2>
+
+        <form method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="mb-4">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" class="form-control" placeholder="you@example.com" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Input.Password" class="form-label"></label>
+                <input asp-for="Input.Password" class="form-control" placeholder="Enter your password" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid mb-4">
+                <button type="submit" class="btn btn-primary">Sign in</button>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="/Register">Create new account</a>
+                <a href="/ForgotPassword">Forgot password?</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@*Shows client side errors in real time*@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

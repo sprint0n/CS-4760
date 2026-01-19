@@ -1,0 +1,41 @@
+﻿@page
+@model University_Grant_Application_System.Pages.AdminDashboard.IndexModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1>Admin Dashboard</h1>
+<div class="mb-3 d-flex gap-2"> 
+    <button class="btn btn-primary">RSPG</button> 
+    <button class="btn btn-secondary">File Upload</button> 
+    <button class="btn btn-success">Calendar Tab</button> 
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.AdminList[0].Name)</th>
+            <th>@Html.DisplayNameFor(model => model.AdminList[0].School)</th>
+            <th>@Html.DisplayNameFor(model => model.AdminList[0].College)</th>
+            <th>@Html.DisplayNameFor(model => model.AdminList[0].Department)</th>
+            <th>Add to Committee</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.AdminList)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.School)</td>
+                <td>@Html.DisplayFor(modelItem => item.College)</td>
+                <td>@Html.DisplayFor(modelItem => item.Department)</td>
+                <td>
+                    <a class="btn btn-primary" asp-page="./AddToCommittee" asp-route-id="@item.Id">
+                        Add to Committee
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Pages.Admin
+namespace University_Grant_Application_System.Pages.AdminDashboard
 {
     public class EditModel : PageModel
     {
@@ -21,7 +21,7 @@ namespace University_Grant_Application_System.Pages.Admin
         }
 
         [BindProperty]
-        public AdminType Admin { get; set; } = default!;
+        public User Users { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,12 +30,12 @@ namespace University_Grant_Application_System.Pages.Admin
                 return NotFound();
             }
 
-            var admin =  await _context.Admin.FirstOrDefaultAsync(m => m.Id == id);
-            if (admin == null)
+            var user =  await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
-            Admin = admin;
+            Users = user;
             return Page();
         }
 
@@ -48,7 +48,7 @@ namespace University_Grant_Application_System.Pages.Admin
                 return Page();
             }
 
-            _context.Attach(Admin).State = EntityState.Modified;
+            _context.Attach(User).State = EntityState.Modified;
 
             try
             {
@@ -56,7 +56,7 @@ namespace University_Grant_Application_System.Pages.Admin
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AdminExists(Admin.Id))
+                if (!UserExists(Users.Id))
                 {
                     return NotFound();
                 }
@@ -69,9 +69,9 @@ namespace University_Grant_Application_System.Pages.Admin
             return RedirectToPage("./Index");
         }
 
-        private bool AdminExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.Admin.Any(e => e.Id == id);
+            return _context.User.Any(e => e.Id == id);
         }
     }
 }

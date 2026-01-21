@@ -1,30 +1,61 @@
 using System.ComponentModel.DataAnnotations;
+using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using University_Grant_Application_System.Data;
+using University_Grant_Application_System.Models;
+using BCrypt.Net;
+
 
 public class IndexModel : PageModel
 {
+    private readonly University_Grant_Application_SystemContext _context;
+    public IndexModel(University_Grant_Application_SystemContext context)
+    {
+        _context = context;
+    }
+
+
     [BindProperty]
     public LoginInputModel Input { get; set; }
     public string ErrorMessage { get; set; }
 
-    public void OnGet()
+    public void OnGetAsync()
     {
 
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid) // Fail
         {
             return Page();
         }
 
-        //Success
-        // TODO: Compare against a user database
-        // TODO: Redirect to dashboard based on role
+        var user = await _context.User
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.ToLower()); 
+        if (user == null)
+        {
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return Page();
+        }
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(Input.Password, user.HashedPassword);
 
-        return RedirectToPage("/AdminDashboard/Index");
+        if (!isPasswordValid)
+        {
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return Page();
+
+        }
+
+        bool isAdmin = user.isAdmin;
+
+        if(isAdmin)
+        {
+            return RedirectToPage("/AdminDashboard/Index");
+        }
+        return RedirectToPage("/UserView");
     }
 
     // Class to hold form inputs

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Pages.Admin
+namespace University_Grant_Application_System.Pages.AdminDashboard
 {
     public class CreateModel : PageModel
     {
@@ -25,7 +25,7 @@ namespace University_Grant_Application_System.Pages.Admin
         }
 
         [BindProperty]
-        public AdminType Admin { get; set; } = default!;
+        public User Users { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -35,7 +35,7 @@ namespace University_Grant_Application_System.Pages.Admin
                 return Page();
             }
 
-            _context.Admin.Add(Admin);
+            _context.User.Add(Users);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

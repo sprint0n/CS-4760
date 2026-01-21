@@ -3,10 +3,18 @@ using Microsoft.Extensions.DependencyInjection;
 using University_Grant_Application_System.Data;
 var builder = WebApplication.CreateBuilder(args);
 
+//Make it so the connection string autofills the right directory
+string projectRoot = builder.Environment.ContentRootPath;
+string appDataPath = Path.Combine(projectRoot, "App_Data");
+AppDomain.CurrentDomain.SetData("DataDirectory", appDataPath);
+
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<University_Grant_Application_SystemContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("University_Grant_Application_SystemContext") ?? throw new InvalidOperationException("Connection string 'University_Grant_Application_SystemContext' not found.")));
+    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 

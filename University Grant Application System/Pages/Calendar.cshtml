@@ -1,0 +1,43 @@
+﻿@page
+@{
+    ViewData["Title"] = "Grant Calendar";
+}
+@*
+    This was written and created by Pramish, I just added it because of my having 
+*@
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+<div class="text-center">
+    <h1 class="display-4">Grant Deadlines</h1>
+    <p>Click a date to see details.</p>
+</div>
+
+<div id='calendar' style="max-width: 900px; margin: 40px auto;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            // This runs when you click a date
+            dateClick: function(info) {
+                alert('You clicked on: ' + info.dateStr);
+            },
+            // Sample events (Year-Month-Day)
+            events: [
+                { title: 'Grant Open', start: '2026-02-01', color: 'green' },
+                { title: 'Deadline', start: '2026-02-20', color: 'red' }
+            ]
+        });
+        calendar.render();
+    });
+</script>
+
+                

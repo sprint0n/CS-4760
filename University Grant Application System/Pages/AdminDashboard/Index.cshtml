@@ -5,6 +5,44 @@
     ViewData["Title"] = "Index";
 }
 
+<h1>Admin Dashboard</h1>
+
+<!-- Displays if the uplaod was successful -->
+@if (TempData["UploadSuccess"] != null)
+{
+    <div id="uploadSuccessAlert" class="alert alert-success mt-3">
+        @TempData["UploadSuccess"]
+    </div>
+}
+
+<div class="mb-3 d-flex gap-2">
+
+    <button class="btn btn-primary">RSPG</button>
+
+    <form method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
+        <input type="file" asp-for="UploadFile" id="fileInput" style="display:none" />
+
+        <!-- Button that opens the file picker -->
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click();">
+            Upload File
+        </button>
+
+        <!-- Filename appears here -->
+        <span id="fileName" class="text-muted" style="display:none;"></span>
+
+        <!-- Submit button (hidden until a file is selected) -->
+        <button type="submit" id="uploadSubmit" class="btn btn-success" style="display:none;">
+            Submit
+        </button>
+    </form>
+
+    <button class="btn btn-success">Calendar Tab</button>
+
+</div>
+
+
+
+
 <h1>Index</h1>
 
 <p>
@@ -70,3 +108,39 @@
 }
     </tbody>
 </table>
+
+
+<script> // USED FOR FILE UPLOADER
+    document.getElementById('fileInput').addEventListener('change', function () {
+        const submitBtn = document.getElementById('uploadSubmit');
+        const fileNameSpan = document.getElementById('fileName');
+
+        if (this.files.length > 0) {
+            const fileName = this.files[0].name;
+
+            // Show filename
+            fileNameSpan.textContent = fileName;
+            fileNameSpan.style.display = 'inline';
+
+            // Show submit button
+            submitBtn.style.display = 'inline-block';
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const alert = document.getElementById("uploadSuccessAlert");
+        if (alert) {
+            setTimeout(() => {
+                alert.style.transition = "opacity 1s ease";
+                alert.style.opacity = "0";
+
+                // Remove from layout after fade
+                setTimeout(() => alert.remove(), 1000);
+            }, 3000); // Wait 3 seconds before fading
+        }
+    });
+</script>
+
+

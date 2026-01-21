@@ -1,0 +1,39 @@
+﻿/* Grants dashboard */
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.due-date {
+    font-weight: bold;
+}
+
+.horizontal-scroll {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.application-card {
+    min-width: 250px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.approved-list {
+    list-style: none;
+    padding: 0;
+}
+
+.approved-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}

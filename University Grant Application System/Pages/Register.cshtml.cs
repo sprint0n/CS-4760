@@ -1,56 +1,94 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using University_Grant_Application_System.Data;
+using University_Grant_Application_System.Models;
+using BCrypt.Net;
 
 public class RegisterModel : PageModel
 {
+    private readonly University_Grant_Application_SystemContext _context;
+
+    public RegisterModel(University_Grant_Application_SystemContext context)
+    {
+        _context = context;
+    }
+
     [BindProperty]
     public RegisterInputModel Input { get; set; }
 
     public List<SelectListItem> CollegeOptions { get; set; }
     public List<SelectListItem> DepartmentOptions { get; set; }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        LoadDropdowns();
+        await LoadDropdowns();
     }
 
-    private void LoadDropdowns()
+    private async Task LoadDropdowns()
     {
-        // TODO: Load these from a database
+        var collegeList = new List<string> { "Engineering", "Mathematics" };
+        var departmentList = new List<string> { "Computer Science", "Statistics" };
 
-        CollegeOptions = new List<SelectListItem>
+        try
         {
-            new SelectListItem("Engineering", "Engineering"),
-            new SelectListItem("Arts & Sciences", "Arts & Sciences"),
-            new SelectListItem("Business", "Business"),
-            new SelectListItem("Health", "Health")
-        };
+            var dbColleges = await _context.User
+                .Select(u => u.College)
+                .Distinct()
+                .ToListAsync();
 
-        DepartmentOptions = new List<SelectListItem>
+            var dbDepts = await _context.User
+                .Select(u => u.Department)
+                .Distinct()
+                .ToListAsync();
+
+            collegeList = collegeList.Union(dbColleges).ToList();
+            departmentList = departmentList.Union(dbDepts).ToList();
+        }
+        catch (Exception ex)
         {
-            new SelectListItem("Computer Science", "Computer Science"),
-            new SelectListItem("Mathematics", "Mathematics"),
-            new SelectListItem("Physics", "Physics"),
-            new SelectListItem("Biology", "Biology"),
-            new SelectListItem("Marketing", "Marketing")
-        };
+            Console.WriteLine("Database query failed: " + ex.Message);
+        }
+
+        CollegeOptions = collegeList.Where(x => !string.IsNullOrEmpty(x))
+            .Select(c => new SelectListItem(c, c)).ToList();
+        DepartmentOptions = departmentList.Where(x => !string.IsNullOrEmpty(x))
+            .Select(d => new SelectListItem(d, d)).ToList();
     }
-
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        LoadDropdowns();
+        
 
         if (!ModelState.IsValid) // Fail
         {
+            await LoadDropdowns();
             return Page();
         }
 
-        // Success
-        // TODO: Save user to database
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(Input.Password);
+
+        var newUser = new User
+        {
+            FirstName = Input.FirstName,
+            LastName = Input.LastName,
+            Birthday = Input.Birthday,
+            Email = Input.Email,
+            Department = Input.SelectedDepartment,
+            College = Input.SelectedCollege,
+            HashedPassword = hashedPassword,
+            School = "Placeholder",
+            AccountID = Input.AccountIndex
+        };
+
+        _context.User.Add(newUser);
+        await _context.SaveChangesAsync();
+
+
 
         return RedirectToPage("/Index");
     }
@@ -71,7 +109,7 @@ public class RegisterModel : PageModel
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Birthday")]
-        public DateTime Birthday { get; set; }
+        public DateOnly Birthday { get; set; }
 
         [Required]
         [EmailAddress]
@@ -93,7 +131,7 @@ public class RegisterModel : PageModel
         [Required]
         [RegularExpression(@"^\d{6}$", ErrorMessage = "Account index must be a 6-digit number")]
         [Display(Name = "Account Index")]
-        public string AccountIndex { get; set; }
+        public int AccountIndex { get; set; }
 
         [Required(ErrorMessage = "Please select a college")]
         [Display(Name = "College")]

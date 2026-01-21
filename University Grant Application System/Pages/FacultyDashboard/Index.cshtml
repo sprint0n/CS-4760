@@ -1,0 +1,81 @@
+﻿@page
+@model University_Grant_Application_System.Pages.FacultyDashboard.IndexModel
+@{
+    ViewData["Title"] = "Grants Dashboard";
+}
+@section Styles {
+        <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
+}
+
+
+<!-- Top Toolbar -->
+<section class="toolbar">
+    <div class="toolbar-left">
+        <h2>Due Date</h2>
+        <p class="due-date">
+            @Model.ApplicationDueDate.ToString("MMMM dd, yyyy")
+        </p>
+    </div>
+
+    <div class="toolbar-right">
+        <a asp-page="/Applications/Create" class="btn btn-primary">
+            New Grant Application
+        </a>
+    </div>
+</section>
+
+<hr />
+
+<!-- In Progress Applications -->
+<section class="applications-section">
+    <h3>Current Grant Applications</h3>
+
+    <div class="horizontal-scroll">
+        @foreach (var app in Model.InProgressApplications)
+        {
+            <div class="card application-card">
+                <h4>@app.Title</h4>
+                <p>Status: @app.Status</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- In Review / Finished Applications -->
+<section class="applications-section">
+    <h3>In Review Applications</h3>
+
+    <div class="horizontal-scroll">
+        @foreach (var app in Model.InReviewApplications)
+        {
+            <div class="card application-card">
+                <h4>@app.Title</h4>
+                <p>Status: @app.Status</p>
+            </div>
+        }
+    </div>
+</section>
+
+<hr />
+
+<!-- Approved Grants -->
+<section class="approved-section">
+    <h3>Approved Grants</h3>
+
+    @if (Model.ApprovedGrants.Any())
+    {
+        <ul class="approved-list">
+            @foreach (var grant in Model.ApprovedGrants)
+            {
+                <li class="approved-item">
+                    <strong>@grant.Title</strong>
+                    <span class="amount">@grant.Amount.ToString("C")</span>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="text-muted">No approved grants yet.</p>
+    }
+</section>

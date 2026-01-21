@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-NExt" Version="4.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12">
       <PrivateAssets>all</PrivateAssets>
@@ -18,6 +19,16 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\uploads\" />
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="App_Data\GrantAppDb.mdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="App_Data\GrantAppDb_log.ldf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

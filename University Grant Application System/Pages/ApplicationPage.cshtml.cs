@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations; 
 
-namespace University_Grant_Application_System.Pages.Shared
+namespace University_Grant_Application_System.Pages
 {
-    public class IndexModel : PageModel
+    public class ApplicationPageModel : PageModel
     {
 
         [BindProperty]

@@ -33,6 +33,13 @@
             </div>
         </div>
 
+        <div class="mb-3">
+            <label asp-for="PrimaryInvestigator" class="form-label">
+                Primary Investigator
+            </label>
+            <input asp-for="PrimaryInvestigator" class="form-control" />
+            <span asp-validation-for="PrimaryInvestigator" class="text-danger"></span>
+        </div>
 
         <div class="mb-3">
             <label asp-for="GrantTitle" class="form-label">Grant Title</label>
@@ -51,6 +58,12 @@
             <label asp-for="Procedure" class="form-label"></label>
             <textarea asp-for="Procedure" class="form-control" rows="4"></textarea>
             <span asp-validation-for="Procedure" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Timeline" class="form-label"></label>
+            <textarea asp-for="Timeline" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Timeline" class="text-danger"></span>
         </div>
 
         <div class="form-check">

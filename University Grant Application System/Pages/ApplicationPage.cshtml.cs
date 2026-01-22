@@ -35,6 +35,10 @@ namespace University_Grant_Application_System.Pages
         [Display(Name = "Procedures")]
         public string Procedure { get; set; }
 
+        [BindProperty]
+        [Required(ErrorMessage = "Primary Investigator is required")]
+        public string PrimaryInvestigator { get; set; }
+
 
         [BindProperty]
         [Required(ErrorMessage = "Please enter in the title")]
@@ -45,6 +49,12 @@ namespace University_Grant_Application_System.Pages
         [Required]
         [Display(Name = "Grant Purpose")]
         public string GrantPurpose { get; set; }
+
+        [BindProperty]
+        [Required]
+        [Display(Name = "Timeline")]
+        public string Timeline { get; set; }
+
 
         /// <summary>
         /// This is used for the Humans or Animals checkbox

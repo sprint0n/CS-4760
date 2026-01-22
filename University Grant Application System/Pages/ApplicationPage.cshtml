@@ -11,17 +11,42 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="mb-3">
-            <label asp-for="ApplicantName" class="form-label"></label>
-            <input asp-for="ApplicantName" class="form-control" />
-            <span asp-validation-for="ApplicantName" class="text-danger"></span>
+         <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="IndexNumber" class="form-label"></label>
+                    <input asp-for="IndexNumber" class="form-control" readonly/>
+                    <span asp-validation-for="IndexNumber" class="text-danger"></span>
+                </div>
+            </div>
+     
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="TypeOfUser" class="form-label"></label>
+                    <select asp-for="TypeOfUser" class="form-select">
+                        @foreach (var userType in Model.UserTypes)
+                        {
+                            <option value="@userType">@userType</option>
+                        }
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
+            <label asp-for="PrimaryInvestigator" class="form-label">
+                Primary Investigator
+            </label>
+            <input asp-for="PrimaryInvestigator" class="form-control" />
+            <span asp-validation-for="PrimaryInvestigator" class="text-danger"></span>
         </div>
+
+        <div class="mb-3">
+            <label asp-for="GrantTitle" class="form-label">Grant Title</label>
+            <input asp-for="GrantTitle" class="form-control" />
+            <span asp-validation-for="GrantTitle" class="text-danger"></span>
+        </div>
+
 
         <div class="mb-3">
             <label asp-for="GrantPurpose" class="form-label"></label>
@@ -29,11 +54,49 @@
             <span asp-validation-for="GrantPurpose" class="text-danger"></span>
         </div>
 
+        <div>
+            <label asp-for="Procedure" class="form-label"></label>
+            <textarea asp-for="Procedure" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Procedure" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Timeline" class="form-label"></label>
+            <textarea asp-for="Timeline" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Timeline" class="text-danger"></span>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="HumansOrAnimals" class="form-check-input" id="HumansAnimalsCheck"/>
+            <label asp-for="HumansOrAnimals" class="form-check-label">Does your research use Humans or Animals?</label>
+        </div>
+
+        <div id="fileUploadSection" style="display:none;">
+            <label class="form-label">IBR Documenation Approval</label>
+            <input type="file" class="form-control" />
+        </div>
+
+
+
         <button type="submit" class="btn btn-primary">Submit Application</button>
     </form>
 </div>
 
+
 @section Scripts {
     @* This enables client-side validation (errors pop up without refreshing) *@
     <partial name="_ValidationScriptsPartial" />
+
+    @*This is the script to enable the file upload for the animals*@
+    <script>
+        const checkbox = document.getElementById("HumansAnimalsCheck");
+        const uploadSection = document.getElementById("fileUploadSection");
+
+        checkbox.addEventListener("change", function () {
+            uploadSection.style.display = this.checked ? "block" : "none";
+        });
+    </script>
+
+
+    
 }

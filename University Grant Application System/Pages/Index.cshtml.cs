@@ -55,7 +55,7 @@ public class IndexModel : PageModel
         {
             return RedirectToPage("/AdminDashboard/Index");
         }
-        return RedirectToPage("/UserView");
+        return RedirectToPage("/FacultyDashboard/Index");
     }
 
     // Class to hold form inputs

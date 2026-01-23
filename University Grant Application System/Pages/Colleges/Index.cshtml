@@ -1,0 +1,41 @@
+﻿@page
+@model University_Grant_Application_System.Pages.Colleges.IndexModel
+
+@{
+    ViewData["Title"] = "Colleges";
+    Layout = "_AdminLayout";
+}
+
+<h1>Colleges</h1>
+
+<p>
+    <a class="btn btn-primary" asp-page="Create">Create New College</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                College
+            </th>
+            <th>
+                Modify
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.College)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CollegeName)
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

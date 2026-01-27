@@ -29,7 +29,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                 return NotFound();
             }
 
-            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _context.Users.FirstOrDefaultAsync(m => m.UserId == id);
 
             if (user is not null)
             {
@@ -48,11 +48,11 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                 return NotFound();
             }
 
-            var user = await _context.User.FindAsync(id);
+            var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
                 Users = user;
-                _context.User.Remove(Users);
+                _context.Users.Remove(Users);
                 await _context.SaveChangesAsync();
             }
 

@@ -35,7 +35,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                 return Page();
             }
 
-            _context.User.Add(Users);
+            _context.Users.Add(Users);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

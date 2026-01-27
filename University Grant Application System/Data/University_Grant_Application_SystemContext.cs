@@ -14,8 +14,12 @@ namespace University_Grant_Application_System.Data
         {
         }
 
-        public DbSet<University_Grant_Application_System.Models.User> User { get; set; } = default!;
+        public DbSet<University_Grant_Application_System.Models.User> Users { get; set; } = default!;
         public DbSet<University_Grant_Application_System.Models.FormTable> FormTable { get; set; } = default!;
         public DbSet<University_Grant_Application_System.Models.College> Colleges { get; set; } = default!;
+        public DbSet<University_Grant_Application_System.Models.Department> Departments { get; set; } = default!;
+
+        public DbSet<University_Grant_Application_System.Models.School> Schools { get; set; } = default!;
+
     }
 }

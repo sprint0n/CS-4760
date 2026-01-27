@@ -1,17 +1,26 @@
+using System.ComponentModel.DataAnnotations; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations; 
+using Microsoft.EntityFrameworkCore;
+using University_Grant_Application_System.Data;
+using University_Grant_Application_System.Models;
 
 namespace University_Grant_Application_System.Pages
 {
     public class ApplicationPageModel : PageModel
     {
+        private readonly University_Grant_Application_SystemContext _context;
+
+        public ApplicationPageModel(University_Grant_Application_SystemContext context)
+        {
+            _context = context;
+        }
 
 
         [BindProperty]
         [Required]
         [Display(Name = "Index number")]
-        public string IndexNumber { get; set; }
+        public int IndexNumber { get; set; }
 
         //This is for the dropdown menu for Primaryuser || Type of user
 
@@ -65,12 +74,25 @@ namespace University_Grant_Application_System.Pages
 
 
 
-
-
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            var userEmail = User.Identity?.Name;
 
+            if (userEmail != null)
+            {
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == userEmail);
+                
+                if (currentUser != null)
+                {
+                    PrimaryInvestigator = $"{currentUser.FirstName} {currentUser.LastName}";
+                    IndexNumber = currentUser.AccountID;
+                }
+            }
+            return Page();
         }
+
+     
 
 
 

@@ -24,14 +24,9 @@ namespace University_Grant_Application_System.Pages.Colleges
         public async Task OnGetAsync()
         {
             // Temporary placeholder data until the database is ready
-            College = new List<College> 
-            { 
-                new College { Id = 1, CollegeName = "College of Engineering" }, 
-                new College { Id = 2, CollegeName = "College of Business" }, 
-                new College { Id = 3, CollegeName = "College of Arts & Humanities" }, 
-                new College { Id = 4, CollegeName = "College of Science" } 
-            };
-            // College = await _context.Colleges.ToListAsync(); -- use later with database
+            College = await _context.Colleges.ToListAsync();
+
+            //  -- use later with database
         }
     }
 }

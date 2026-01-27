@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using BCrypt.Net;
 
 
@@ -33,7 +36,7 @@ public class IndexModel : PageModel
             return Page();
         }
 
-        var user = await _context.User
+        var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.ToLower()); 
         if (user == null)
         {
@@ -48,10 +51,24 @@ public class IndexModel : PageModel
             return Page();
 
         }
+    
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Email),
+            new Claim("UserId", user.UserId.ToString()),
+            new Claim(ClaimTypes.Role, user.userType.ToLower())
+        };
+        var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTime.UtcNow.AddMinutes(5)
+        };
+        await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
 
-        bool isAdmin = user.isAdmin;
+       
 
-        if(isAdmin)
+        if(user.userType.ToLower() == "admin")
         {
             return RedirectToPage("/AdminDashboard/Index");
         }

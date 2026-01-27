@@ -28,7 +28,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                 return NotFound();
             }
 
-            var user = await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _context.Users.FirstOrDefaultAsync(m => m.UserId == id);
 
             if (user is not null)
             {

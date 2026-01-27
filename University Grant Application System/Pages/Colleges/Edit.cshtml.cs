@@ -30,7 +30,7 @@ namespace University_Grant_Application_System.Pages.Colleges
                 return NotFound();
             }
 
-            var college =  await _context.Colleges.FirstOrDefaultAsync(m => m.Id == id);
+            var college =  await _context.Colleges.FirstOrDefaultAsync(m => m.CollegeId == id);
             if (college == null)
             {
                 return NotFound();
@@ -56,7 +56,7 @@ namespace University_Grant_Application_System.Pages.Colleges
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CollegeExists(College.Id))
+                if (!CollegeExists(College.CollegeId))
                 {
                     return NotFound();
                 }
@@ -71,7 +71,7 @@ namespace University_Grant_Application_System.Pages.Colleges
 
         private bool CollegeExists(int id)
         {
-            return _context.Colleges.Any(e => e.Id == id);
+            return _context.Colleges.Any(e => e.CollegeId == id);
         }
     }
 }

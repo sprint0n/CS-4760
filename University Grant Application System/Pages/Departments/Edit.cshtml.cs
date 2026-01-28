@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Pages.Colleges
+namespace University_Grant_Application_System.Pages.Departments
 {
     public class EditModel : PageModel
     {
@@ -21,7 +21,7 @@ namespace University_Grant_Application_System.Pages.Colleges
         }
 
         [BindProperty]
-        public College College { get; set; } = default!;
+        public Department Department { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,12 +30,13 @@ namespace University_Grant_Application_System.Pages.Colleges
                 return NotFound();
             }
 
-            var college =  await _context.Colleges.FirstOrDefaultAsync(m => m.CollegeId == id);
-            if (college == null)
+            var department =  await _context.Departments.FirstOrDefaultAsync(m => m.DepartmentId == id);
+            if (department == null)
             {
                 return NotFound();
             }
-            College = college;
+            Department = department;
+           ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolId");
             return Page();
         }
 
@@ -48,7 +49,7 @@ namespace University_Grant_Application_System.Pages.Colleges
                 return Page();
             }
 
-            _context.Attach(College).State = EntityState.Modified;
+            _context.Attach(Department).State = EntityState.Modified;
 
             try
             {
@@ -56,7 +57,7 @@ namespace University_Grant_Application_System.Pages.Colleges
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CollegeExists(College.CollegeId))
+                if (!DepartmentExists(Department.DepartmentId))
                 {
                     return NotFound();
                 }
@@ -69,9 +70,9 @@ namespace University_Grant_Application_System.Pages.Colleges
             return RedirectToPage("./Index");
         }
 
-        private bool CollegeExists(int id)
+        private bool DepartmentExists(int id)
         {
-            return _context.Colleges.Any(e => e.CollegeId == id);
+            return _context.Departments.Any(e => e.DepartmentId == id);
         }
     }
 }

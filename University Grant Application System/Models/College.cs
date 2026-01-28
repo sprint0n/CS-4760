@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace University_Grant_Application_System.Models
 {
@@ -6,7 +7,7 @@ namespace University_Grant_Application_System.Models
     {
         [Key]
         [Required]
-        public int Id { get; set; }
+        public int CollegeId { get; set; }
 
         [Required]
         public string CollegeName { get; set; }

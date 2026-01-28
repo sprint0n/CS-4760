@@ -27,7 +27,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
 
         public async Task OnGetAsync()
         {
-            Users = await _context.User.ToListAsync();
+            Users = await _context.Users.ToListAsync();
         }
 
         public async Task<IActionResult> OnPostAsync()

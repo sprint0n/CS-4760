@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Pages.Colleges
+namespace University_Grant_Application_System.Pages.Departments
 {
     public class DeleteModel : PageModel
     {
@@ -20,7 +20,7 @@ namespace University_Grant_Application_System.Pages.Colleges
         }
 
         [BindProperty]
-        public College College { get; set; } = default!;
+        public Department Department { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,11 +29,11 @@ namespace University_Grant_Application_System.Pages.Colleges
                 return NotFound();
             }
 
-            var college = await _context.Colleges.FirstOrDefaultAsync(m => m.CollegeId == id);
+            var department = await _context.Departments.FirstOrDefaultAsync(m => m.DepartmentId == id);
 
-            if (college is not null)
+            if (department is not null)
             {
-                College = college;
+                Department = department;
 
                 return Page();
             }
@@ -48,11 +48,11 @@ namespace University_Grant_Application_System.Pages.Colleges
                 return NotFound();
             }
 
-            var college = await _context.Colleges.FindAsync(id);
-            if (college != null)
+            var department = await _context.Departments.FindAsync(id);
+            if (department != null)
             {
-                College = college;
-                _context.Colleges.Remove(College);
+                Department = department;
+                _context.Departments.Remove(Department);
                 await _context.SaveChangesAsync();
             }
 

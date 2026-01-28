@@ -56,19 +56,27 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Input.SelectedCollege" class="form-label"></label>
-                <select asp-for="Input.SelectedCollege" asp-items="Model.CollegeOptions" class="form-select">
+                <label asp-for="Input.SelectedCollegeId" class="form-label"></label>
+                <select id="collegeSelect" asp-for="Input.SelectedCollegeId" asp-items="Model.CollegeOptions" class="form-select">
                     <option value="">Select a college</option>
                 </select>
-                <span asp-validation-for="Input.SelectedCollege" class="text-danger"></span>
+                <span asp-validation-for="Input.SelectedCollegeId" class="text-danger"></span>
+            </div>
+
+              <div class="mb-3">
+                <label asp-for="Input.SelectedSchoolId" class="form-label"></label>
+                <select id="schoolSelect" asp-for="Input.SelectedSchoolId" asp-items="Model.SchoolOptions" class="form-select">
+                    <option value="">Select a school</option>
+                </select>
+                <span asp-validation-for="Input.SelectedSchoolId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Input.SelectedDepartment" class="form-label"></label>
-                <select asp-for="Input.SelectedDepartment" asp-items="Model.DepartmentOptions" class="form-select">
+                <label asp-for="Input.SelectedDepartmentId" class="form-label"></label>
+                <select id="departmentSelect" asp-for="Input.SelectedDepartmentId" asp-items="Model.DepartmentOptions" class="form-select">
                     <option value="">Select a department</option>
                 </select>
-                <span asp-validation-for="Input.SelectedDepartment" class="text-danger"></span>
+                <span asp-validation-for="Input.SelectedDepartmentId" class="text-danger"></span>
             </div>
 
             <div class="d-grid mb-3">
@@ -85,4 +93,46 @@
 @*Shows client side errors in real time*@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const collegeSelect = document.getElementById('collegeSelect');
+        const schoolSelect = document.getElementById('schoolSelect');
+        const departmentSelect = document.getElementById('departmentSelect');
+
+        const resetDropdown = (target, text) => {
+            target.innerHTML = `<option value="">${text}</option>`;
+            target.disabled = true;
+        }
+
+        collegeSelect.addEventListener('change', async function() {
+            const collegeId = this.value;
+            resetDropdown(schoolSelect, "Select a school");
+            resetDropdown(departmentSelect, "Select a department");
+
+            if(collegeId){
+                const response = await fetch(`?handler=Schools&collegeId=${collegeId}`);
+                const schools = await response.json();
+
+                schools.forEach(s => {
+                       schoolSelect.innerHTML += `<option value="${s.schoolId}">${s.schoolName}</option>`;                
+                });
+                schoolSelect.disabled = false;
+            }
+        });
+
+         schoolSelect.addEventListener('change', async function() {
+            const schoolId = this.value;
+            resetDropdown(departmentSelect, "Select a department");
+
+            if(schoolId){
+                const response = await fetch(`?handler=Departments&schoolId=${schoolId}`);
+                const depts = await response.json();
+
+                depts.forEach(d => {
+                    departmentSelect.innerHTML += `<option value="${d.departmentId}">${d.departmentName}</option>`
+                });
+                departmentSelect.disabled = false;
+            }
+        });
+    </script>
 }

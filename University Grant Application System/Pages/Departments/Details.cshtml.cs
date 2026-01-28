@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Pages.AdminDashboard
+namespace University_Grant_Application_System.Pages.Departments
 {
     public class DetailsModel : PageModel
     {
@@ -19,7 +19,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
             _context = context;
         }
 
-        public User Users { get; set; } = default!;
+        public Department Department { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,11 +28,11 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                 return NotFound();
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(m => m.UserId == id);
+            var department = await _context.Departments.FirstOrDefaultAsync(m => m.DepartmentId == id);
 
-            if (user is not null)
+            if (department is not null)
             {
-                Users = user;
+                Department = department;
 
                 return Page();
             }

@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using University_Grant_Application_System.Data;
+using University_Grant_Application_System.Models;
 
 namespace University_Grant_Application_System.Pages
 {
@@ -14,18 +17,23 @@ namespace University_Grant_Application_System.Pages
         public decimal Amount { get; set; }
 
         public decimal TaxAmount { get; set; }
-
     }
+
     public class ApplicationPageModel : PageModel
     {
+        private readonly University_Grant_Application_SystemContext _context;
+
+        public ApplicationPageModel(University_Grant_Application_SystemContext context)
+        {
+            _context = context;
+        }
 
         [BindProperty]
         [Required]
         [Display(Name = "Index number")]
-        public string IndexNumber { get; set; }
-
+        public int IndexNumber { get; set; }
+        
         //This is for the dropdown menu for Primaryuser || Type of user
-
         [BindProperty]
         [Required]
         [Display(Name = "User")]
@@ -89,14 +97,32 @@ namespace University_Grant_Application_System.Pages
 
         [BindProperty]
         public List<IncomeSource> IncomeSources { get; set; } = new();
-        public void OnGet()
+
+        public async Task<IActionResult> OnGetAsync()
         {
-            // Preload RSPG as the main application funding
+            // 1️⃣ Prefill user info from the database
+            var userEmail = User.Identity?.Name;
+
+            if (userEmail != null)
+            {
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == userEmail);
+
+                if (currentUser != null)
+                {
+                    PrimaryInvestigator = $"{currentUser.FirstName} {currentUser.LastName}";
+                    IndexNumber = currentUser.AccountID;
+                }
+            }
+
+            // 2️⃣ Preload RSPG as the main application funding
             IncomeSources.Add(new IncomeSource
             {
                 SourceName = "RSPG",
                 Amount = 0
             });
+
+            return Page();
         }
 
         public IActionResult OnPost()

@@ -82,6 +82,8 @@ namespace University_Grant_Application_System.Pages
         [BindProperty]
         public bool HumansOrAnimals { get; set; }
 
+        [BindProperty]
+        public IFormFile UploadFile { get; set; }
         // Supporting documents (one required, two optional)
         [BindProperty]
         [Display(Name = "Required supporting document")]
@@ -114,6 +116,9 @@ namespace University_Grant_Application_System.Pages
                     IndexNumber = currentUser.AccountID;
                 }
             }
+            return Page();
+        }
+
 
             // 2️⃣ Preload RSPG as the main application funding
             IncomeSources.Add(new IncomeSource
@@ -125,7 +130,7 @@ namespace University_Grant_Application_System.Pages
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Ensure required file present
             if (RequiredDocument == null || RequiredDocument.Length == 0)
@@ -140,14 +145,31 @@ namespace University_Grant_Application_System.Pages
 
             if (!ModelState.IsValid)
             {
-
                 return Page();
             }
 
+            if (UploadFile != null && UploadFile.Length > 0)
+            {
+                var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
+                var uploadPath = Path.Combine("wwwroot/uploads", uniqueName);
+
+                using (var stream = System.IO.File.Create(uploadPath))
+                {
+                    await UploadFile.CopyToAsync(stream);
+                }
+
+                TempData["UploadSuccess"] = $"Successfully uploaded: {UploadFile.FileName}";
+            }
+
+            // TODO: Save the application data to the database here
+            // var application = new Application { ... };
+            // _context.Applications.Add(application);
+            // await _context.SaveChangesAsync();
             // TODO: calculate and display taxes
             // TODO: process/save uploaded files (RequiredDocument, OptionalDocument1, OptionalDocument2)
 
             return Content("Success! Your application has been submitted.");
         }
+
     }
 }

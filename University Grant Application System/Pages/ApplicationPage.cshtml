@@ -71,9 +71,19 @@
             <label asp-for="HumansOrAnimals" class="form-check-label">Does your research use Humans or Animals?</label>
         </div>
 
-        <div id="fileUploadSection" style="display:none;">
-            <label class="form-label">IBR Documenation Approval</label>
-            <input type="file" class="form-control" />
+        <div id="fileUploadSection" style="display:none;"> 
+            <label class="form-label">IBR Documentation Approval</label> 
+            
+            <!-- Hidden file input bound to UploadFile --> 
+            <input type="file" asp-for="UploadFile" id="fileInput" style="display:none" /> 
+            
+            <!-- Button that opens the file picker --> 
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click();"> 
+                Upload File
+            </button> 
+
+            <!-- Filename appears here --> 
+            <span id="fileName" class="text-muted" style="display:none;"></span> 
         </div>
 
         <!-- New supporting documents section -->
@@ -141,6 +151,22 @@
         });
     </script>
 
+    <script>
+        // USED FOR FILE UPLOADER
+           document.getElementById('fileInput').addEventListener('change', function () {
+               const fileNameSpan = document.getElementById('fileName');
+
+               if (this.files.length > 0) {
+                   const fileName = this.files[0].name;
+
+                   // Show filename
+                   fileNameSpan.textContent = fileName;
+                   fileNameSpan.style.display = 'inline';
+
+               }
+           });
+    </script>
+    
     @* Add Income Source dynamic inputs *@
     <script>
         const maxSources = 4;

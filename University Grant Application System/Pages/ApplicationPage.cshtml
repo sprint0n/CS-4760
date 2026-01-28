@@ -86,7 +86,51 @@
             <span id="fileName" class="text-muted" style="display:none;"></span> 
         </div>
 
+        <!-- New supporting documents section -->
+        <div class="mt-4">
+            <h4>Supporting Documents</h4>
+            <p>One required document and two optional documents.</p>
 
+            <div class="mb-3">
+                <label asp-for="RequiredDocument" class="form-label"></label>
+                <input asp-for="RequiredDocument" type="file" class="form-control" />
+                <span asp-validation-for="RequiredDocument" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="OptionalDocument1" class="form-label"></label>
+                <input asp-for="OptionalDocument1" type="file" class="form-control" />
+                <span asp-validation-for="OptionalDocument1" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="OptionalDocument2" class="form-label"></label>
+                <input asp-for="OptionalDocument2" type="file" class="form-control" />
+                <span asp-validation-for="OptionalDocument2" class="text-danger"></span>
+            </div>
+        </div>
+
+        <h4>Other Sources of Funding (Max 4)</h4>
+        <div class="income-section mb-4">
+            <div id="incomeSourcesContainer">
+                @for (int i = 0; i < Model.IncomeSources.Count; i++)
+                {
+                    <div class="income-source mb-3 border p-3" data-index="@i">
+                        <label>Source Name</label>
+                        <input asp-for="IncomeSources[@i].SourceName" class="form-control" />
+
+                        <label>Amount ($)</label>
+                        <input asp-for="IncomeSources[@i].Amount"
+                               class="form-control"
+                               type="number"
+                               step="0.01" />
+                    </div>
+                }
+            </div>
+            <button type="button" id="addSourceBtn" class="btn btn-secondary">
+                Add Additional Income Source
+            </button>
+        </div>
 
         <button type="submit" class="btn btn-primary">Submit Application</button>
     </form>
@@ -94,10 +138,10 @@
 
 
 @section Scripts {
-    @* This enables client-side validation (errors pop up without refreshing) *@
+    @* Client-side validation *@
     <partial name="_ValidationScriptsPartial" />
 
-    @*This is the script to enable the file upload for the animals*@
+    @* File upload show/hide logic *@
     <script>
         const checkbox = document.getElementById("HumansAnimalsCheck");
         const uploadSection = document.getElementById("fileUploadSection");
@@ -123,4 +167,38 @@
            });
     </script>
     
+    @* Add Income Source dynamic inputs *@
+    <script>
+        const maxSources = 4;
+
+        document.getElementById("addSourceBtn").addEventListener("click", () => {
+            const container = document.getElementById("incomeSourcesContainer");
+            const currentCount = container.querySelectorAll(".income-source").length;
+
+            if (currentCount >= maxSources) {
+                alert("You can enter a maximum of " + maxSources + " income sources.");
+                return;
+            }
+
+            const newIndex = currentCount;
+
+            const div = document.createElement("div");
+            div.classList.add("income-source", "mb-3", "border", "p-3");
+            div.setAttribute("data-index", newIndex);
+
+            div.innerHTML = `
+                <label>Source Name</label>
+                <input name="IncomeSources[${newIndex}].SourceName"
+                       class="form-control" />
+
+                <label>Amount ($)</label>
+                <input name="IncomeSources[${newIndex}].Amount"
+                       class="form-control"
+                       type="number"
+                       step="0.01" />
+            `;
+
+            container.appendChild(div);
+        });
+    </script>
 }

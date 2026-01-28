@@ -60,12 +60,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.Users[0].LastName)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Users[0].School)
-            </th>
-            <th>
+             <th>
                 @Html.DisplayNameFor(model => model.Users[0].College)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Users[0].School)
+            </th
             <th>
                 @Html.DisplayNameFor(model => model.Users[0].Department)
             </th>
@@ -88,13 +88,13 @@
                 @Html.DisplayFor(modelItem => item.LastName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.School)
+                @Html.DisplayFor(modelItem => item.College.CollegeName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.College)
+                @Html.DisplayFor(modelItem => item.School.SchoolName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Department)
+                @Html.DisplayFor(modelItem => item.Department.DepartmentName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Email)

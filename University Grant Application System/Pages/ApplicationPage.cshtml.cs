@@ -104,29 +104,25 @@ namespace University_Grant_Application_System.Pages
         {
             // 1️⃣ Prefill user info from the database
             var userEmail = User.Identity?.Name;
-
+        
             if (userEmail != null)
             {
                 var currentUser = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == userEmail);
-
+        
                 if (currentUser != null)
                 {
                     PrimaryInvestigator = $"{currentUser.FirstName} {currentUser.LastName}";
                     IndexNumber = currentUser.AccountID;
                 }
             }
-            return Page();
-        }
-
-
-            // 2️⃣ Preload RSPG as the main application funding
-            IncomeSources.Add(new IncomeSource
+        
+            IncomeSources.Add(new IncomeSource()
             {
                 SourceName = "RSPG",
                 Amount = 0
             });
-
+        
             return Page();
         }
 

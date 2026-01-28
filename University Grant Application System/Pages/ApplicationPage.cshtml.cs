@@ -72,7 +72,8 @@ namespace University_Grant_Application_System.Pages
         [BindProperty]
         public bool HumansOrAnimals { get; set; }
 
-
+        [BindProperty]
+        public IFormFile UploadFile { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -92,20 +93,34 @@ namespace University_Grant_Application_System.Pages
             return Page();
         }
 
-     
 
-
-
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
-
                 return Page();
             }
 
+            if (UploadFile != null && UploadFile.Length > 0)
+            {
+                var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
+                var uploadPath = Path.Combine("wwwroot/uploads", uniqueName);
+
+                using (var stream = System.IO.File.Create(uploadPath))
+                {
+                    await UploadFile.CopyToAsync(stream);
+                }
+
+                TempData["UploadSuccess"] = $"Successfully uploaded: {UploadFile.FileName}";
+            }
+
+            // TODO: Save the application data to the database here
+            // var application = new Application { ... };
+            // _context.Applications.Add(application);
+            // await _context.SaveChangesAsync();
 
             return Content("Success! Your application has been submitted.");
         }
+
     }
 }

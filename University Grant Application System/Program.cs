@@ -9,7 +9,24 @@ string appDataPath = Path.Combine(projectRoot, "App_Data");
 AppDomain.CurrentDomain.SetData("DataDirectory", appDataPath);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/AdminDashboard", "AdminOnly");
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
+});
+
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.Cookie.Name = "UserAuthCookie";
+        options.LoginPath = "/Index"; 
+        options.AccessDeniedPath = "/AccessDenied";
+    });
+
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -30,10 +47,12 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
+
 
 app.Run();

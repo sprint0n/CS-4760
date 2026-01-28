@@ -25,6 +25,8 @@ public class RegisterModel : PageModel
     public List<SelectListItem> CollegeOptions { get; set; }
     public List<SelectListItem> DepartmentOptions { get; set; }
 
+    public List<SelectListItem> SchoolOptions { get; set; }
+
     public async Task OnGetAsync()
     {
         await LoadDropdowns();
@@ -32,37 +34,33 @@ public class RegisterModel : PageModel
 
     private async Task LoadDropdowns()
     {
-        var collegeList = new List<string> { "Engineering", "Mathematics" };
-        var departmentList = new List<string> { "Computer Science", "Statistics" };
+        var colleges = await _context.Colleges.ToListAsync();
+        var departments = await _context.Departments.ToListAsync();
+        var schools = await _context.Schools.ToListAsync();
 
         try
         {
-            var dbColleges = await _context.User
-                .Select(u => u.College)
-                .Distinct()
-                .ToListAsync();
+            CollegeOptions = colleges
+              .Select(c => new SelectListItem {
+                Value = c.CollegeId.ToString(),
+                Text = c.CollegeName
+              }).ToList();
 
-            var dbDepts = await _context.User
-                .Select(u => u.Department)
-                .Distinct()
-                .ToListAsync();
-
-            collegeList = collegeList.Union(dbColleges).ToList();
-            departmentList = departmentList.Union(dbDepts).ToList();
+            DepartmentOptions = departments
+              .Select(c => new SelectListItem
+              {
+                  Value = c.DepartmentId.ToString(),
+                  Text = c.DepartmentName
+              }).ToList();
         }
         catch (Exception ex)
         {
             Console.WriteLine("Database query failed: " + ex.Message);
         }
 
-        CollegeOptions = collegeList.Where(x => !string.IsNullOrEmpty(x))
-            .Select(c => new SelectListItem(c, c)).ToList();
-        DepartmentOptions = departmentList.Where(x => !string.IsNullOrEmpty(x))
-            .Select(d => new SelectListItem(d, d)).ToList();
     }
     public async Task<IActionResult> OnPostAsync()
     {
-        
 
         if (!ModelState.IsValid) // Fail
         {
@@ -78,19 +76,38 @@ public class RegisterModel : PageModel
             LastName = Input.LastName,
             Birthday = Input.Birthday,
             Email = Input.Email,
-            Department = Input.SelectedDepartment,
-            College = Input.SelectedCollege,
             HashedPassword = hashedPassword,
-            School = "Placeholder",
-            AccountID = Input.AccountIndex
+            AccountID = Input.AccountIndex,
+            CollegeId = Input.SelectedCollegeId,
+            SchoolId = Input.SelectedSchoolId,
+            DepartmentId = Input.SelectedDepartmentId,
+            userType = "Teacher"
         };
 
-        _context.User.Add(newUser);
+        _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
 
 
 
         return RedirectToPage("/Index");
+    }
+
+    public async Task<JsonResult> OnGetSchoolsAsync(int collegeId)
+    {
+        var schools = await _context.Schools
+            .Where(s => s.CollegeId == collegeId)
+            .Select(s => new { s.SchoolId, s.SchoolName })
+            .ToListAsync();
+        return new JsonResult(schools);
+    }
+
+    public async Task<JsonResult> OnGetDepartmentsAsync(int schoolId)
+    {
+        var departments = await _context.Departments
+            .Where(s => s.SchoolId == schoolId)
+            .Select(s => new { s.DepartmentId, s.DepartmentName })
+            .ToListAsync();
+        return new JsonResult(departments);
     }
 
     //Class to hold form inputs
@@ -135,10 +152,14 @@ public class RegisterModel : PageModel
 
         [Required(ErrorMessage = "Please select a college")]
         [Display(Name = "College")]
-        public string SelectedCollege { get; set; }
+        public int SelectedCollegeId { get; set; }
 
         [Required(ErrorMessage = "Please select a department")]
         [Display(Name = "Department")]
-        public string SelectedDepartment { get; set; }
+        public int SelectedDepartmentId { get; set; }
+
+        [Required(ErrorMessage = "Please select a school")]
+        [Display(Name = "School")]
+        public int SelectedSchoolId { get; set; }
     }
 }

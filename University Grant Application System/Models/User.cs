@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace University_Grant_Application_System.Models
 {
@@ -6,14 +8,12 @@ namespace University_Grant_Application_System.Models
     {
         [Key]
         [Required]
-        public int Id { get; set; }
+        public int UserId { get; set; }
         [Required]
         public string FirstName { get; set; } = string.Empty;
         [Required]
         public string LastName {  get; set; } = string.Empty;
-        public string School { get; set; } = string.Empty;
-        public string College { get; set; } = string.Empty;
-        public string Department { get; set; } = string.Empty;
+
         [Required]
         public string Email { get; set; } = string.Empty;
         [Required]
@@ -23,6 +23,20 @@ namespace University_Grant_Application_System.Models
 
         public DateOnly Birthday { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddYears(-20));
 
-        public bool isAdmin { get; set; } = false;
+        public string userType { get; set; } = string.Empty;
+
+
+        public int? SchoolId { get; set; }
+        [ForeignKey("SchoolId")]
+        public School? School { get; set; }
+
+        // Foreign Key
+        public int? CollegeId { get; set; }
+        [ForeignKey("CollegeId")]
+        public College? College { get; set; }
+
+        public int? DepartmentId { get; set; }
+        [ForeignKey("DepartmentId")]
+        public Department? Department { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace University_Grant_Application_System.Pages.Colleges
                 return NotFound();
             }
 
-            var college = await _context.Colleges.FirstOrDefaultAsync(m => m.Id == id);
+            var college = await _context.Colleges.FirstOrDefaultAsync(m => m.CollegeId == id);
 
             if (college is not null)
             {

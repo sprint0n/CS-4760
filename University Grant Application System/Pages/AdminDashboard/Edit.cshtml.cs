@@ -30,7 +30,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                 return NotFound();
             }
 
-            var user =  await _context.User.FirstOrDefaultAsync(m => m.Id == id);
+            var user =  await _context.Users.FirstOrDefaultAsync(m => m.UserId == id);
             if (user == null)
             {
                 return NotFound();
@@ -56,7 +56,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(Users.Id))
+                if (!UserExists(Users.UserId))
                 {
                     return NotFound();
                 }
@@ -71,7 +71,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
 
         private bool UserExists(int id)
         {
-            return _context.User.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.UserId == id);
         }
     }
 }

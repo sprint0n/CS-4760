@@ -72,18 +72,12 @@
         </div>
 
         <div id="fileUploadSection" style="display:none;"> 
-            <label class="form-label">IBR Documentation Approval</label> 
-            
-            <!-- Hidden file input bound to UploadFile --> 
-            <input type="file" asp-for="UploadFile" id="fileInput" style="display:none" /> 
-            
-            <!-- Button that opens the file picker --> 
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click();"> 
-                Upload File
-            </button> 
-
-            <!-- Filename appears here --> 
-            <span id="fileName" class="text-muted" style="display:none;"></span> 
+            <div class="mb-3"> 
+                <label asp-for="UploadFile" class="form-label">
+                    IRB Documentation Approval
+                </label> <input asp-for="UploadFile" type="file" class="form-control" /> 
+                <span asp-validation-for="UploadFile" class="text-danger"></span> 
+            </div> 
         </div>
 
         <!-- New supporting documents section -->

@@ -84,6 +84,7 @@ namespace University_Grant_Application_System.Pages
 
         [BindProperty]
         public IFormFile UploadFile { get; set; }
+
         // Supporting documents (one required, two optional)
         [BindProperty]
         [Display(Name = "Required supporting document")]
@@ -116,8 +117,6 @@ namespace University_Grant_Application_System.Pages
                     IndexNumber = currentUser.AccountID;
                 }
             }
-            return Page();
-        }
 
 
             // 2️⃣ Preload RSPG as the main application funding
@@ -126,8 +125,30 @@ namespace University_Grant_Application_System.Pages
                 SourceName = "RSPG",
                 Amount = 0
             });
-
             return Page();
+        }
+
+        private async Task<string?> SaveFileAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return null;
+
+            // Ensure upload folder exists
+            var uploadFolder = Path.Combine("wwwroot", "uploads");
+            Directory.CreateDirectory(uploadFolder);
+
+            // Create unique filename with original extension
+            var extension = Path.GetExtension(file.FileName);
+            var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
+
+            var filePath = Path.Combine(uploadFolder, uniqueName);
+
+            using (var stream = System.IO.File.Create(filePath))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return uniqueName; // return stored filename for DB
         }
 
         public async Task<IActionResult> OnPost()
@@ -148,18 +169,11 @@ namespace University_Grant_Application_System.Pages
                 return Page();
             }
 
-            if (UploadFile != null && UploadFile.Length > 0)
-            {
-                var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
-                var uploadPath = Path.Combine("wwwroot/uploads", uniqueName);
-
-                using (var stream = System.IO.File.Create(uploadPath))
-                {
-                    await UploadFile.CopyToAsync(stream);
-                }
-
-                TempData["UploadSuccess"] = $"Successfully uploaded: {UploadFile.FileName}";
-            }
+            // Save all uploaded files
+            var irbFileName = await SaveFileAsync(UploadFile); 
+            var requiredDocFileName = await SaveFileAsync(RequiredDocument); 
+            var optional1FileName = await SaveFileAsync(OptionalDocument1); 
+            var optional2FileName = await SaveFileAsync(OptionalDocument2);
 
             // TODO: Save the application data to the database here
             // var application = new Application { ... };

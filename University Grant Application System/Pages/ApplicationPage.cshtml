@@ -33,12 +33,33 @@
             </div>
         </div>
 
+
         <div class="mb-3">
-            <label asp-for="PrimaryInvestigator" class="form-label">
-                Primary Investigator
-            </label>
-            <input asp-for="PrimaryInvestigator" class="form-control" />
+            <label asp-for="PrimaryInvestigator" class="form-label">Primary Investigator</label>
+            <select asp-for="PrimaryInvestigator" class="form-select">
+                <option value="">-- Select Investigator --</option>
+                @foreach (var userName in Model.AllUsers)
+                {
+                    <option value="@userName">@userName</option>
+                }
+            </select>
             <span asp-validation-for="PrimaryInvestigator" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">
+                Name:
+            </label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Department" class="form-label">
+                Department:
+            </label>
+            <input asp-for="Department" class="form-control" />
+            <span asp-validation-for="Department" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -54,10 +75,11 @@
             <span asp-validation-for="GrantPurpose" class="text-danger"></span>
         </div>
 
+
         <div>
-            <label asp-for="Procedure" class="form-label"></label>
-            <textarea asp-for="Procedure" class="form-control" rows="4"></textarea>
-            <span asp-validation-for="Procedure" class="text-danger"></span>
+            <label asp-for="DissemenationBudget" class="form-label"></label>
+            <textarea asp-for="DissemenationBudget" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="DissemenationBudget" class="text-danger"></span>
         </div>
 
         <div>
@@ -79,6 +101,23 @@
                 <span asp-validation-for="UploadFile" class="text-danger"></span> 
             </div> 
         </div>
+
+        <div class="form-check">
+            <input asp-for="HasPastFunding" class="form-check-input" id="PastFundingCheck" />
+            <label class="form-check-label">Received past funding (Last 5 years)?</label>
+        </div>
+
+        <div id="HasPastBudget" style="display:none">
+            <div class="mb-3">
+                <label asp-for="PastBudget" class="form-label"> Past Budgets
+                </label>
+                <textarea asp-for="PastBudget" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="PastBudget" class="text-danger"></span>
+            </div>
+        </div>
+
+
+
 
         <!-- New supporting documents section -->
         <div class="mt-4">
@@ -139,9 +178,16 @@
     <script>
         const checkbox = document.getElementById("HumansAnimalsCheck");
         const uploadSection = document.getElementById("fileUploadSection");
+        const pastFundingCheck = document.getElementById("PastFundingCheck");
+        const pastBudget = document.getElementById("HasPastBudget");
 
-        checkbox.addEventListener("change", function () {
+
+           checkbox.addEventListener("change", function () {
             uploadSection.style.display = this.checked ? "block" : "none";
+        });
+
+           pastFundingCheck.addEventListener("change", function () {
+            pastBudget.style.display = this.checked ? "block" : "none";
         });
     </script>
 

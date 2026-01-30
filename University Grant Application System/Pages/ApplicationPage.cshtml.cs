@@ -39,6 +39,12 @@ namespace University_Grant_Application_System.Pages
         [Display(Name = "User")]
         public string TypeOfUser { get; set; }
 
+        //This is the user's department
+        [BindProperty]
+        public string Department { get; set; }
+        
+        public List<string> AllUsers { get; set; }
+
         public List<string> UserTypes { get; } = new List<string>
         {
             "PrimaryUser",
@@ -58,6 +64,9 @@ namespace University_Grant_Application_System.Pages
         [Required(ErrorMessage = "Primary Investigator is required")]
         public string PrimaryInvestigator { get; set; }
 
+        [BindProperty]
+        [Required]
+        public string Name { get; set; }
 
         [BindProperty]
         [Required(ErrorMessage = "Please enter in the title")]
@@ -68,6 +77,15 @@ namespace University_Grant_Application_System.Pages
         [Required]
         [Display(Name = "Grant Purpose")]
         public string GrantPurpose { get; set; }
+
+
+        [BindProperty]
+        public bool HasPastFunding { get; set; }
+
+
+        [BindProperty]
+        [Required]
+        public string DissemenationBudget { get; set; }
 
         [BindProperty]
         [Required]
@@ -84,6 +102,9 @@ namespace University_Grant_Application_System.Pages
 
         [BindProperty]
         public IFormFile UploadFile { get; set; }
+
+        [BindProperty]
+        public string? PastBudget { get; set; }
 
         // Supporting documents (one required, two optional)
         [BindProperty]
@@ -109,14 +130,25 @@ namespace University_Grant_Application_System.Pages
             if (userEmail != null)
             {
                 var currentUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == userEmail);
+              .Include(u => u.Department)
+              .FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (currentUser != null)
                 {
-                    PrimaryInvestigator = $"{currentUser.FirstName} {currentUser.LastName}";
+                    Name = $"{currentUser.FirstName} {currentUser.LastName}";
                     IndexNumber = currentUser.AccountID;
+
+                    Department = currentUser.Department?.DepartmentName ?? " No assigned department";
+
+     
                 }
             }
+
+            
+
+            AllUsers = await _context.Users
+            .Select(u => u.FirstName + " " + u.LastName)
+            .ToListAsync();
 
 
             // 2️⃣ Preload RSPG as the main application funding
@@ -126,6 +158,10 @@ namespace University_Grant_Application_System.Pages
                 Amount = 0
             });
             return Page();
+
+
+     
+
         }
 
         private async Task<string?> SaveFileAsync(IFormFile file)

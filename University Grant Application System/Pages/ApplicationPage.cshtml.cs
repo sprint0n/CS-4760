@@ -1,13 +1,13 @@
-using System.ComponentModel.DataAnnotations; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
 namespace University_Grant_Application_System.Pages
 {
+    // Helper class for the View (Income rows)
     public class IncomeSource
     {
         [Required]
@@ -32,8 +32,8 @@ namespace University_Grant_Application_System.Pages
         [Required]
         [Display(Name = "Index number")]
         public int IndexNumber { get; set; }
-        
-        //This is for the dropdown menu for Primaryuser || Type of user
+
+        // Dropdown menu for User Type
         [BindProperty]
         [Required]
         [Display(Name = "User")]
@@ -41,14 +41,9 @@ namespace University_Grant_Application_System.Pages
 
         public List<string> UserTypes { get; } = new List<string>
         {
-            "PrimaryUser",
-            "Student",
-            "Faculty",
-            "Staff",
-            "External Researcher"
+            "PrimaryUser", "Student", "Faculty", "Staff", "External Researcher"
         };
 
-        //This is the name for the Procedure
         [BindProperty]
         [Required]
         [Display(Name = "Procedures")]
@@ -58,11 +53,9 @@ namespace University_Grant_Application_System.Pages
         [Required(ErrorMessage = "Primary Investigator is required")]
         public string PrimaryInvestigator { get; set; }
 
-
         [BindProperty]
         [Required(ErrorMessage = "Please enter in the title")]
         public string GrantTitle { get; set; }
-
 
         [BindProperty]
         [Required]
@@ -74,17 +67,12 @@ namespace University_Grant_Application_System.Pages
         [Display(Name = "Timeline")]
         public string Timeline { get; set; }
 
-
-        /// <summary>
-        /// This is used for the Humans or Animals checkbox
-        /// True opens file upload
-        /// </summary>
         [BindProperty]
         public bool HumansOrAnimals { get; set; }
 
         [BindProperty]
         public IFormFile UploadFile { get; set; }
-        // Supporting documents (one required, two optional)
+
         [BindProperty]
         [Display(Name = "Required supporting document")]
         public IFormFile RequiredDocument { get; set; }
@@ -100,9 +88,13 @@ namespace University_Grant_Application_System.Pages
         [BindProperty]
         public List<IncomeSource> IncomeSources { get; set; } = new();
 
+        // YOUR BUDGET PROPERTY
+        [BindProperty]
+        public List<PersonnelExpense> PersonnelExpenses { get; set; } = new List<PersonnelExpense>();
+
         public async Task<IActionResult> OnGetAsync()
         {
-            // 1️⃣ Prefill user info from the database
+            // 1. Prefill user info from the database
             var userEmail = User.Identity?.Name;
 
             if (userEmail != null)
@@ -116,11 +108,9 @@ namespace University_Grant_Application_System.Pages
                     IndexNumber = currentUser.AccountID;
                 }
             }
-            return Page();
-        }
 
-
-            // 2️⃣ Preload RSPG as the main application funding
+            // 2. Preload RSPG as the main application funding
+            // (Moved inside the method to fix the red errors)
             IncomeSources.Add(new IncomeSource
             {
                 SourceName = "RSPG",
@@ -132,7 +122,7 @@ namespace University_Grant_Application_System.Pages
 
         public async Task<IActionResult> OnPost()
         {
-            // Ensure required file present
+            // 1. Validation
             if (RequiredDocument == null || RequiredDocument.Length == 0)
             {
                 ModelState.AddModelError(nameof(RequiredDocument), "The required supporting document must be uploaded.");
@@ -148,6 +138,7 @@ namespace University_Grant_Application_System.Pages
                 return Page();
             }
 
+            // 2. Handle File Upload
             if (UploadFile != null && UploadFile.Length > 0)
             {
                 var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
@@ -161,15 +152,36 @@ namespace University_Grant_Application_System.Pages
                 TempData["UploadSuccess"] = $"Successfully uploaded: {UploadFile.FileName}";
             }
 
-            // TODO: Save the application data to the database here
-            // var application = new Application { ... };
-            // _context.Applications.Add(application);
-            // await _context.SaveChangesAsync();
-            // TODO: calculate and display taxes
-            // TODO: process/save uploaded files (RequiredDocument, OptionalDocument1, OptionalDocument2)
+            // 3. Save to Database (Using FormTable)
+            // We combine missing columns (Timeline, Inv) into Description so they are saved.
+            var formEntry = new FormTable
+            {
+                Title = GrantTitle,          // Maps to FormTable.Title
+                Procedure = Procedure,       // Maps to FormTable.Procedure
+                UserId = 1,                  // Placeholder ID (Update this logic later if needed)
+                Description = $"{GrantPurpose} | Inv: {PrimaryInvestigator} | Time: {Timeline}"
+            };
 
-            return Content("Success! Your application has been submitted.");
+            _context.FormTable.Add(formEntry);
+            await _context.SaveChangesAsync(); // Generates the ID
+
+            // 4. Save Personnel Expenses
+            if (PersonnelExpenses != null && PersonnelExpenses.Count > 0)
+            {
+                foreach (var person in PersonnelExpenses)
+                {
+                    // Link the expense to the FormTable ID we just created
+                    person.ApplicationId = formEntry.Id;
+                    _context.PersonnelExpenses.Add(person);
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            // Note: We are not saving IncomeSources to the DB yet because
+            // 'IncomeSource' needs to be added to Database Context first.
+            // For now, only the Budget (Personnel) is saving to the database.
+
+            return Content("Success! Application and Budget saved.");
         }
-
     }
 }

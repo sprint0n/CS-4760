@@ -1,0 +1,97 @@
+﻿@model University_Grant_Application_System.Pages.ApplicationPageModel
+
+<div class="card mt-4 mb-4">
+    <div class="card-header bg-primary text-white">
+        <h3>Budget</h3>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs" id="budgetTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="personnel-tab" data-bs-toggle="tab" data-bs-target="#personnel" type="button" role="tab">Personnel</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="equipment-tab" data-bs-toggle="tab" data-bs-target="#equipment" type="button" role="tab">Equipment</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="travel-tab" data-bs-toggle="tab" data-bs-target="#travel" type="button" role="tab">Travel</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="other-tab" data-bs-toggle="tab" data-bs-target="#other" type="button" role="tab">Other</button>
+            </li>
+        </ul>
+
+        <div class="tab-content pt-3">
+            <div class="tab-pane fade show active" id="personnel" role="tabpanel">
+                <h5 class="mb-3">Personnel Expenses</h5>
+                <div id="personnel-container">
+                    <div class="personnel-row border p-3 mb-3 rounded bg-light">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Role</label>
+                                <select name="PersonnelExpenses[0].Role" class="form-control role-select" onchange="calculateTax(this)">
+                                    <option value="Student">Student</option>
+                                    <option value="Teacher">Teacher</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Description</label>
+                                <input type="text" name="PersonnelExpenses[0].Description" class="form-control" placeholder="Task description" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Amount ($)</label>
+                                <input type="number" name="PersonnelExpenses[0].Amount" class="form-control amount-input" oninput="calculateTax(this)" placeholder="0.00" />
+                            </div>
+                            <div class="col-md-3">
+                                <label>Taxed Amount ($)</label>
+                                <input type="number" name="PersonnelExpenses[0].TaxedAmount" class="form-control tax-output" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addPersonRow()">+ Add New Person</button>
+            </div>
+
+            <div class="tab-pane fade" id="equipment" role="tabpanel"><p class="p-3">Equipment Placeholder</p></div>
+            <div class="tab-pane fade" id="travel" role="tabpanel"><p class="p-3">Travel Placeholder</p></div>
+            <div class="tab-pane fade" id="other" role="tabpanel"><p class="p-3">Other Placeholder</p></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let personIndex = 1;
+    function addPersonRow() {
+        const container = document.getElementById('personnel-container');
+        const newRow = `
+        <div class="personnel-row border p-3 mb-3 rounded bg-light">
+            <div class="row">
+                <div class="col-md-3">
+                    <select name="PersonnelExpenses[${personIndex}].Role" class="form-control role-select" onchange="calculateTax(this)">
+                        <option value="Student">Student</option>
+                        <option value="Teacher">Teacher</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="PersonnelExpenses[${personIndex}].Description" class="form-control" placeholder="Description" />
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="PersonnelExpenses[${personIndex}].Amount" class="form-control amount-input" oninput="calculateTax(this)" placeholder="0.00" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="PersonnelExpenses[${personIndex}].TaxedAmount" class="form-control tax-output" readonly />
+                </div>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', newRow);
+        personIndex++;
+    }
+
+    function calculateTax(element) {
+        const row = element.closest('.row');
+        const role = row.querySelector('.role-select').value;
+        const amount = parseFloat(row.querySelector('.amount-input').value) || 0;
+        const taxBox = row.querySelector('.tax-output');
+        let rate = (role === "Student") ? 0.0825 : 0.225;
+        taxBox.value = (amount * rate).toFixed(2);
+    }
+</script>

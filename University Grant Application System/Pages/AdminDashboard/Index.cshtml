@@ -44,14 +44,26 @@
 </div>
 
 
-
-
-<h1>Index</h1>
-
 <p>
-    <a asp-page="Create">Create New</a>
+    <a class="btn btn-primary" asp-page="Create">Create New User</a>
 </p>
+
+<h2>Committee Members</h2>
+
 <table class="table">
+    <colgroup>
+        <col style="width: 8%;"> <!-- First Name -->
+        <col style="width: 8%;"> <!-- Last Name -->
+        <col style="width: 10%;"> <!-- College -->
+        <col style="width: 12%;"> <!-- School -->
+        <col style="width: 12%;"> <!-- Department -->
+        <col style="width: 15%;"> <!-- email -->
+        <col style="width: 9%;"> <!-- AccountId -->
+        <col style="width: 10%;"> <!-- Chair -->
+        <col style="width: 5%;"> <!-- Remove -->
+        <col style="width: 11%"> <!-- Modify -->
+    </colgroup>
+
     <thead>
         <tr>
             <th>
@@ -61,10 +73,10 @@
                 @Html.DisplayNameFor(model => model.Users[0].LastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Users[0].School)
+                @Html.DisplayNameFor(model => model.Users[0].College)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Users[0].College)
+                @Html.DisplayNameFor(model => model.Users[0].School)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Users[0].Department)
@@ -75,12 +87,21 @@
             <th>
                 @Html.DisplayNameFor(model => model.Users[0].AccountID)
             </th>
-            <th></th>
+            <th>
+                Make Chair
+            </th>
+            <th>
+                
+            </th>
+            <th>
+                
+            </th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Users) {
-        <tr>
+    @foreach (var item in Model.CommitteeMembers)
+    {
+        <tr class="@(item.committeeMemberStatus == "chair" ? "table-success" : "")">
             <td>
                 @Html.DisplayFor(modelItem => item.FirstName)
             </td>
@@ -88,13 +109,13 @@
                 @Html.DisplayFor(modelItem => item.LastName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.School)
+                @Html.DisplayFor(modelItem => item.College.CollegeName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.College)
+                @Html.DisplayFor(modelItem => item.School.SchoolName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Department)
+                @Html.DisplayFor(modelItem => item.Department.DepartmentName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Email)
@@ -103,12 +124,117 @@
                 @Html.DisplayFor(modelItem => item.AccountID)
             </td>
             <td>
+                @if (item.committeeMemberStatus == "chair")
+                {
+                    <span class="fw-bold">Chair</span>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="MakeChair" style="display:inline;">
+                        <input type="hidden" name="userId" value="@item.UserId" />
+                        <button class="btn btn-warning btn-sm">Make Chair</button>
+                    </form>
+                }
+            </td>
+            <td>
+                <form method="post" asp-page-handler="RemoveFromCommittee">
+                    <input type="hidden" name="userId" value="@item.UserId" />
+                    <button class="btn btn-danger btn-sm">Remove</button>
+                </form>
+            </td>
+            <td>
                 <a asp-page="./Edit" asp-route-id="@item.UserId">Edit</a> |
                 <a asp-page="./Details" asp-route-id="@item.UserId">Details</a> |
                 <a asp-page="./Delete" asp-route-id="@item.UserId">Delete</a>
             </td>
         </tr>
-}
+    }
+    </tbody>
+</table>
+
+<h2>Non-Committee Members</h2>
+
+<table class="table">
+    <colgroup>
+        <col style="width: 8%;">
+        <col style="width: 8%;">
+        <col style="width: 12%;">
+        <col style="width: 12%;">
+        <col style="width: 12%;">
+        <col style="width: 15%;">
+        <col style="width: 9%;">
+        <col style="width: 12%;">
+        <col style="width: 8%;">
+    </colgroup>
+
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Users[0].FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Users[0].LastName)
+            </th>
+             <th>
+                @Html.DisplayNameFor(model => model.Users[0].College)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Users[0].School)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Users[0].Department)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Users[0].Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Users[0].AccountID)
+            </th>
+            <th>
+                
+            </th>
+            <th>
+                
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Users) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.College.CollegeName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.School.SchoolName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department.DepartmentName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountID)
+            </td>
+            <td>
+                <form method="post" asp-page-handler="AddToCommittee" style="display:inline;">
+                    <input type="hidden" name="userId" value="@item.UserId" />
+                    <button class="btn btn-primary btn-sm">Add to Committee</button>
+                </form>
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.UserId">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.UserId">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.UserId">Delete</a>
+            </td>
+        </tr>
+    }
     </tbody>
 </table>
 

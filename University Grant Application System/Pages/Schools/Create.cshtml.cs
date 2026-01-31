@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Pages.Departments
+namespace University_Grant_Application_System.Pages.Schools
 {
     public class CreateModel : PageModel
     {
@@ -21,25 +21,22 @@ namespace University_Grant_Application_System.Pages.Departments
 
         public IActionResult OnGet()
         {
-            ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolName");
-            ViewData["DepartmentChairId"] = new SelectList(_context.Users, "UserId", "FirstName", "LastName");
+        ViewData["CollegeId"] = new SelectList(_context.Colleges, "CollegeId", "CollegeName");
             return Page();
         }
 
         [BindProperty]
-        public Department Department { get; set; } = default!;
+        public School School { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolName");
-                ViewData["DepartmentChairId"] = new SelectList(_context.Users, "UserId", "FirstName", "LastName");
                 return Page();
             }
 
-            _context.Departments.Add(Department);
+            _context.Schools.Add(School);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

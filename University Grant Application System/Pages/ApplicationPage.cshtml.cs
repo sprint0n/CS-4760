@@ -39,6 +39,12 @@ namespace University_Grant_Application_System.Pages
         [Display(Name = "User")]
         public string TypeOfUser { get; set; }
 
+        //This is the user's department
+        [BindProperty]
+        public string Department { get; set; }
+        
+        public List<string> AllUsers { get; set; }
+
         public List<string> UserTypes { get; } = new List<string>
         {
             "PrimaryUser", "Student", "Faculty", "Staff", "External Researcher"
@@ -61,6 +67,15 @@ namespace University_Grant_Application_System.Pages
         [Required]
         [Display(Name = "Grant Purpose")]
         public string GrantPurpose { get; set; }
+
+
+        [BindProperty]
+        public bool HasPastFunding { get; set; }
+
+
+        [BindProperty]
+        [Required]
+        public string DissemenationBudget { get; set; }
 
         [BindProperty]
         [Required]
@@ -100,12 +115,17 @@ namespace University_Grant_Application_System.Pages
             if (userEmail != null)
             {
                 var currentUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == userEmail);
+              .Include(u => u.Department)
+              .FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (currentUser != null)
                 {
-                    PrimaryInvestigator = $"{currentUser.FirstName} {currentUser.LastName}";
+                    Name = $"{currentUser.FirstName} {currentUser.LastName}";
                     IndexNumber = currentUser.AccountID;
+
+                    Department = currentUser.Department?.DepartmentName ?? " No assigned department";
+
+     
                 }
             }
 
@@ -116,8 +136,34 @@ namespace University_Grant_Application_System.Pages
                 SourceName = "RSPG",
                 Amount = 0
             });
-
             return Page();
+
+
+     
+
+        }
+
+        private async Task<string?> SaveFileAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return null;
+
+            // Ensure upload folder exists
+            var uploadFolder = Path.Combine("wwwroot", "uploads");
+            Directory.CreateDirectory(uploadFolder);
+
+            // Create unique filename with original extension
+            var extension = Path.GetExtension(file.FileName);
+            var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
+
+            var filePath = Path.Combine(uploadFolder, uniqueName);
+
+            using (var stream = System.IO.File.Create(filePath))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return uniqueName; // return stored filename for DB
         }
 
         public async Task<IActionResult> OnPost()

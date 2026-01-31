@@ -21,11 +21,25 @@ namespace University_Grant_Application_System.Pages.Departments
 
         public IList<Department> Department { get;set; } = default!;
 
+        public Dictionary<int, string> DepartmentChairs { get; set; } = new();
         public async Task OnGetAsync()
         {
             Department = await _context.Departments
                 .Include(d => d.School)
                 .ToListAsync();
+
+            var chairs = await _context.Users
+                .Where(u => u.userType.ToLower() == "chair" && u.DepartmentId != null)
+                .ToListAsync();
+
+            foreach (var dept in Department)
+            {
+                var chair = chairs.FirstOrDefault(u => u.DepartmentId == dept.DepartmentId);
+                DepartmentChairs[dept.DepartmentId] = chair != null
+                ? $"{chair.FirstName} {chair.LastName}"
+                : "No Chair Assigned";
+            }
+
         }
     }
 }

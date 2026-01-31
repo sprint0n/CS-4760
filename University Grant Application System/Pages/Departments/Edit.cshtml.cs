@@ -23,6 +23,9 @@ namespace University_Grant_Application_System.Pages.Departments
         [BindProperty]
         public Department Department { get; set; } = default!;
 
+        [BindProperty]
+        public int SelectedChairId { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -36,7 +39,22 @@ namespace University_Grant_Application_System.Pages.Departments
                 return NotFound();
             }
             Department = department;
-           ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolId");
+
+            var currentChair = await _context.Users
+                .FirstOrDefaultAsync(u => u.DepartmentId == id && u.userType == "chair");
+
+            if (currentChair != null)
+            {
+                SelectedChairId = currentChair.UserId;
+            }
+            
+            var deptUsers = _context.Users
+                .Where(u => u.DepartmentId == id)
+                .Select(u => new { u.UserId, FullName = u.FirstName + " " + u.LastName })
+                .ToList();
+
+            ViewData["ChairIdList"] = new SelectList(deptUsers, "UserId", "FullName");
+            ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolId");
             return Page();
         }
 
@@ -50,6 +68,23 @@ namespace University_Grant_Application_System.Pages.Departments
             }
 
             _context.Attach(Department).State = EntityState.Modified;
+
+
+            var oldChair = await _context.Users
+                .FirstOrDefaultAsync(u => u.DepartmentId == Department.DepartmentId && u.userType == "chair");
+
+            var newChair = await _context.Users.FindAsync(SelectedChairId); 
+
+            if (newChair != null && (oldChair == null || oldChair.UserId != newChair.UserId))
+            {
+           
+                if (oldChair != null)
+                {
+                    oldChair.userType = "teacher";
+                }
+                // Promote the new chair
+                newChair.userType = "chair";
+            }
 
             try
             {

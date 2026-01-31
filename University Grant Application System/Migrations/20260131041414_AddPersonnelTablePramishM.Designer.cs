@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University_Grant_Application_System.Data;
 
@@ -11,9 +12,11 @@ using University_Grant_Application_System.Data;
 namespace University_Grant_Application_System.Migrations
 {
     [DbContext(typeof(University_Grant_Application_SystemContext))]
-    partial class University_Grant_Application_SystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260131041414_AddPersonnelTablePramishM")]
+    partial class AddPersonnelTablePramishM
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,9 +50,6 @@ namespace University_Grant_Application_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
 
-                    b.Property<int>("DepartmentChairId")
-                        .HasColumnType("int");
-
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -72,26 +72,9 @@ namespace University_Grant_Application_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("EquipmentExpense")
-                        .HasColumnType("real");
-
-                    b.Property<string>("GrantPurpose")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("PersonalExpense")
-                        .HasColumnType("real");
-
-                    b.Property<int>("PrincipalInvestigatorID")
-                        .HasColumnType("int");
 
                     b.Property<string>("Procedure")
                         .IsRequired()
@@ -102,20 +85,8 @@ namespace University_Grant_Application_System.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<float>("TotalBudget")
-                        .HasColumnType("real");
-
-                    b.Property<float>("TravelExpense")
-                        .HasColumnType("real");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("isIRB")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("uploadedFile")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -214,10 +185,6 @@ namespace University_Grant_Application_System.Migrations
 
                     b.Property<int?>("SchoolId")
                         .HasColumnType("int");
-
-                    b.Property<string>("committeeMemberStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("userType")
                         .IsRequired()

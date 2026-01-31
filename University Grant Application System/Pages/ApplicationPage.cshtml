@@ -88,6 +88,8 @@
             <span asp-validation-for="Timeline" class="text-danger"></span>
         </div>
 
+        <partial name="Shared/_BudgetSection" model="Model" />
+
         <div class="form-check">
             <input asp-for="HumansOrAnimals" class="form-check-input" id="HumansAnimalsCheck"/>
             <label asp-for="HumansOrAnimals" class="form-check-label">Does your research use Humans or Animals?</label>

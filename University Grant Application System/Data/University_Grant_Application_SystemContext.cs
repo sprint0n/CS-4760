@@ -20,6 +20,7 @@ namespace University_Grant_Application_System.Data
         public DbSet<University_Grant_Application_System.Models.Department> Departments { get; set; } = default!;
 
         public DbSet<University_Grant_Application_System.Models.School> Schools { get; set; } = default!;
+        public DbSet<University_Grant_Application_System.Models.PersonnelExpense> PersonnelExpenses { get; set; } = default!;
 
     }
 }

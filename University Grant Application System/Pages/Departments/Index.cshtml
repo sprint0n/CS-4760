@@ -38,8 +38,8 @@
                 @Html.DisplayFor(modelItem => item.School.SchoolName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DepartmentChairId) 
-            </td>
+                @Model.DepartmentChairs[item.DepartmentId]            
+           </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.DepartmentId">Edit</a> |
                 <a asp-page="./Details" asp-route-id="@item.DepartmentId">Details</a> |

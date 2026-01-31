@@ -25,11 +25,10 @@
                 <span asp-validation-for="Department.SchoolId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Department.DepartmentChairId" class="control-label">Department Chair</label>
-                <select asp-for="Department.DepartmentChairId" class="form-control" asp-items="ViewBag.DepartmentChairId">
-                    <option value="">-- Select a Department Chair --</option>
+            <label class="control-label">Select Department Chair</label>
+                <select asp-for="SelectedChairId" class="form-control" asp-items="ViewBag.UserList">
+                    <option value="">-- Select a User --</option>
                 </select>
-                <span asp-validation-for="Department.DepartmentChairId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

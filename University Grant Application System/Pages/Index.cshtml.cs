@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using BCrypt.Net;
+using Humanizer;
 
 
 public class IndexModel : PageModel
@@ -37,7 +38,7 @@ public class IndexModel : PageModel
         }
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.ToLower()); 
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.ToLower());
         if (user == null)
         {
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -51,13 +52,19 @@ public class IndexModel : PageModel
             return Page();
 
         }
-    
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.Email),
             new Claim("UserId", user.UserId.ToString()),
-            new Claim(ClaimTypes.Role, user.userType.ToLower())
+            new Claim("UserType", user.userType),
+            new Claim("IsAdmin", user.isAdmin.ToString())
         };
+
+        if (user.isAdmin)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, "admin"));
+        }
         var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
         var authProperties = new AuthenticationProperties
         {
@@ -66,9 +73,9 @@ public class IndexModel : PageModel
         };
         await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(claimsIdentity), authProperties);
 
-       
 
-        if(user.userType.ToLower() == "admin")
+
+        if (user.isAdmin)
         {
             return RedirectToPage("/AdminDashboard/Index");
         }

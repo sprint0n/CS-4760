@@ -28,7 +28,9 @@ namespace University_Grant_Application_System.Pages.Departments
                 return NotFound();
             }
 
-            var department = await _context.Departments.FirstOrDefaultAsync(m => m.DepartmentId == id);
+            var department = await _context.Departments
+                .Include(d => d.School)
+                .FirstOrDefaultAsync(m => m.DepartmentId == id);
 
             if (department is not null)
             {

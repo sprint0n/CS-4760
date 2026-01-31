@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Pages.Departments
+namespace University_Grant_Application_System.Pages.Schools
 {
     public class IndexModel : PageModel
     {
@@ -19,13 +19,12 @@ namespace University_Grant_Application_System.Pages.Departments
             _context = context;
         }
 
-        public IList<Department> Department { get;set; } = default!;
+        public IList<School> School { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Department = await _context.Departments
-                .Include(d => d.School)
-                .ToListAsync();
+            School = await _context.Schools
+                .Include(s => s.College).ToListAsync();
         }
     }
 }

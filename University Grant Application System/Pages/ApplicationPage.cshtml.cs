@@ -42,7 +42,7 @@ namespace University_Grant_Application_System.Pages
         //This is the user's department
         [BindProperty]
         public string Department { get; set; }
-        
+
         public List<string> AllUsers { get; set; }
 
         public List<string> UserTypes { get; } = new List<string>
@@ -67,6 +67,12 @@ namespace University_Grant_Application_System.Pages
         [Required]
         [Display(Name = "Grant Purpose")]
         public string GrantPurpose { get; set; }
+
+        [BindProperty]
+        public string Name { get; set; } 
+
+        [BindProperty]
+        public string? PastBudget { get; set; }
 
 
         [BindProperty]
@@ -125,7 +131,7 @@ namespace University_Grant_Application_System.Pages
 
                     Department = currentUser.Department?.DepartmentName ?? " No assigned department";
 
-     
+
                 }
             }
 
@@ -139,7 +145,7 @@ namespace University_Grant_Application_System.Pages
             return Page();
 
 
-     
+
 
         }
 

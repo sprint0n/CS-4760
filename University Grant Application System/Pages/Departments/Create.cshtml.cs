@@ -22,12 +22,23 @@ namespace University_Grant_Application_System.Pages.Departments
         public IActionResult OnGet()
         {
             ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolName");
-            ViewData["DepartmentChairId"] = new SelectList(_context.Users, "UserId", "FirstName", "LastName");
+
+            var allUsers = _context.Users
+                .Select(u => new
+                {
+                    u.UserId,
+                    FullName = u.FirstName + " " + u.LastName
+                })
+                .ToList();
+
+            ViewData["UserList"] = new SelectList(allUsers, "UserId", "FullName");
             return Page();
         }
 
         [BindProperty]
         public Department Department { get; set; } = default!;
+        [BindProperty]
+        public int? SelectedChairId { get; set; }
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -35,12 +46,24 @@ namespace University_Grant_Application_System.Pages.Departments
             if (!ModelState.IsValid)
             {
                 ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolName");
-                ViewData["DepartmentChairId"] = new SelectList(_context.Users, "UserId", "FirstName", "LastName");
                 return Page();
             }
 
             _context.Departments.Add(Department);
             await _context.SaveChangesAsync();
+
+            if (SelectedChairId.HasValue)
+            {
+                var user = await _context.Users.FindAsync(SelectedChairId.Value);
+                if (user != null)
+                {
+                    user.userType = "chair";
+                    user.DepartmentId = Department.DepartmentId;
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
 
             return RedirectToPage("./Index");
         }

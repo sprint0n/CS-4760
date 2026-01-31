@@ -28,7 +28,9 @@ namespace University_Grant_Application_System.Pages.Schools
                 return NotFound();
             }
 
-            var school = await _context.Schools.FirstOrDefaultAsync(m => m.SchoolId == id);
+            var school = await _context.Schools
+                .Include(s => s.College)
+                .FirstOrDefaultAsync(m => m.SchoolId == id);
 
             if (school is not null)
             {

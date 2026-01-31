@@ -100,6 +100,9 @@ namespace University_Grant_Application_System.Pages
         [BindProperty]
         public List<IncomeSource> IncomeSources { get; set; } = new();
 
+        [BindProperty]
+        public List<PersonnelExpense> PersonnelExpenses { get; set; } = new List<PersonnelExpense>();
+
         public async Task<IActionResult> OnGetAsync()
         {
             // 1️⃣ Prefill user info from the database
@@ -116,19 +119,19 @@ namespace University_Grant_Application_System.Pages
                     IndexNumber = currentUser.AccountID;
                 }
             }
-            return Page();
-        }
-
-
-            // 2️⃣ Preload RSPG as the main application funding
             IncomeSources.Add(new IncomeSource
             {
                 SourceName = "RSPG",
                 Amount = 0
             });
-
             return Page();
         }
+
+
+        
+
+           
+       
 
         public async Task<IActionResult> OnPost()
         {

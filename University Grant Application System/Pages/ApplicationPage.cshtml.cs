@@ -135,6 +135,11 @@ namespace University_Grant_Application_System.Pages
                 }
             }
 
+            AllUsers = await _context.Users
+                .Select(u => u.FirstName + " " + u.LastName)
+                .ToListAsync();
+
+
             // 2. Preload RSPG as the main application funding
             // (Moved inside the method to fix the red errors)
             IncomeSources.Add(new IncomeSource

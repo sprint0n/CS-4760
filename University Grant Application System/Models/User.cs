@@ -25,6 +25,8 @@ namespace University_Grant_Application_System.Models
 
         public string userType { get; set; } = string.Empty;
 
+        public bool isAdmin { get; set; } = false;
+
         public string committeeMemberStatus {  get; set; } = string.Empty;
 
 

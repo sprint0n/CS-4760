@@ -10,7 +10,6 @@ namespace University_Grant_Application_System.Models
         public int DepartmentId { get; set; }
         public string DepartmentName { get; set; } = string.Empty;
 
-        public int DepartmentChairId { get; set; }
 
         public int SchoolId { get; set; }
         [ForeignKey("SchoolId")]

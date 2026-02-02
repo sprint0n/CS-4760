@@ -16,14 +16,14 @@ builder.Services.AddRazorPages(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireClaim("IsAdmin", "True"));
 });
 
 builder.Services.AddAuthentication("MyCookieAuth")
     .AddCookie("MyCookieAuth", options =>
     {
         options.Cookie.Name = "UserAuthCookie";
-        options.LoginPath = "/Index"; 
+        options.LoginPath = "/Index";
         options.AccessDeniedPath = "/AccessDenied";
     });
 

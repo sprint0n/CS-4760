@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University_Grant_Application_System.Data;
 
@@ -11,9 +12,11 @@ using University_Grant_Application_System.Data;
 namespace University_Grant_Application_System.Migrations
 {
     [DbContext(typeof(University_Grant_Application_SystemContext))]
-    partial class University_Grant_Application_SystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260202203123_AddedExpenseAndFIleUploadTables")]
+    partial class AddedExpenseAndFIleUploadTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,16 +75,14 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int>("ApplicationID")
+                        .HasColumnType("int");
+
                     b.Property<string>("EquipmentName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FormTableId")
-                        .HasColumnType("int");
-
                     b.HasKey("EquipmentExpenseId");
-
-                    b.HasIndex("FormTableId");
 
                     b.ToTable("EquipmentExpenses");
                 });
@@ -105,9 +106,15 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<float>("DisseminationBudget")
                         .HasColumnType("real");
 
+                    b.Property<int>("EquipmentExpenseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("GrantPurpose")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OtherExpenseId")
+                        .HasColumnType("int");
 
                     b.Property<float>("OtherFunding1Amount")
                         .HasColumnType("real");
@@ -137,6 +144,9 @@ namespace University_Grant_Application_System.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PersonnelExpenseId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PrincipalInvestigatorID")
                         .HasColumnType("int");
 
@@ -156,6 +166,9 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<float>("TotalBudget")
                         .HasColumnType("real");
 
+                    b.Property<int>("TravelExpenseId")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -170,6 +183,14 @@ namespace University_Grant_Application_System.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EquipmentExpenseId");
+
+                    b.HasIndex("OtherExpenseId");
+
+                    b.HasIndex("PersonnelExpenseId");
+
+                    b.HasIndex("TravelExpenseId");
 
                     b.HasIndex("UserId");
 
@@ -187,7 +208,7 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.Property<int>("FormTableId")
+                    b.Property<int>("ApplicationId")
                         .HasColumnType("int");
 
                     b.Property<string>("OtherExpenseName")
@@ -195,8 +216,6 @@ namespace University_Grant_Application_System.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OtherExpensesId");
-
-                    b.HasIndex("FormTableId");
 
                     b.ToTable("OtherExpenses");
                 });
@@ -212,12 +231,12 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int>("ApplicationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("FormTableId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -227,8 +246,6 @@ namespace University_Grant_Application_System.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FormTableId");
 
                     b.ToTable("PersonnelExpenses");
                 });
@@ -266,7 +283,7 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.Property<int>("FormTableId")
+                    b.Property<int>("ApplicationID")
                         .HasColumnType("int");
 
                     b.Property<string>("TravelName")
@@ -274,8 +291,6 @@ namespace University_Grant_Application_System.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TravelExpenseId");
-
-                    b.HasIndex("FormTableId");
 
                     b.ToTable("TravelExpenses");
                 });
@@ -385,48 +400,47 @@ namespace University_Grant_Application_System.Migrations
                     b.Navigation("School");
                 });
 
-            modelBuilder.Entity("University_Grant_Application_System.Models.EquipmentExpense", b =>
+            modelBuilder.Entity("University_Grant_Application_System.Models.FormTable", b =>
                 {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
-                        .WithMany("EquipmentExpenses")
-                        .HasForeignKey("FormTableId")
+                    b.HasOne("University_Grant_Application_System.Models.EquipmentExpense", "EquipmentExpense")
+                        .WithMany()
+                        .HasForeignKey("EquipmentExpenseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FormTable");
-                });
+                    b.HasOne("University_Grant_Application_System.Models.OtherExpense", "OtherExpense")
+                        .WithMany()
+                        .HasForeignKey("OtherExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("University_Grant_Application_System.Models.FormTable", b =>
-                {
+                    b.HasOne("University_Grant_Application_System.Models.PersonnelExpense", "PersonnelExpense")
+                        .WithMany()
+                        .HasForeignKey("PersonnelExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("University_Grant_Application_System.Models.TravelExpense", "TravelExpense")
+                        .WithMany()
+                        .HasForeignKey("TravelExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("University_Grant_Application_System.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("EquipmentExpense");
+
+                    b.Navigation("OtherExpense");
+
+                    b.Navigation("PersonnelExpense");
+
+                    b.Navigation("TravelExpense");
+
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("University_Grant_Application_System.Models.OtherExpense", b =>
-                {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
-                        .WithMany("OtherExpenses")
-                        .HasForeignKey("FormTableId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FormTable");
-                });
-
-            modelBuilder.Entity("University_Grant_Application_System.Models.PersonnelExpense", b =>
-                {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
-                        .WithMany("PersonnelExpenses")
-                        .HasForeignKey("FormTableId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FormTable");
                 });
 
             modelBuilder.Entity("University_Grant_Application_System.Models.School", b =>
@@ -438,17 +452,6 @@ namespace University_Grant_Application_System.Migrations
                         .IsRequired();
 
                     b.Navigation("College");
-                });
-
-            modelBuilder.Entity("University_Grant_Application_System.Models.TravelExpense", b =>
-                {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
-                        .WithMany("TravelExpenses")
-                        .HasForeignKey("FormTableId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FormTable");
                 });
 
             modelBuilder.Entity("University_Grant_Application_System.Models.UploadedFile", b =>
@@ -485,14 +488,6 @@ namespace University_Grant_Application_System.Migrations
 
             modelBuilder.Entity("University_Grant_Application_System.Models.FormTable", b =>
                 {
-                    b.Navigation("EquipmentExpenses");
-
-                    b.Navigation("OtherExpenses");
-
-                    b.Navigation("PersonnelExpenses");
-
-                    b.Navigation("TravelExpenses");
-
                     b.Navigation("UploadedFiles");
                 });
 #pragma warning restore 612, 618

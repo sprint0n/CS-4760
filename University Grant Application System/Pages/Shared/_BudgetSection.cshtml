@@ -51,9 +51,64 @@
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addPersonRow()">+ Add New Person</button>
             </div>
 
-            <div class="tab-pane fade" id="equipment" role="tabpanel"><p class="p-3">Equipment Placeholder</p></div>
-            <div class="tab-pane fade" id="travel" role="tabpanel"><p class="p-3">Travel Placeholder</p></div>
-            <div class="tab-pane fade" id="other" role="tabpanel"><p class="p-3">Other Placeholder</p></div>
+            <div class="tab-pane fade show inactive" id="equipment" role="tabpanel">
+                <h5 class="mb-3">Equipment Expenses</h5>
+                <div id="equipment-container">
+                    <div class="equipment-row border p-3 mb-3 rounded bg-light">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Equipment Name</label>
+                                <input type="text" name="EquipmentExpenses[0].Name" class="form-control" placeholder="equipment name" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Amount ($)</label>
+                                <input type="number" name="EquipmentExpenses[0].Amount" class="form-control amount-input" placeholder="0.00" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEquipmentRow()">+ Add New Equipment</button>
+            </div>
+
+
+            <div class="tab-pane fade show inactive" id="travel" role="tabpanel">
+                <h5 class="mb-3">Travel Expenses</h5>
+                <div id="travel-container">
+                    <div class="travel-row border p-3 mb-3 rounded bg-light">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Equipment Name</label>
+                                <input type="text" name="TravelExpenses[0].Name" class="form-control" placeholder="travel name" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Amount ($)</label>
+                                <input type="number" name="TravelExpenses[0].Amount" class="form-control amount-input" placeholder="0.00" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addTravelRow()">+ Add New Travel</button>
+            </div>
+
+            <div class="tab-pane fade show inactive" id="other" role="tabpanel">
+                <h5 class="mb-3">Other Expenses</h5>
+                <div id="other-container">
+                    <div class="other-row border p-3 mb-3 rounded bg-light">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Other Name</label>
+                                <input type="text" name="OtherExpenses[0].Name" class="form-control" placeholder="other name" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Amount ($)</label>
+                                <input type="number" name="OtherExpenses[0].Amount" class="form-control amount-input" placeholder="0.00" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addOtherRow()">+ Add New Other</button>
+            </div>
+
         </div>
     </div>
 </div>

@@ -3,24 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace University_Grant_Application_System.Models
 {
-    public class PersonnelExpense
+    public class EquipmentExpense
     {
         [Key]
-        public int Id { get; set; }
+        public int EquipmentExpenseId { get; set; }
 
         public int FormTableId { get; set; }
         [ForeignKey("FormTableId")]
         public virtual FormTable? FormTable { get; set; }
 
         [Required]
-        public string Role { get; set; } // "Student" or "Teacher"
-
-        public string Description { get; set; }
+        public string EquipmentName { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Amount { get; set; }
 
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal TaxedAmount { get; set; }
     }
 }

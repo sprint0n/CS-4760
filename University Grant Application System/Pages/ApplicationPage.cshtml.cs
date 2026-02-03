@@ -215,6 +215,9 @@ namespace University_Grant_Application_System.Pages
             {
                 Title = GrantTitle,          // Maps to FormTable.Title
                 Procedure = Procedure,       // Maps to FormTable.Procedure
+                Timeline = Timeline,
+                GrantPurpose = GrantPurpose,
+                ApplicationStatus = "Pending",
                 UserId = 1,                  // Placeholder ID (Update this logic later if needed)
                 Description = $"{GrantPurpose} | Inv: {PrimaryInvestigator} | Time: {Timeline}"
             };
@@ -225,15 +228,16 @@ namespace University_Grant_Application_System.Pages
             // 4. Save Personnel Expenses
             if (PersonnelExpenses != null && PersonnelExpenses.Count > 0)
             {
-                foreach (var person in PersonnelExpenses)
+                foreach (var expense in PersonnelExpenses)
                 {
                     // Link the expense to the FormTable ID we just created
-                    person.ApplicationId = formEntry.Id;
-                    _context.PersonnelExpenses.Add(person);
+                    formEntry.PersonnelExpenses.Add(expense);
                 }
                 await _context.SaveChangesAsync();
             }
 
+            _context.FormTable.Add(formEntry);
+            await _context.SaveChangesAsync();
             // Note: We are not saving IncomeSources to the DB yet because
             // 'IncomeSource' needs to be added to Database Context first.
             // For now, only the Budget (Personnel) is saving to the database.

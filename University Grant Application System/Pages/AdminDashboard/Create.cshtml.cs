@@ -21,6 +21,10 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
 
         public IActionResult OnGet()
         {
+            ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolName");
+            ViewData["CollegeId"] = new SelectList(_context.Colleges, "CollegeId", "CollegeName");
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "DepartmentId", "DepartmentName");
+
             return Page();
         }
 
@@ -32,6 +36,10 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
         {
             if (!ModelState.IsValid)
             {
+                ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolName");
+                ViewData["CollegeId"] = new SelectList(_context.Colleges, "CollegeId", "CollegeName");
+                ViewData["DepartmentId"] = new SelectList(_context.Departments, "DepartmentId", "DepartmentName");
+
                 return Page();
             }
 

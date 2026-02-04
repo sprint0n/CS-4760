@@ -21,6 +21,18 @@ namespace University_Grant_Application_System.Pages
 
     public class ApplicationPageModel : PageModel
     {
+        private decimal CalculateTotalBudget(FormTable form)
+        {
+            decimal total = 0;
+
+            total += form.PersonnelExpenses.Sum(p => p.Amount);
+            total += form.EquipmentExpenses.Sum(e => e.Amount);
+            total += form.TravelExpenses.Sum(t => t.Amount);
+            total += form.OtherExpenses.Sum(o => o.Amount);
+
+            return total;
+        }
+
         private readonly University_Grant_Application_SystemContext _context;
 
         public ApplicationPageModel(University_Grant_Application_SystemContext context)
@@ -42,9 +54,7 @@ namespace University_Grant_Application_System.Pages
         //This is the user's department
         [BindProperty]
         public string Department { get; set; }
-
-        public List<string> AllUsers { get; set; }
-
+        public List<string> AllUsers { get; set; } = new List<string>();
         public List<string> UserTypes { get; } = new List<string>
         {
             "PrimaryUser", "Student", "Faculty", "Staff", "External Researcher"
@@ -52,14 +62,15 @@ namespace University_Grant_Application_System.Pages
 
         [BindProperty]
         [Required]
-        [Display(Name = "Procedures")]
         public string Procedure { get; set; }
 
         [BindProperty]
+        [Display(Name = "Primary Investigator")]
         [Required(ErrorMessage = "Primary Investigator is required")]
         public string PrimaryInvestigator { get; set; }
 
         [BindProperty]
+        [Display(Name = "Grant Title")]
         [Required(ErrorMessage = "Please enter in the title")]
         public string GrantTitle { get; set; }
 
@@ -69,9 +80,10 @@ namespace University_Grant_Application_System.Pages
         public string GrantPurpose { get; set; }
 
         [BindProperty]
-        public string Name { get; set; } 
+        public string Name { get; set; }
 
         [BindProperty]
+        [Display(Name = "Past Budget")]
         public string? PastBudget { get; set; }
 
 
@@ -81,6 +93,7 @@ namespace University_Grant_Application_System.Pages
 
         [BindProperty]
         [Required]
+        [Display(Name = "Dissemenation Budget")]
         public string DissemenationBudget { get; set; }
 
         [BindProperty]
@@ -92,7 +105,7 @@ namespace University_Grant_Application_System.Pages
         public bool HumansOrAnimals { get; set; }
 
         [BindProperty]
-        public IFormFile UploadFile { get; set; }
+        public IFormFile? UploadFile { get; set; }
 
         [BindProperty]
         [Display(Name = "Required supporting document")]
@@ -109,9 +122,17 @@ namespace University_Grant_Application_System.Pages
         [BindProperty]
         public List<IncomeSource> IncomeSources { get; set; } = new();
 
-        // YOUR BUDGET PROPERTY
         [BindProperty]
-        public List<PersonnelExpense> PersonnelExpenses { get; set; } = new List<PersonnelExpense>();
+        public List<PersonnelExpense> PersonnelExpenses { get; set; } = new();
+
+        [BindProperty]
+        public List<EquipmentExpense> EquipmentExpenses { get; set; } = new();
+
+        [BindProperty]
+        public List<TravelExpense> TravelExpenses { get; set; } = new();
+
+        [BindProperty]
+        public List<OtherExpense> OtherExpenses { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -135,23 +156,23 @@ namespace University_Grant_Application_System.Pages
                 }
             }
 
-            AllUsers = await _context.Users
-                .Select(u => u.FirstName + " " + u.LastName)
-                .ToListAsync();
+            await PopulateSelectListsAsync();
 
-
-            // 2. Preload RSPG as the main application funding
-            // (Moved inside the method to fix the red errors)
             IncomeSources.Add(new IncomeSource
             {
                 SourceName = "RSPG",
                 Amount = 0
             });
+
             return Page();
+        }
 
-
-
-
+        // Populate lists used by the view so they are available on GET and POST
+        private async Task PopulateSelectListsAsync()
+        {
+            AllUsers = await _context.Users
+                .Select(u => u.FirstName + " " + u.LastName)
+                .ToListAsync();
         }
 
         private async Task<string?> SaveFileAsync(IFormFile file)
@@ -159,13 +180,11 @@ namespace University_Grant_Application_System.Pages
             if (file == null || file.Length == 0)
                 return null;
 
-            // Ensure upload folder exists
             var uploadFolder = Path.Combine("wwwroot", "uploads");
             Directory.CreateDirectory(uploadFolder);
 
-            // Create unique filename with original extension
             var extension = Path.GetExtension(file.FileName);
-            var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
+            var uniqueName = $"{file.FileName}_{Guid.NewGuid()}{extension}";
 
             var filePath = Path.Combine(uploadFolder, uniqueName);
 
@@ -174,13 +193,13 @@ namespace University_Grant_Application_System.Pages
                 await file.CopyToAsync(stream);
             }
 
-            return uniqueName; // return stored filename for DB
+            return uniqueName;
         }
 
-        public async Task<IActionResult> OnPost()
+        public async Task<IActionResult> OnPostAsync(string action)
         {
-            // 1. Validation
-            if (RequiredDocument == null || RequiredDocument.Length == 0)
+            // Validation for required files
+            if (action == "Submit" && (RequiredDocument == null || RequiredDocument.Length == 0))
             {
                 ModelState.AddModelError(nameof(RequiredDocument), "The required supporting document must be uploaded.");
             }
@@ -192,57 +211,72 @@ namespace University_Grant_Application_System.Pages
 
             if (!ModelState.IsValid)
             {
+                await PopulateSelectListsAsync();
                 return Page();
             }
 
-            // 2. Handle File Upload
+            // Optionally save uploaded file(s)
             if (UploadFile != null && UploadFile.Length > 0)
             {
-                var uniqueName = $"{UploadFile.FileName}_{Guid.NewGuid()}";
-                var uploadPath = Path.Combine("wwwroot/uploads", uniqueName);
-
-                using (var stream = System.IO.File.Create(uploadPath))
-                {
-                    await UploadFile.CopyToAsync(stream);
-                }
-
+                var uniqueName = await SaveFileAsync(UploadFile);
                 TempData["UploadSuccess"] = $"Successfully uploaded: {UploadFile.FileName}";
             }
 
-            // 3. Save to Database (Using FormTable)
-            // We combine missing columns (Timeline, Inv) into Description so they are saved.
+            if (RequiredDocument != null && RequiredDocument.Length > 0)
+            {
+                var uniqueName = await SaveFileAsync(RequiredDocument);
+                TempData["UploadSuccess"] += $", Required document uploaded: {RequiredDocument.FileName}";
+            }
+
+            // Resolve current user
+            var userEmail = User.Identity?.Name;
+            var currentUser = userEmail != null
+                ? await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail)
+                : null;
+            var userId = currentUser?.UserId ?? 1;
+
+            // Determine application status based on which button was clicked
+            var status = action == "Submit" ? "Pending" : "Saved";
+
             var formEntry = new FormTable
             {
-                Title = GrantTitle,          // Maps to FormTable.Title
-                Procedure = Procedure,       // Maps to FormTable.Procedure
+                Title = GrantTitle,
+                Procedure = Procedure,
                 Timeline = Timeline,
                 GrantPurpose = GrantPurpose,
-                ApplicationStatus = "Pending",
-                UserId = 1,                  // Placeholder ID (Update this logic later if needed)
+                UserId = userId,
+                ApplicationStatus = status, // <-- dynamically set
+                isIRB = HumansOrAnimals,
+                pastFunding = HasPastFunding,
+                pastBudgets = PastBudget ?? string.Empty,
                 Description = $"{GrantPurpose} | Inv: {PrimaryInvestigator} | Time: {Timeline}"
             };
 
-            _context.FormTable.Add(formEntry);
-            await _context.SaveChangesAsync(); // Generates the ID
+            // Add expenses
+            PersonnelExpenses.ForEach(p => formEntry.PersonnelExpenses.Add(p));
+            EquipmentExpenses.ForEach(e => formEntry.EquipmentExpenses.Add(e));
+            TravelExpenses.ForEach(t => formEntry.TravelExpenses.Add(t));
+            OtherExpenses.ForEach(o => formEntry.OtherExpenses.Add(o));
 
-            // 4. Save Personnel Expenses
-            if (PersonnelExpenses != null && PersonnelExpenses.Count > 0)
-            {
-                foreach (var expense in PersonnelExpenses)
-                {
-                    // Link the expense to the FormTable ID we just created
-                    formEntry.PersonnelExpenses.Add(expense);
-                }
-                await _context.SaveChangesAsync();
-            }
+            formEntry.TotalBudget = CalculateTotalBudget(formEntry);
 
+            // Persist
             _context.FormTable.Add(formEntry);
             await _context.SaveChangesAsync();
-            // Note: We are not saving IncomeSources to the DB yet because
-            // 'IncomeSource' needs to be added to Database Context first.
-            // For now, only the Budget (Personnel) is saving to the database.
 
-            return Content("Success! Application and Budget saved.");
+            TempData["Message"] = action == "Submit" ? "Application submitted successfully!" : "Draft saved successfully!";
+
+            if (currentUser != null && currentUser.isAdmin) 
+            { 
+                return RedirectToPage("/AdminDashboard/Index"); 
+            } 
+            else if (currentUser != null) 
+            { 
+                return RedirectToPage("/FacultyDashboard/Index"); 
+            } 
+
+            // Fallback: go to login/index if user info is missing
+            return RedirectToPage("/Index");
         }
     }
 }

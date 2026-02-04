@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
 }
 
-
 <!-- Top Toolbar -->
 <section class="toolbar">
     <div class="toolbar-left">
@@ -26,12 +25,12 @@
 
 <hr />
 
-<!-- In Progress Applications -->
+<!--Saved Applications -->
 <section class="applications-section">
-    <h3>Current Grant Applications</h3>
+    <h3>Saved Grant Applications</h3>
 
     <div class="horizontal-scroll">
-        @foreach (var app in Model.InProgressApplications)
+        @foreach (var app in Model.SavedApplications)
         {
             <div class="card application-card">
                 <h4>@app.Title</h4>

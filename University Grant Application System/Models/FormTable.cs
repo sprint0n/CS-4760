@@ -53,10 +53,9 @@ namespace University_Grant_Application_System.Models
 
         public string ApplicationStatus {  get; set; } = string.Empty;
 
-        public float TotalBudget { get; set; }
+        public decimal TotalBudget { get; set; }
 
         public virtual ICollection<PersonnelExpense> PersonnelExpenses { get; set; } = new List<PersonnelExpense>();
-
 
         public virtual ICollection<TravelExpense> TravelExpenses { get; set; } = new List<TravelExpense>();
 

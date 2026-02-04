@@ -79,6 +79,12 @@ public class IndexModel : PageModel
         {
             return RedirectToPage("/AdminDashboard/Index");
         }
+
+        if (user.committeeMemberStatus == "member" || user.committeeMemberStatus == "chair")
+        {
+            return RedirectToPage("/CommitteeDashboard");
+        }
+
         return RedirectToPage("/FacultyDashboard/Index");
     }
 

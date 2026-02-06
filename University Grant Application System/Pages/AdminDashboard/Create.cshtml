@@ -1,70 +1,137 @@
 ﻿@page
 @model University_Grant_Application_System.Pages.AdminDashboard.CreateModel
 
-        @{
-        ViewData["Title"] = "Create";
-        }
-        
-        <h1>Create</h1>
-        
-    <h4>Users</h4>
-    <hr />
-    <div class="row">
-    <div class="col-md-4">
-    <form method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Users.FirstName" class="control-label">First Name</label>
-                <input asp-for="Users.FirstName" class="form-control" />
-                <span asp-validation-for="Users.FirstName" class="text-danger"></span>
+@{
+    ViewData["Title"] = "Create User";
+    Layout = "_AdminLayout";  
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height:60vh;">
+    <div class="card p-4" style="width:400px;">
+        <h2 class="card-title text-center mb-3">Create User</h2>
+
+        <form method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="Input.FirstName" class="form-label"></label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Users.LastName" class="control-label">Last Name</label>
-                <input asp-for="Users.LastName" class="form-control" />
-                <span asp-validation-for="Users.LastName" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="Input.LastName" class="form-label"></label>
+                <input asp-for="Input.LastName" class="form-control" />
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Users.CollegeId" class="control-label">College</label>
-                <select asp-for="Users.CollegeId" class="form-control" asp-items="ViewBag.CollegeId">
-                    <option value="">-- Select a College --</option>
+
+            <div class="mb-3">
+                <label asp-for="Input.Birthday" class="form-label"></label>
+                <input asp-for="Input.Birthday" type="date" class="form-control" />
+                <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" type="email" class="form-control" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label"></label>
+                <input asp-for="Input.Password" type="password" class="form-control" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-control" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.AccountIndex" class="form-label"></label>
+                <input asp-for="Input.AccountIndex" class="form-control" placeholder="6-digit number" />
+                <span asp-validation-for="Input.AccountIndex" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.SelectedCollegeId" class="form-label"></label>
+                <select id="collegeSelect" asp-for="Input.SelectedCollegeId" asp-items="Model.CollegeOptions" class="form-select">
+                    <option value="">Select a college</option>
                 </select>
-                <span asp-validation-for="Users.CollegeId" class="text-danger"></span>
+                <span asp-validation-for="Input.SelectedCollegeId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Users.SchoolId" class="control-label">School</label>
-                <select asp-for="Users.SchoolId" class="form-control" asp-items="ViewBag.SchoolId">
-                    <option value="">-- Select a School --</option>
+
+            <div class="mb-3">
+                <label asp-for="Input.SelectedSchoolId" class="form-label"></label>
+                <select id="schoolSelect" asp-for="Input.SelectedSchoolId" asp-items="Model.SchoolOptions" class="form-select">
+                    <option value="">Select a school</option>
                 </select>
-                <span asp-validation-for="Users.SchoolId" class="text-danger"></span>
+                <span asp-validation-for="Input.SelectedSchoolId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Users.DepartmentId" class="control-label">Department</label>
-                <select asp-for="Users.DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId">
-                    <option value="">-- Select a Department --</option>
+
+            <div class="mb-3">
+                <label asp-for="Input.SelectedDepartmentId" class="form-label"></label>
+                <select id="departmentSelect" asp-for="Input.SelectedDepartmentId" asp-items="Model.DepartmentOptions" class="form-select">
+                    <option value="">Select a department</option>
                 </select>
-                <span asp-validation-for="Users.DepartmentId" class="text-danger"></span>
+                <span asp-validation-for="Input.SelectedDepartmentId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Users.Email" class="control-label">Email</label>
-                <input asp-for="Users.Email" class="form-control" />
-                <span asp-validation-for="Users.Email" class="text-danger"></span>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Register</button>
             </div>
-            <div class="form-group">
-                <label asp-for="Users.AccountID" class="control-label">Account ID</label>
-                <input asp-for="Users.AccountID" class="form-control" />
-                <span asp-validation-for="Users.AccountID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="text-center">
+                <a asp-page="Index">Back to login</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-page="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const collegeSelect = document.getElementById('collegeSelect');
+        const schoolSelect = document.getElementById('schoolSelect');
+        const departmentSelect = document.getElementById('departmentSelect');
+
+        const resetDropdown = (target, text) => {
+            target.innerHTML = `<option value="">${text}</option>`;
+            target.disabled = true;
+        }
+
+        collegeSelect.addEventListener('change', async function() {
+            const collegeId = this.value;
+            resetDropdown(schoolSelect, "Select a school");
+            resetDropdown(departmentSelect, "Select a department");
+
+            if(collegeId){
+                const response = await fetch(`?handler=Schools&collegeId=${collegeId}`);
+                const schools = await response.json();
+
+                schools.forEach(s => {
+                       schoolSelect.innerHTML += `<option value="${s.schoolId}">${s.schoolName}</option>`;
+                });
+                schoolSelect.disabled = false;
+            }
+        });
+
+         schoolSelect.addEventListener('change', async function() {
+            const schoolId = this.value;
+            resetDropdown(departmentSelect, "Select a department");
+
+            if(schoolId){
+                const response = await fetch(`?handler=Departments&schoolId=${schoolId}`);
+                const depts = await response.json();
+
+                depts.forEach(d => {
+                    departmentSelect.innerHTML += `<option value="${d.departmentId}">${d.departmentName}</option>`
+                });
+                departmentSelect.disabled = false;
+            }
+        });
+    </script>
 }

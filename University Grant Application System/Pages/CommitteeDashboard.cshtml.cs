@@ -23,7 +23,9 @@ namespace University_Grant_Application_System.Pages
                 .Select(a => new Grant
                 {
                     Title = a.Title,
-                    Amount = a.TotalBudget
+                    PrincipalInvestigator = a.PrincipalInvestigatorID.ToString(),
+                    Amount = a.TotalBudget,
+                    OtherAmount = a.OtherFunding1Amount,
                 })
                 .ToList();
         }
@@ -31,7 +33,9 @@ namespace University_Grant_Application_System.Pages
         public class Grant
         {
             public string Title { get; set; } = "";
+            public string PrincipalInvestigator { get; set; } = "";
             public decimal Amount { get; set; }
+            public float OtherAmount { get; set; }
         }
     }
 }

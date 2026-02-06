@@ -16,7 +16,14 @@
         {
             <div class="card application-card">
                 <h4>@app.Title</h4>
-                <p>Amount: @app.Amount</p>
+                <p>Principal Investigator: </p>
+                <div class="alert alert-info" role="alert">
+                    <p>RSPG Amount: @app.Amount</p>
+                </div>
+                <p>Other Amount:</p>
+                <a asp-page="/Rubric" class="btn btn-primary">
+                    Review
+                </a>
             </div>
         }
     </div>

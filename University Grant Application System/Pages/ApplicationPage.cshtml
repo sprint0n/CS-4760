@@ -2,6 +2,22 @@
 @model University_Grant_Application_System.Pages.ApplicationPageModel
 @{
     ViewData["Title"] = "Grant Application";
+    if (User.HasClaim("IsAdmin", "True"))
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (User.HasClaim("CommitteeStatus", "member") || User.HasClaim("CommitteeStatus", "chair"))
+    {
+        Layout = "_CommitteeLayout";
+    }
+    else if (User.HasClaim("userType", "chair"))
+    {
+        Layout = "_DeptChairLayout";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
 }
 
 <div class="container mt-4">

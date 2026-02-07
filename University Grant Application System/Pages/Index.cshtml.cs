@@ -58,7 +58,8 @@ public class IndexModel : PageModel
             new Claim(ClaimTypes.Name, user.Email),
             new Claim("UserId", user.UserId.ToString()),
             new Claim("UserType", user.userType),
-            new Claim("IsAdmin", user.isAdmin.ToString())
+            new Claim("IsAdmin", user.isAdmin.ToString()),
+            new Claim("CommitteeStatus", user.committeeMemberStatus ?? "none")
         };
 
         if (user.isAdmin)
@@ -80,9 +81,16 @@ public class IndexModel : PageModel
             return RedirectToPage("/AdminDashboard/Index");
         }
 
-        if (user.committeeMemberStatus == "member" || user.committeeMemberStatus == "chair")
+        string status = user.committeeMemberStatus?.ToLower();
+
+        if (status == "member" || status == "chair")
         {
-            return RedirectToPage("/CommitteeDashboard");
+            return RedirectToPage("/CommitteeDashboard/CommitteeDashboard");
+        }
+
+        if (user.userType == "chair")
+        {
+            return RedirectToPage("/DeptChairDashboard/DeptChairDashboard");
         }
 
         return RedirectToPage("/FacultyDashboard/Index");

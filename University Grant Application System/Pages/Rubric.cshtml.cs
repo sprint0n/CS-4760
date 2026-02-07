@@ -26,10 +26,9 @@ namespace University_Grant_Application_System.Pages
 
         public void OnPost()
         {
-            // Simple addition of all bound properties
-            TotalScore = BudgetScore + SupportScore + ReputationScore +
-                         InnovationScore + CommunityScore + ProcedureScore +
-                         TimelineScore + EvaluationScore + EvidenceScore;
+            TotalScore = BudgetScore * 3 + SupportScore * 3 + ReputationScore * 5 +
+                         InnovationScore * 5 + CommunityScore * 5 + ProcedureScore +
+                         TimelineScore + EvaluationScore * 3 + EvidenceScore;
         }
     }
 }

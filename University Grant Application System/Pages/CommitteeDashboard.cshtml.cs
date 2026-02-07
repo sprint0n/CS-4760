@@ -35,7 +35,7 @@ namespace University_Grant_Application_System.Pages
             public string Title { get; set; } = "";
             public string PrincipalInvestigator { get; set; } = "";
             public decimal Amount { get; set; }
-            public float OtherAmount { get; set; }
+            public float OtherAmount { get; set; } = 0;
         }
     }
 }

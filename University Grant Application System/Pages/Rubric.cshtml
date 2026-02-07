@@ -1,0 +1,230 @@
+﻿@page
+@model University_Grant_Application_System.Pages.RubricModel
+@{
+}
+
+<div class="container mt-4">
+    <h2 class="border-bottom pb-2">RSPG Rubric <small class="text-muted">(Updated Feb. 2022)</small> </h2>
+
+    <form method="post">
+        <h4 class="mt-4 text-primary">Area One: Select ONE Criterion </h4>
+        <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 20%;">Criterion</th>
+                    <th style="width: 25%;">2 Points</th>
+                    <th style="width: 25%;">1 Point</th>
+                    <th style="width: 20%;">0 Points</th>
+                    <th style="width: 10%;">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Budget(Weight:3)</strong></td>
+                    <td>The project has demostrated significant matching funds and/or contributions in kind. </td>
+                    <td>The project has some additional funding and/or contributions in kind. </td>
+                    <td>The project has no budgetary support </td>
+                    <td>
+                        <select asp-for="BudgetScore" class="form-select score-input" data-weight="3" data-section="area-one">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Support (Weight:3)</strong></td>
+                    <td>The project has demonstrated significant support, in addition to the department and college, through letters of collaboration with other areas on campus or the community. </td>
+                    <td>The project has demonstrated interest and commitment from the department and college with additional letters/emeails of support. </td>
+                    <td>The project has the required general support from the department and college </td>
+                    <td>
+                        <select asp-for="SupportScore" class="form-select score-input" data-weight="3" data-section="area-one">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <h4 class="mt-4 text-primary">Area Two: Select ONE Criterion </h4>
+        <div class="card p-3 mb-4">
+            <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 20%;">Criterion</th>
+                        <th style="width: 25%;">2 Points</th>
+                        <th style="width: 25%;">1 Point</th>
+                        <th style="width: 20%;">0 Points</th>
+                        <th style="width: 10%;">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>University or Program Reputation(Weight:5)</strong></td>
+                        <td>Reserach/ presentation will significantly imporve the University or Program reputation for example and international or national conference, performance, exhibition of importance, or a peer-reviewed publication in your field.</td>
+                        <td>Reserach / presentation will generally imporve the Unveirstiy or Program reputation for example a state or local conference, performance, exhibition of importance, or a non-peer reviewed publication in your field.</td>
+                        <td>Minimal to no impact on the University or Program reputation </td>
+                        <td>
+                            <select asp-for="ReputationScore" class="form-select score-input" data-weight="5" data-section="area-two">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Innovation Teaching (Weight:5)</strong></td>
+                        <td>The project indicates innovative teaching strategies or the implmentation / creation of high impact educational experiences to a coures, program or curriculum not currently incorporating these innovations.</td>
+                        <td>The project indicates updates to a coures, program, curriculum, or activities that will imporve teaching or enhance student learning. </td>
+                        <td>The project does not adequately demonstrate instructional imporvement or innovative teaching. </td>
+                        <td>
+                            <select asp-for="InnovationScore" class="form-select score-input" data-weight="5" data-section="area-two">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Community Educational Engagement (Weight:5)</strong></td>
+                        <td>The project provdies real world learning opportunities for students with well articulated learning outcomes and impacts individuals/organizations in the community.</td>
+                        <td>The project provides real world learning opportunities for students and impacts individuals/organizations in the community. Learning outcomes are implied rather than clearly specified. </td>
+                        <td>The project has minimal to no student or community impact. </td>
+                        <td>
+                            <select asp-for="CommunityScore" class="form-select score-input" data-weight="5" data-section="area-two">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        <h4 class="mt-4 text-primary">Area Three: Select ALL Criteria </h4>
+            <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 20%;">Criterion</th>
+                        <th style="width: 25%;">2 Points</th>
+                        <th style="width: 25%;">1 Point</th>
+                        <th style="width: 20%;">0 Points</th>
+                        <th style="width: 10%;">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Procedures & Methods(Weight:1)</strong></td>
+                        <td>The project indicates how the gaols and objectives will be met including steps involved in the design, development and implemenation of the project. The project seems feasible at outlined. </td>
+                        <td>The project gaols and objectives are at least partially indicated. Steps involved in the design development and implemenation of the project seem incomplete, unclear or not obtainable.
+                        <td>The project goals, objectives and steps involved in the design, development and implementation are not addressed sufficiently.</td>
+                        <td>
+                            <select asp-for="ProcedureScore" class="form-select score-input" data-weight="1">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Timeline & Budgetary description (Weight:1)</strong></td>
+                        <td>Project timeline and budget is explained in detail, realistc, effective, and outcome oriented.</td>
+                        <td>Project timeline or budgetary issues is addressed </td>
+                        <td>Timeline or budgetary issues not fully developed </td>
+                        <td>
+                            <select asp-for="TimelineScore" class="form-select score-input" data-weight="1">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Evaluation & Dissemination(Weight:3)</strong></td>
+                        <td>The project has the potentail to be widely disseminated beyond the University, for example at an international or national conference, performance, exhibition of importance, or a peer-reviewed publication in your field.</td>
+                        <td>The project success will be documented and shared within the University (e.g. Teaching and Learning Forum) or at a state or local conference, performance, exhibition, or a non-peer reviewed pbulicaiton in your field. </td>
+                        <td>The project will have minimal to no sharable or publishable results. </td>
+                        <td>
+                            <select asp-for="EvaluationScore" class="form-select score-input" data-weight="3">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Evidential Documentation(Weight:1)</strong></td>
+                        <td>The project has the required documentation, documentation of project viability and dissemination, letters of support, and other items to assist the committee in determining the importance of the project.</td>
+                        <td>The project has the required documentation, and in addition has provided additional informaiton to assist the committee in determining project viability. </td>
+                        <td>The project has the required doucmentation such conference acceptance and proof of project costs. </td>
+                        <td>
+                            <select asp-for="EvidenceScore" class=" form-select score-input" data-weight="1">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="alert alert-info mt-4">
+                <h3>Total: <span id="totalScoreDisplay">@Model.TotalScore</span></h3>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Submit Score</button>
+                <a asp-page="/CommitteeDashboard" class="btn btn-secondary">Cancel</a>
+            </div>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const scoreInputs = document.querySelectorAll('.score-input');
+            const totalDisplay = document.getElementById('totalScoreDisplay');
+
+            function calculateTotal() {
+                let total = 0;
+
+                scoreInputs.forEach(select => {
+                    const score = parseInt(select.value) || 0;
+                    const weight = parseInt(select.getAttribute('data-weight')) || 1;
+                    total += (score * weight);
+                });
+
+                totalDisplay.textContent = total;
+            }
+
+            scoreInputs.forEach(select => {
+                select.addEventListener('change', calculateTotal);
+            });
+
+
+            calculateTotal();
+        });
+
+                document.querySelectorAll('.score-input').forEach(select => {
+            select.addEventListener('change', function() {
+                const section = this.getAttribute('data-section');
+
+                if (section === 'area-one' || section === 'area-two') {
+                    const val = parseInt(this.value);
+
+                    if (val > 0) {
+                        document.querySelectorAll(`[data-section="${section}"]`).forEach(other => {
+                            if (other !== this) {
+                                other.value = "0";
+                            }
+                        });
+                    }
+                }
+                calculateTotal();
+            });
+        });
+    </script>
+}

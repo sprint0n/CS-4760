@@ -12,11 +12,17 @@ AppDomain.CurrentDomain.SetData("DataDirectory", appDataPath);
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/AdminDashboard", "AdminOnly");
+    options.Conventions.AuthorizePage("/CommitteeDashboard", "CommitteeOnly");
+    options.Conventions.AuthorizePage("/DeptChairDashboard", "ChairOnly");
+    //Authorize Page for pages, authorize folder for folders, make sure the Policy matches in Program.cs and Index.cshtml.cs, just gotta lock the DepartmentDash the same way
 });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireClaim("IsAdmin", "True"));
+options.AddPolicy("AdminOnly", policy => policy.RequireClaim("IsAdmin", "True"));
+options.AddPolicy("CommitteeOnly", policy => policy.RequireClaim("CommitteStatus", "member", "chair"));
+options.AddPolicy("ChairOnly", policy => policy.RequireClaim("UserType", "chair"));
+    //You should be able to add a "chair only" policy that checks userType to see if they're a chair
 });
 
 builder.Services.AddAuthentication("MyCookieAuth")

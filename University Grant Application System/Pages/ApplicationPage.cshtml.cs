@@ -266,14 +266,24 @@ namespace University_Grant_Application_System.Pages
 
             TempData["Message"] = action == "Submit" ? "Application submitted successfully!" : "Draft saved successfully!";
 
-            if (currentUser != null && currentUser.isAdmin) 
+            // Redirect based on user role/claims
+            if (currentUser != null) 
             { 
-                return RedirectToPage("/AdminDashboard/Index"); 
-            } 
-            else if (currentUser != null) 
-            { 
+                if (currentUser.isAdmin) 
+                { 
+                    return RedirectToPage("/AdminDashboard/Index"); 
+                } 
+                if (currentUser.committeeMemberStatus == "member" || currentUser.committeeMemberStatus == "chair") 
+                { 
+                    return RedirectToPage("/CommitteeDashboard/CommitteeDashboard"); 
+                } 
+                if (currentUser.userType == "chair") 
+                { 
+                    return RedirectToPage("/DeptChairDashboard/DeptChairDashboard"); 
+                } 
+                // Default for faculty
                 return RedirectToPage("/FacultyDashboard/Index"); 
-            } 
+            }
 
             // Fallback: go to login/index if user info is missing
             return RedirectToPage("/Index");

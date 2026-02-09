@@ -5,6 +5,22 @@
         <h3>Budget</h3>
     </div>
     <div class="card-body">
+
+        <div class="row mb-4 p-2 bg-light border rounded mx-1">
+            <div class="col-md-4">
+                <label class="fw-bold">Total RSPGs:</label>
+                <input type="text" class="form-control" placeholder="$0.00" />
+            </div>
+            <div class="col-md-4">
+                <label class="fw-bold">Total Others:</label>
+                <input type="text" class="form-control" placeholder="$0.00" />
+            </div>
+            <div class="col-md-4">
+                <label class="fw-bold">Total Taxes:</label>
+                <input type="text" class="form-control" placeholder="$0.00" />
+            </div>
+        </div>
+
         <ul class="nav nav-tabs" id="budgetTabs" role="tablist">
             <li class="nav-item">
                 <button class="nav-link active" id="personnel-tab" data-bs-toggle="tab" data-bs-target="#personnel" type="button" role="tab">Personnel</button>
@@ -24,26 +40,30 @@
             <div class="tab-pane fade show active" id="personnel" role="tabpanel">
                 <h5 class="mb-3">Personnel Expenses</h5>
                 <div id="personnel-container">
-                    <div class="personnel-row border p-3 mb-3 rounded bg-light">
-                        <div class="row">
+                    <div class="personnel-row border p-3 mb-3 rounded shadow-sm">
+                        <div class="row g-2">
                             <div class="col-md-3">
-                                <label>Role</label>
-                                <select name="PersonnelExpenses[0].Role" class="form-control role-select" onchange="calculateTax(this)">
+                                <label class="form-label small">Role</label>
+                                <select name="PersonnelExpenses[0].Role" class="form-control form-control-sm role-select" onchange="calculateTax(this)">
                                     <option value="Student">Student</option>
                                     <option value="Teacher">Teacher</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label>Description</label>
-                                <input type="text" name="PersonnelExpenses[0].Description" class="form-control" placeholder="Task description" />
+                                <label class="form-label small">Description</label>
+                                <input type="text" name="PersonnelExpenses[0].Description" class="form-control form-control-sm" placeholder="Task description" />
                             </div>
                             <div class="col-md-2">
-                                <label>Amount ($)</label>
-                                <input type="number" name="PersonnelExpenses[0].Amount" class="form-control amount-input" oninput="calculateTax(this)" placeholder="0.00" />
+                                <label class="form-label small text-success">RSPG ($)</label>
+                                <input type="number" name="PersonnelExpenses[0].Amount" class="form-control form-control-sm amount-input" oninput="calculateTax(this)" placeholder="0.00" />
                             </div>
-                            <div class="col-md-3">
-                                <label>Taxed Amount ($)</label>
-                                <input type="number" name="PersonnelExpenses[0].TaxedAmount" class="form-control tax-output" readonly />
+                            <div class="col-md-2">
+                                <label class="form-label small text-secondary">Other ($)</label>
+                                <input type="number" name="PersonnelExpenses[0].OtherAmount1" class="form-control form-control-sm" placeholder="Other" />
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label small text-secondary">Other ($)</label>
+                                <input type="number" name="PersonnelExpenses[0].OtherAmount2" class="form-control form-control-sm" placeholder="Other" />
                             </div>
                         </div>
                     </div>
@@ -51,18 +71,26 @@
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addPersonRow()">+ Add New Person</button>
             </div>
 
-            <div class="tab-pane fade show inactive" id="equipment" role="tabpanel">
+            <div class="tab-pane fade" id="equipment" role="tabpanel">
                 <h5 class="mb-3">Equipment Expenses</h5>
                 <div id="equipment-container">
-                    <div class="equipment-row border p-3 mb-3 rounded bg-light">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label>Equipment Name</label>
-                                <input type="text" name="EquipmentExpenses[0].EquipmentName" class="form-control" placeholder="equipment name" />
+                    <div class="equipment-row border p-3 mb-3 rounded shadow-sm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Equipment Name</label>
+                                <input type="text" name="EquipmentExpenses[0].EquipmentName" class="form-control" placeholder="Equipments..." />
                             </div>
-                            <div class="col-md-2">
-                                <label>Amount ($)</label>
-                                <input type="number" name="EquipmentExpenses[0].Amount" class="form-control amount-input" placeholder="0.00" />
+                            <div class="col-md-3">
+                                <label class="form-label text-success">RSPG ($)</label>
+                                <input type="number" name="EquipmentExpenses[0].RSPGAmount" class="form-control" placeholder="RSPG" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">Other ($)</label>
+                                <input type="number" name="EquipmentExpenses[0].OtherAmount1" class="form-control" placeholder="Others" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">Other ($)</label>
+                                <input type="number" name="EquipmentExpenses[0].OtherAmount2" class="form-control" placeholder="Others" />
                             </div>
                         </div>
                     </div>
@@ -70,19 +98,26 @@
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEquipmentRow()">+ Add New Equipment</button>
             </div>
 
-
-            <div class="tab-pane fade show inactive" id="travel" role="tabpanel">
+            <div class="tab-pane fade" id="travel" role="tabpanel">
                 <h5 class="mb-3">Travel Expenses</h5>
                 <div id="travel-container">
-                    <div class="travel-row border p-3 mb-3 rounded bg-light">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label>Equipment Name</label>
-                                <input type="text" name="TravelExpenses[0].TravelName" class="form-control" placeholder="travel name" />
+                    <div class="travel-row border p-3 mb-3 rounded shadow-sm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Travel Description</label>
+                                <input type="text" name="TravelExpenses[0].TravelName" class="form-control" placeholder="Travels..." />
                             </div>
-                            <div class="col-md-2">
-                                <label>Amount ($)</label>
-                                <input type="number" name="TravelExpenses[0].Amount" class="form-control amount-input" placeholder="0.00" />
+                            <div class="col-md-3">
+                                <label class="form-label text-success">RSPG ($)</label>
+                                <input type="number" name="TravelExpenses[0].RSPGAmount" class="form-control" placeholder="RSPG" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">Other ($)</label>
+                                <input type="number" name="TravelExpenses[0].OtherAmount1" class="form-control" placeholder="Others" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">Other ($)</label>
+                                <input type="number" name="TravelExpenses[0].OtherAmount2" class="form-control" placeholder="Others" />
                             </div>
                         </div>
                     </div>
@@ -90,18 +125,26 @@
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addTravelRow()">+ Add New Travel</button>
             </div>
 
-            <div class="tab-pane fade show inactive" id="other" role="tabpanel">
+            <div class="tab-pane fade" id="other" role="tabpanel">
                 <h5 class="mb-3">Other Expenses</h5>
                 <div id="other-container">
-                    <div class="other-row border p-3 mb-3 rounded bg-light">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label>Other Name</label>
-                                <input type="text" name="OtherExpenses[0].OtherExpenseName" class="form-control" placeholder="other name" />
+                    <div class="other-row border p-3 mb-3 rounded shadow-sm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Description</label>
+                                <input type="text" name="OtherExpenses[0].OtherExpenseName" class="form-control" placeholder="Miscellaneous" />
                             </div>
-                            <div class="col-md-2">
-                                <label>Amount ($)</label>
-                                <input type="number" name="OtherExpenses[0].Amount" class="form-control amount-input" placeholder="0.00" />
+                            <div class="col-md-3">
+                                <label class="form-label text-success">RSPG ($)</label>
+                                <input type="number" name="OtherExpenses[0].RSPGAmount" class="form-control" placeholder="RSPG" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">Other ($)</label>
+                                <input type="number" name="OtherExpenses[0].OtherAmount1" class="form-control" placeholder="Others" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary">Other ($)</label>
+                                <input type="number" name="OtherExpenses[0].OtherAmount2" class="form-control" placeholder="Others" />
                             </div>
                         </div>
                     </div>
@@ -114,26 +157,43 @@
 </div>
 
 <script>
+    //INDICES FOR ROWS
     let personIndex = 1;
+    let equipIndex = 1;
+    let travelIndex = 1;
+    let otherIndex = 1;
+
+    // HELPER TO REMOVE ROWS
+    function removeRow(button) {
+        button.closest('div[class*="-row"]').remove();
+    }
+
+    // PERSONNEL JS
     function addPersonRow() {
         const container = document.getElementById('personnel-container');
         const newRow = `
-        <div class="personnel-row border p-3 mb-3 rounded bg-light">
-            <div class="row">
+        <div class="personnel-row border p-3 mb-3 rounded shadow-sm">
+            <div class="d-flex justify-content-end mb-2">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+            </div>
+            <div class="row g-2">
                 <div class="col-md-3">
-                    <select name="PersonnelExpenses[${personIndex}].Role" class="form-control role-select" onchange="calculateTax(this)">
+                    <select name="PersonnelExpenses[${personIndex}].Role" class="form-control form-control-sm role-select" onchange="calculateTax(this)">
                         <option value="Student">Student</option>
                         <option value="Teacher">Teacher</option>
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <input type="text" name="PersonnelExpenses[${personIndex}].Description" class="form-control" placeholder="Description" />
+                    <input type="text" name="PersonnelExpenses[${personIndex}].Description" class="form-control form-control-sm" placeholder="Description" />
                 </div>
                 <div class="col-md-2">
-                    <input type="number" name="PersonnelExpenses[${personIndex}].Amount" class="form-control amount-input" oninput="calculateTax(this)" placeholder="0.00" />
+                    <input type="number" name="PersonnelExpenses[${personIndex}].Amount" class="form-control form-control-sm amount-input" oninput="calculateTax(this)" placeholder="0.00" />
                 </div>
-                <div class="col-md-3">
-                    <input type="number" name="PersonnelExpenses[${personIndex}].TaxedAmount" class="form-control tax-output" readonly />
+                <div class="col-md-2">
+                    <input type="number" name="PersonnelExpenses[${personIndex}].OtherAmount1" class="form-control form-control-sm" placeholder="Other" />
+                </div>
+                <div class="col-md-1">
+                    <input type="number" name="PersonnelExpenses[${personIndex}].OtherAmount2" class="form-control form-control-sm" placeholder="Other" />
                 </div>
             </div>
         </div>`;
@@ -145,8 +205,92 @@
         const row = element.closest('.row');
         const role = row.querySelector('.role-select').value;
         const amount = parseFloat(row.querySelector('.amount-input').value) || 0;
-        const taxBox = row.querySelector('.tax-output');
+
+        // 8.25% for Student, 22.5% for Teacher
         let rate = (role === "Student") ? 0.0825 : 0.225;
-        taxBox.value = (amount * rate).toFixed(2);
+        let taxValue = (amount * rate).toFixed(2);
+
+        console.log("Calculated Tax for this row:", taxValue);
+    }
+
+    //EQUIPMENT JS
+    function addEquipmentRow() {
+        const container = document.getElementById('equipment-container');
+        const newRow = `
+        <div class="equipment-row border p-3 mb-3 rounded shadow-sm">
+            <div class="d-flex justify-content-end mb-2">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="EquipmentExpenses[${equipIndex}].EquipmentName" class="form-control" placeholder="Equipment Name" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="EquipmentExpenses[${equipIndex}].RSPGAmount" class="form-control" placeholder="RSPG" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="EquipmentExpenses[${equipIndex}].OtherAmount1" class="form-control" placeholder="Others" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="EquipmentExpenses[${equipIndex}].OtherAmount2" class="form-control" placeholder="Others" />
+                </div>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', newRow);
+        equipIndex++;
+    }
+
+    //TRAVEL JS
+    function addTravelRow() {
+        const container = document.getElementById('travel-container');
+        const newRow = `
+        <div class="travel-row border p-3 mb-3 rounded shadow-sm">
+            <div class="d-flex justify-content-end mb-2">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="TravelExpenses[${travelIndex}].TravelName" class="form-control" placeholder="Travel Description" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="TravelExpenses[${travelIndex}].RSPGAmount" class="form-control" placeholder="RSPG" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="TravelExpenses[${travelIndex}].OtherAmount1" class="form-control" placeholder="Others" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="TravelExpenses[${travelIndex}].OtherAmount2" class="form-control" placeholder="Others" />
+                </div>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', newRow);
+        travelIndex++;
+    }
+
+    //OTHER JS
+    function addOtherRow() {
+        const container = document.getElementById('other-container');
+        const newRow = `
+        <div class="other-row border p-3 mb-3 rounded shadow-sm">
+            <div class="d-flex justify-content-end mb-2">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="OtherExpenses[${otherIndex}].OtherExpenseName" class="form-control" placeholder="Description" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="OtherExpenses[${otherIndex}].RSPGAmount" class="form-control" placeholder="RSPG" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="OtherExpenses[${otherIndex}].OtherAmount1" class="form-control" placeholder="Others" />
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="OtherExpenses[${otherIndex}].OtherAmount2" class="form-control" placeholder="Others" />
+                </div>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', newRow);
+        otherIndex++;
     }
 </script>

@@ -191,6 +191,23 @@ namespace University_Grant_Application_System.Pages
                     TravelExpenses = draft.TravelExpenses.ToList();
                     OtherExpenses = draft.OtherExpenses.ToList();
 
+                    // ===============================
+                    // Add placeholder rows if empty
+                    // ===============================
+                    if (!PersonnelExpenses.Any()) PersonnelExpenses.Add(new PersonnelExpense());
+                    if (!EquipmentExpenses.Any()) EquipmentExpenses.Add(new EquipmentExpense());
+                    if (!TravelExpenses.Any()) TravelExpenses.Add(new TravelExpense());
+                    if (!OtherExpenses.Any()) OtherExpenses.Add(new OtherExpense());
+
+                    // Populate IncomeSources
+                    IncomeSources = new List<IncomeSource>
+                    {
+                        new IncomeSource { SourceName = draft.OtherFunding1Name, Amount = (decimal)(draft.OtherFunding1Amount ?? 0) },
+                        new IncomeSource { SourceName = draft.OtherFunding2Name, Amount = (decimal)(draft.OtherFunding2Amount ?? 0) },
+                        new IncomeSource { SourceName = draft.OtherFunding3Name, Amount = (decimal)(draft.OtherFunding3Amount ?? 0) },
+                        new IncomeSource { SourceName = draft.OtherFunding4Name, Amount = (decimal)(draft.OtherFunding4Amount ?? 0) },
+                    }.Where(f => !string.IsNullOrWhiteSpace(f.SourceName) || f.Amount > 0).ToList();
+
                     return Page();
                 }
             }
@@ -203,6 +220,14 @@ namespace University_Grant_Application_System.Pages
                 SourceName = "RSPG",
                 Amount = 0
             });
+
+            // ===============================
+            // Add placeholder rows for expenses
+            // ===============================
+            if (!PersonnelExpenses.Any()) PersonnelExpenses.Add(new PersonnelExpense());
+            if (!EquipmentExpenses.Any()) EquipmentExpenses.Add(new EquipmentExpense());
+            if (!TravelExpenses.Any()) TravelExpenses.Add(new TravelExpense());
+            if (!OtherExpenses.Any()) OtherExpenses.Add(new OtherExpense());
 
             return Page();
         }
@@ -393,6 +418,26 @@ namespace University_Grant_Application_System.Pages
             // Calculate total budget
             // -----------------------------
             formEntry.TotalBudget = CalculateTotalBudget(formEntry);
+
+            // === INCOME SOURCES: max 4, pad if necessary ===
+            var funding = IncomeSources
+                .Where(f => !string.IsNullOrWhiteSpace(f.SourceName)) // ignore empty rows
+                .Take(4)
+                .Concat(Enumerable.Repeat(new IncomeSource(), 4))
+                .Take(4)
+                .ToList();
+
+            formEntry.OtherFunding1Name = funding[0].SourceName ?? string.Empty;
+            formEntry.OtherFunding1Amount = (float?)funding[0].Amount;
+
+            formEntry.OtherFunding2Name = funding[1].SourceName ?? string.Empty;
+            formEntry.OtherFunding2Amount = (float?)funding[1].Amount;
+
+            formEntry.OtherFunding3Name = funding[2].SourceName ?? string.Empty;
+            formEntry.OtherFunding3Amount = (float?)funding[2].Amount;
+
+            formEntry.OtherFunding4Name = funding[3].SourceName ?? string.Empty;
+            formEntry.OtherFunding4Amount = (float?)funding[3].Amount;
 
             // -----------------------------
             // Persist to database

@@ -32,10 +32,10 @@
     <div class="horizontal-scroll">
         @foreach (var app in Model.SavedApplications)
         {
-            <div class="card application-card">
+            <a asp-page="/ApplicationPage" asp-route-draftId="@app.Id" class="card application-card" style="text-decoration: none; color: inherit;">
                 <h4>@app.Title</h4>
                 <p>Status: @app.Status</p>
-            </div>
+            </a>
         }
     </div>
 </section>

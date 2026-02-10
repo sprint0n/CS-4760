@@ -72,7 +72,7 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
                 .Select(f => new ApprovedGrant
                 {
                     Title = f.Title,
-                    Amount = f.TotalBudget // or your approved amount field
+                    Amount = f.TotalBudget ?? 0m // or your approved amount field
                 })
                 .ToListAsync();
 

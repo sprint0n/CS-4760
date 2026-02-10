@@ -12,15 +12,15 @@ namespace University_Grant_Application_System.Models
         [ForeignKey("FormTableId")]
         public virtual FormTable? FormTable { get; set; }
 
-        [Required]
-        public string Role { get; set; } // "Student" or "Teacher"
+        // Optional, can be left blank
+        public string? Role { get; set; }
 
-        public string Description { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal Amount { get; set; }
+        public string? Description { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal TaxedAmount { get; set; }
+        public decimal? Amount { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal? TaxedAmount { get; set; }
     }
 }

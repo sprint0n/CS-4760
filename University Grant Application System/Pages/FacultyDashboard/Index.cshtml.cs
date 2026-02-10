@@ -52,6 +52,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Saved")
                 .Select(f => new ApplicationCard
                 {
+                    Id = f.Id,
                     Title = f.Title,
                     Status = f.ApplicationStatus
                 })
@@ -73,7 +74,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 .Select(f => new ApprovedGrant
                 {
                     Title = f.Title,
-                    Amount = f.TotalBudget // or your approved amount field
+                    Amount = f.TotalBudget ?? 0m // or your approved amount field
                 })
                 .ToListAsync();
 
@@ -84,6 +85,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
 
     public class ApplicationCard
     {
+        public int Id { get; set; }
         public string Title { get; set; } = "";
         public string Status { get; set; } = "";
     }

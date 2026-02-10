@@ -24,8 +24,8 @@ namespace University_Grant_Application_System.Pages
                 {
                     Title = a.Title,
                     PrincipalInvestigator = a.PrincipalInvestigatorID.ToString(),
-                    Amount = a.TotalBudget,
-                    OtherAmount = a.OtherFunding1Amount,
+                    Amount = a.TotalBudget ?? 0m,
+                    OtherAmount = a.OtherFunding1Amount ?? 0f,
                 })
                 .ToList();
         }

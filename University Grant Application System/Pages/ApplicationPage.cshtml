@@ -25,6 +25,7 @@
     <hr />
 
     <form method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="DraftId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
          <div class="row">
@@ -109,8 +110,11 @@
         <partial name="Shared/_BudgetSection" model="Model" />
 
         <div class="form-check">
-            <input asp-for="HumansOrAnimals" class="form-check-input" id="HumansAnimalsCheck"/>
-            <label asp-for="HumansOrAnimals" class="form-check-label">Does your research use Humans or Animals?</label>
+            <input type="checkbox" name="HumansOrAnimals" class="form-check-input" id="HumansAnimalsCheck"
+                   value="true" @(Model.HumansOrAnimals == true ? "checked" : "") />
+            <label class="form-check-label" for="HumansAnimalsCheck">
+                Does your research use Humans or Animals?
+            </label>
         </div>
 
         <div id="fileUploadSection" style="display:none;"> 
@@ -123,8 +127,11 @@
         </div>
 
         <div class="form-check">
-            <input asp-for="HasPastFunding" class="form-check-input" id="PastFundingCheck" />
-            <label class="form-check-label">Received past funding (Last 5 years)?</label>
+            <input type="checkbox" name="HasPastFunding" class="form-check-input" id="PastFundingCheck"
+                   value="true" @(Model.HasPastFunding == true ? "checked" : "") />
+            <label class="form-check-label" for="PastFundingCheck">
+                Received past funding (Last 5 years)?
+            </label>
         </div>
 
         <div id="HasPastBudget" style="display:none">

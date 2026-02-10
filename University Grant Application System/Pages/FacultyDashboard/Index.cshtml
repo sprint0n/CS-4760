@@ -32,10 +32,23 @@
     <div class="horizontal-scroll">
         @foreach (var app in Model.SavedApplications)
         {
-            <a asp-page="/ApplicationPage" asp-route-draftId="@app.Id" class="card application-card" style="text-decoration: none; color: inherit;">
+            <div class="card application-card" style="padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
                 <h4>@app.Title</h4>
                 <p>Status: @app.Status</p>
-            </a>
+
+                <div class="card-actions" style="display: flex; gap: 0.5rem;">
+                    <!-- Edit button -->
+                    <a asp-page="/ApplicationPage" asp-route-draftId="@app.Id" class="btn btn-primary btn-sm">
+                        Edit
+                    </a>
+
+                    <!-- Delete button -->
+                    <form method="post" asp-page-handler="DeleteDraft" style="display:inline;">
+                        <input type="hidden" name="draftId" value="@app.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </div>
         }
     </div>
 </section>

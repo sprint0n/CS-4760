@@ -127,6 +127,9 @@ namespace University_Grant_Application_System.Pages
         [BindProperty]
         public List<OtherExpense> OtherExpenses { get; set; } = new();
 
+        [BindProperty]
+        public int? DraftId { get; set; }  // Add this property to bind hidden draft ID from the form
+
         public async Task<IActionResult> OnGetAsync(int? draftId)
         {
             // -----------------------------
@@ -241,13 +244,11 @@ namespace University_Grant_Application_System.Pages
             // -----------------------------
             // Conditional validation for Submit
             // -----------------------------
-
             if (string.IsNullOrWhiteSpace(GrantTitle))
                 ModelState.AddModelError(nameof(GrantTitle), "Grant Title is required.");
 
             if (isSubmit)
             {
-                // Required fields
                 if (string.IsNullOrWhiteSpace(Procedure))
                     ModelState.AddModelError(nameof(Procedure), "Procedure is required.");
 
@@ -263,11 +264,9 @@ namespace University_Grant_Application_System.Pages
                 if (string.IsNullOrWhiteSpace(PrimaryInvestigator))
                     ModelState.AddModelError(nameof(PrimaryInvestigator), "Primary Investigator is required.");
 
-                // Required file
                 if (RequiredDocument == null || RequiredDocument.Length == 0)
                     ModelState.AddModelError(nameof(RequiredDocument), "Required supporting document must be uploaded.");
 
-                // Limit for income sources
                 if (IncomeSources.Count > 4)
                     ModelState.AddModelError("", "You may enter a maximum of four income sources.");
             }
@@ -279,7 +278,7 @@ namespace University_Grant_Application_System.Pages
             }
 
             // -----------------------------
-            // Handle file uploads (both draft and submit)
+            // Handle file uploads
             // -----------------------------
             if (UploadFile != null && UploadFile.Length > 0)
             {
@@ -303,31 +302,62 @@ namespace University_Grant_Application_System.Pages
             var userId = currentUser?.UserId ?? 1;
 
             // -----------------------------
-            // Create FormTable entry
+            // Load or create FormTable entry
             // -----------------------------
-            var formEntry = new FormTable
+            FormTable formEntry;
+
+            if (DraftId.HasValue)
             {
-                UserId = userId,
-                ApplicationStatus = isSubmit ? "Pending" : "Saved",
-                Title = GrantTitle,
-                Procedure = Procedure,
-                Timeline = Timeline,
-                GrantPurpose = GrantPurpose,
-                pastBudgets = PastBudget ?? string.Empty,
-                pastFunding = HasPastFunding ?? false,
-                isIRB = HumansOrAnimals ?? false,
-                Description = $"{GrantPurpose} | Inv: {PrimaryInvestigator} | Time: {Timeline}",
-                PrincipalInvestigatorID = _context.Users
-                    .Where(u => (u.FirstName + " " + u.LastName) == PrimaryInvestigator)
-                    .Select(u => u.UserId)
-                    .FirstOrDefault()
-            };
+                // Editing an existing draft
+                formEntry = await _context.FormTable
+                    .Include(f => f.PersonnelExpenses)
+                    .Include(f => f.EquipmentExpenses)
+                    .Include(f => f.TravelExpenses)
+                    .Include(f => f.OtherExpenses)
+                    .FirstOrDefaultAsync(f => f.Id == DraftId.Value && f.UserId == userId);
+
+                if (formEntry == null)
+                {
+                    // Fallback if the draft was deleted
+                    formEntry = new FormTable { UserId = userId };
+                    _context.FormTable.Add(formEntry);
+                }
+                else
+                {
+                    // Clear old expenses so we can replace them
+                    formEntry.PersonnelExpenses.Clear();
+                    formEntry.EquipmentExpenses.Clear();
+                    formEntry.TravelExpenses.Clear();
+                    formEntry.OtherExpenses.Clear();
+                }
+            }
+            else
+            {
+                // New application
+                formEntry = new FormTable { UserId = userId };
+                _context.FormTable.Add(formEntry);
+            }
+
+            // -----------------------------
+            // Populate core fields
+            // -----------------------------
+            formEntry.ApplicationStatus = isSubmit ? "Pending" : "Saved";
+            formEntry.Title = GrantTitle;
+            formEntry.Procedure = Procedure;
+            formEntry.Timeline = Timeline;
+            formEntry.GrantPurpose = GrantPurpose;
+            formEntry.pastBudgets = PastBudget ?? string.Empty;
+            formEntry.pastFunding = HasPastFunding ?? false;
+            formEntry.isIRB = HumansOrAnimals ?? false;
+            formEntry.Description = $"{GrantPurpose} | Inv: {PrimaryInvestigator} | Time: {Timeline}";
+            formEntry.PrincipalInvestigatorID = _context.Users
+                .Where(u => (u.FirstName + " " + u.LastName) == PrimaryInvestigator)
+                .Select(u => u.UserId)
+                .FirstOrDefault();
 
             // -----------------------------
             // Add expenses
             // -----------------------------
-
-            // Only fully completed expenses
             foreach (var p in PersonnelExpenses.Where(p =>
                 !string.IsNullOrWhiteSpace(p.Role) &&
                 !string.IsNullOrWhiteSpace(p.Description) &&
@@ -367,7 +397,6 @@ namespace University_Grant_Application_System.Pages
             // -----------------------------
             // Persist to database
             // -----------------------------
-            _context.FormTable.Add(formEntry);
             await _context.SaveChangesAsync();
 
             TempData["Message"] = isSubmit ? "Application submitted successfully!" : "Draft saved successfully!";
@@ -384,11 +413,9 @@ namespace University_Grant_Application_System.Pages
                 if (currentUser.userType == "chair")
                     return RedirectToPage("/DeptChairDashboard/DeptChairDashboard");
 
-                // Default: faculty
                 return RedirectToPage("/FacultyDashboard/Index");
             }
 
-            // Fallback
             return RedirectToPage("/Index");
         }
     }

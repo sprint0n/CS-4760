@@ -52,6 +52,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Saved")
                 .Select(f => new ApplicationCard
                 {
+                    Id = f.Id,
                     Title = f.Title,
                     Status = f.ApplicationStatus
                 })
@@ -73,17 +74,53 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 .Select(f => new ApprovedGrant
                 {
                     Title = f.Title,
-                    Amount = f.TotalBudget // or your approved amount field
+                    Amount = f.TotalBudget ?? 0m // or your approved amount field
                 })
                 .ToListAsync();
 
             // Example placeholder for due date
             ApplicationDueDate = DateTime.Today.AddDays(14);
         }
+
+        public async Task<IActionResult> OnPostDeleteDraftAsync(int draftId)
+        {
+            var userEmail = User.Identity?.Name;
+            if (userEmail == null)
+                return RedirectToPage(); // or show error
+
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (currentUser == null)
+                return RedirectToPage();
+
+            var draft = await _context.FormTable
+                .Include(f => f.PersonnelExpenses)
+                .Include(f => f.EquipmentExpenses)
+                .Include(f => f.TravelExpenses)
+                .Include(f => f.OtherExpenses)
+                .FirstOrDefaultAsync(f => f.Id == draftId && f.UserId == currentUser.UserId);
+
+            if (draft != null)
+            {
+                // Remove child expenses first (if needed)
+                _context.PersonnelExpenses.RemoveRange(draft.PersonnelExpenses);
+                _context.EquipmentExpenses.RemoveRange(draft.EquipmentExpenses);
+                _context.TravelExpenses.RemoveRange(draft.TravelExpenses);
+                _context.OtherExpenses.RemoveRange(draft.OtherExpenses);
+
+                // Remove the draft itself
+                _context.FormTable.Remove(draft);
+
+                await _context.SaveChangesAsync();
+                TempData["Message"] = $"Draft '{draft.Title}' deleted successfully!";
+            }
+
+            return RedirectToPage(); // Refresh the page
+        }
     }
 
     public class ApplicationCard
     {
+        public int Id { get; set; }
         public string Title { get; set; } = "";
         public string Status { get; set; } = "";
     }

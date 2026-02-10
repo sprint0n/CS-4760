@@ -12,11 +12,9 @@ namespace University_Grant_Application_System.Models
         [ForeignKey("FormTableId")]
         public virtual FormTable? FormTable { get; set; }
 
-        [Required]
-        public string EquipmentName { get; set; } = string.Empty;
+        public string? EquipmentName { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal Amount { get; set; }
-
+        public decimal? Amount { get; set; }
     }
 }

@@ -40,33 +40,36 @@
             <div class="tab-pane fade show active" id="personnel" role="tabpanel">
                 <h5 class="mb-3">Personnel Expenses</h5>
                 <div id="personnel-container">
-                    <div class="personnel-row border p-3 mb-3 rounded shadow-sm">
-                        <div class="row g-2">
-                            <div class="col-md-3">
-                                <label class="form-label small">Role</label>
-                                <select name="PersonnelExpenses[0].Role" class="form-control form-control-sm role-select" onchange="calculateTax(this)">
-                                    <option value="Student">Student</option>
-                                    <option value="Teacher">Teacher</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small">Description</label>
-                                <input type="text" name="PersonnelExpenses[0].Description" class="form-control form-control-sm" placeholder="Task description" />
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small text-success">RSPG ($)</label>
-                                <input type="number" name="PersonnelExpenses[0].Amount" class="form-control form-control-sm amount-input" oninput="calculateTax(this)" placeholder="0.00" />
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small text-secondary">Other ($)</label>
-                                <input type="number" name="PersonnelExpenses[0].OtherAmount1" class="form-control form-control-sm" placeholder="Other" />
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label small text-secondary">Other ($)</label>
-                                <input type="number" name="PersonnelExpenses[0].OtherAmount2" class="form-control form-control-sm" placeholder="Other" />
+                    @for (int i = 0; i < Model.PersonnelExpenses.Count; i++)
+                    {
+                        <div class="personnel-row border p-3 mb-3 rounded shadow-sm">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label class="form-label small">Role</label>
+                                    <select asp-for="PersonnelExpenses[i].Role" class="form-control form-control-sm role-select" onchange="calculateTax(this)">
+                                        <option value="Student">Student</option>
+                                        <option value="Teacher">Teacher</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">Description</label>
+                                    <input asp-for="PersonnelExpenses[i].Description" class="form-control form-control-sm" placeholder="Task description" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small text-success">RSPG ($)</label>
+                                    <input asp-for="PersonnelExpenses[i].Amount" class="form-control form-control-sm amount-input" oninput="calculateTax(this)" placeholder="0.00" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small text-secondary">Other ($)</label>
+                                    <input name="PersonnelExpenses[i].OtherAmount1" class="form-control form-control-sm" placeholder="Other" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label small text-secondary">Other ($)</label>
+                                    <input name="PersonnelExpenses[i].OtherAmount2" class="form-control form-control-sm" placeholder="Other" />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addPersonRow()">+ Add New Person</button>
             </div>
@@ -74,26 +77,29 @@
             <div class="tab-pane fade" id="equipment" role="tabpanel">
                 <h5 class="mb-3">Equipment Expenses</h5>
                 <div id="equipment-container">
-                    <div class="equipment-row border p-3 mb-3 rounded shadow-sm">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Equipment Name</label>
-                                <input type="text" name="EquipmentExpenses[0].EquipmentName" class="form-control" placeholder="Equipments..." />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-success">RSPG ($)</label>
-                                <input type="number" name="EquipmentExpenses[0].RSPGAmount" class="form-control" placeholder="RSPG" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-secondary">Other ($)</label>
-                                <input type="number" name="EquipmentExpenses[0].OtherAmount1" class="form-control" placeholder="Others" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-secondary">Other ($)</label>
-                                <input type="number" name="EquipmentExpenses[0].OtherAmount2" class="form-control" placeholder="Others" />
+                    @for (int i = 0; i < Model.EquipmentExpenses.Count; i++)
+                    {
+                        <div class="equipment-row border p-3 mb-3 rounded shadow-sm">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Equipment Name</label>
+                                    <input asp-for="EquipmentExpenses[i].EquipmentName" class="form-control" placeholder="Equipments..." />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-success">RSPG ($)</label>
+                                    <input asp-for="EquipmentExpenses[i].Amount" class="form-control" placeholder="RSPG" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-secondary">Other ($)</label>
+                                    <input name="EquipmentExpenses[i].OtherAmount1" class="form-control" placeholder="Others" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-secondary">Other ($)</label>
+                                    <input name="EquipmentExpenses[i].OtherAmount2" class="form-control" placeholder="Others" />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEquipmentRow()">+ Add New Equipment</button>
             </div>
@@ -101,26 +107,29 @@
             <div class="tab-pane fade" id="travel" role="tabpanel">
                 <h5 class="mb-3">Travel Expenses</h5>
                 <div id="travel-container">
-                    <div class="travel-row border p-3 mb-3 rounded shadow-sm">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Travel Description</label>
-                                <input type="text" name="TravelExpenses[0].TravelName" class="form-control" placeholder="Travels..." />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-success">RSPG ($)</label>
-                                <input type="number" name="TravelExpenses[0].RSPGAmount" class="form-control" placeholder="RSPG" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-secondary">Other ($)</label>
-                                <input type="number" name="TravelExpenses[0].OtherAmount1" class="form-control" placeholder="Others" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-secondary">Other ($)</label>
-                                <input type="number" name="TravelExpenses[0].OtherAmount2" class="form-control" placeholder="Others" />
+                    @for (int i = 0; i < Model.TravelExpenses.Count; i++)
+                    {
+                        <div class="travel-row border p-3 mb-3 rounded shadow-sm">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Travel Name</label>
+                                    <input asp-for="TravelExpenses[i].TravelName" class="form-control" placeholder="Trip or travel..." />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-success">RSPG ($)</label>
+                                    <input asp-for="TravelExpenses[i].Amount" class="form-control" placeholder="RSPG" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-secondary">Other ($)</label>
+                                    <input name="TravelExpenses[i].OtherAmount1" class="form-control" placeholder="Other" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-secondary">Other ($)</label>
+                                    <input name="TravelExpenses[i].OtherAmount2" class="form-control" placeholder="Other" />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addTravelRow()">+ Add New Travel</button>
             </div>
@@ -128,26 +137,29 @@
             <div class="tab-pane fade" id="other" role="tabpanel">
                 <h5 class="mb-3">Other Expenses</h5>
                 <div id="other-container">
-                    <div class="other-row border p-3 mb-3 rounded shadow-sm">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Description</label>
-                                <input type="text" name="OtherExpenses[0].OtherExpenseName" class="form-control" placeholder="Miscellaneous" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-success">RSPG ($)</label>
-                                <input type="number" name="OtherExpenses[0].RSPGAmount" class="form-control" placeholder="RSPG" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-secondary">Other ($)</label>
-                                <input type="number" name="OtherExpenses[0].OtherAmount1" class="form-control" placeholder="Others" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-secondary">Other ($)</label>
-                                <input type="number" name="OtherExpenses[0].OtherAmount2" class="form-control" placeholder="Others" />
+                    @for (int i = 0; i < Model.OtherExpenses.Count; i++)
+                    {
+                        <div class="other-row border p-3 mb-3 rounded shadow-sm">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Expense Name</label>
+                                    <input asp-for="OtherExpenses[i].OtherExpenseName" class="form-control" placeholder="Expense description..." />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-success">RSPG ($)</label>
+                                    <input asp-for="OtherExpenses[i].Amount" class="form-control" placeholder="RSPG" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-secondary">Other ($)</label>
+                                    <input name="OtherExpenses[i].OtherAmount1" class="form-control" placeholder="Other" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-secondary">Other ($)</label>
+                                    <input name="OtherExpenses[i].OtherAmount2" class="form-control" placeholder="Other" />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="addOtherRow()">+ Add New Other</button>
             </div>

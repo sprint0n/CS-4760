@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.Extensions.Primitives;
 
 namespace University_Grant_Application_System.Models
 {
@@ -31,5 +32,8 @@ namespace University_Grant_Application_System.Models
         public int FormTableId { get; set; }
         [ForeignKey("FormTableId")]
         public FormTable? FormTable { get; set; }
+
+        [Required]
+        public string StoredFileName { get; set; } = string.Empty;
     }
 }

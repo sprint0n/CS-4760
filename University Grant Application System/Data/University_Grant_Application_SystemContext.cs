@@ -28,6 +28,8 @@ namespace University_Grant_Application_System.Data
 
         public DbSet<University_Grant_Application_System.Models.OtherExpense> OtherExpenses { get; set; } = default!;
         public DbSet<University_Grant_Application_System.Models.UploadedFile> UploadedFiles { get; set; } = default!;
+        public DbSet<University_Grant_Application_System.Models.Review> Reviews { get; set; } = default!;
+
 
 
 

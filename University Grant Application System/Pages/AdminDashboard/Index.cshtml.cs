@@ -65,6 +65,9 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
             if (user != null)
             {
                 user.committeeMemberStatus = "";
+
+                var incompleteReviews = _context.Reviews.Where(r => r.ReviewerId == userId && r.ReviewDone == false);
+                _context.Reviews.RemoveRange(incompleteReviews);
                 await _context.SaveChangesAsync();
             }
 

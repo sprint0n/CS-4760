@@ -1,0 +1,132 @@
+﻿@page "{id:int}"
+@model University_Grant_Application_System.Pages.DeptChairDashboard.ReviewModel
+@{
+    ViewData["Title"] = "Review Grant Application";
+    Layout = "_DeptChairLayout";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Review Application: @Model.Application.Title</h2>
+        <span class="badge bg-warning text-dark">@Model.Application.ApplicationStatus</span>
+    </div>
+    <hr />
+
+    <section class="mb-4">
+        <h4>Applicant Information</h4>
+        <div class="row border p-3 bg-light">
+            <div class="col-md-4">
+                <label><strong>Primary Investigator:</strong></label>
+                <p>@Model.InvestigatorName</p>
+            </div>
+            <div class="col-md-4">
+                <label><strong>Index Number:</strong></label>
+                <p>@Model.Application.UserId</p>
+            </div>
+            <div class="col-md-4">
+                <label><strong>Department:</strong></label>
+
+                <p>@(Model.Application.User?.Department?.DepartmentName ?? "N/A")</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-4">
+        <h4>Project Details</h4>
+        <div class="mb-3">
+            <label><strong>Grant Title:</strong></label>
+            <div class="form-control-plaintext border-bottom">@Model.Application.Title</div>
+        </div>
+        <div class="mb-3">
+            <label><strong>Purpose:</strong></label>
+            <div class="p-2 border bg-white" style="white-space: pre-wrap;">@Model.Application.GrantPurpose</div>
+        </div>
+        <div class="mb-3">
+            <label><strong>Procedure:</strong></label>
+            <div class="p-2 border bg-white">@Model.Application.Procedure</div>
+        </div>
+        <div class="mb-3">
+            <label><strong>Timeline:</strong></label>
+            <div class="p-2 border bg-white">@Model.Application.Timeline</div>
+        </div>
+    </section>
+
+    <section class="mb-4">
+        <h4>Budget Breakdown (Total: @Model.Application.TotalBudget?.ToString("C"))</h4>
+        
+        @if (Model.Application.PersonnelExpenses.Any())
+        {
+            <h5>Personnel</h5>
+            <table class="table table-sm border mb-3">
+                <thead class="table-light">
+                    <tr><th>Role</th><th>Description</th><th>Amount</th></tr>
+                </thead>
+                <tbody>
+                    @foreach(var p in Model.Application.PersonnelExpenses) {
+                        <tr><td>@p.Role</td><td>@p.Description</td><td>@p.Amount?.ToString("C")</td></tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Model.Application.EquipmentExpenses.Any())
+        {
+            <h5>Equipment</h5>
+            <table class="table table-sm border mb-3">
+                <thead class="table-light">
+                    <tr><th>Item</th><th>Amount</th></tr>
+                </thead>
+                <tbody>
+                    @foreach(var e in Model.Application.EquipmentExpenses) {
+                        <tr><td>@e.EquipmentName</td><td>@e.Amount?.ToString("C")</td></tr>
+                    }
+                </tbody>
+            </table>
+        }
+        
+
+    </section>
+
+    <section class="mb-4">
+        <h4>Compliance & History</h4>
+        <p><strong>Uses Humans/Animals (IRB):</strong> @(Model.Application.isIRB == true ? "Yes" : "No")</p>
+        <p><strong>Past Funding:</strong> @(Model.Application.pastFunding == true ? "Yes" : "No")</p>
+        @if(Model.Application.pastFunding == true) {
+            <div class="p-2 border mb-3 bg-light">
+                <strong>Past Budget Info:</strong><br />
+                @Model.Application.pastBudgets
+            </div>
+        }
+    </section>
+<div class="mt-4">
+    <h4>Attached Documents</h4>
+    <div class="list-group">
+        @foreach (var file in Model.AttachedFiles)
+        {
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-secondary me-2">@file.Category</span>
+                    <strong>@file.FileName</strong>
+                    <small class="text-muted ms-2">(@(file.FileSize / 1024) KB)</small>
+                </div>
+                <a asp-page-handler="DownloadFile" asp-route-fileId="@file.ID" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-download"></i> View Document
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+    <div class="mt-5 p-4 border shadow-sm bg-white">
+        <h4>Department Chair Decision</h4>
+        <form method="post" asp-page-handler="Action" asp-route-id="@Model.Application.Id">
+            <div class="d-flex gap-3">
+                <button type="submit" name="decision" value="Approve" class="btn btn-success btn-lg">Approve & Forward</button>
+                <button type="submit" name="decision" value="Decline" class="btn btn-danger btn-lg">Decline Application</button>
+                <a asp-page="/DeptChairDashboard/DeptChairDashboard" class="btn btn-secondary btn-lg">Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+               

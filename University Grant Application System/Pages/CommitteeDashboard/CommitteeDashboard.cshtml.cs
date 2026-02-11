@@ -17,6 +17,10 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
         public List<ApplicationCard> SavedApplications { get; set; } = new();
         public List<ApplicationCard> InReviewApplications { get; set; } = new();
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
+
+        public List<ApprovedGrant> ToReviewGrants { get; set; } = new();
+
+
         public async Task OnGetAsync()
         {
             // Get the logged-in user's email
@@ -48,17 +52,24 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
 
             // Retrieve saved drafts
             SavedApplications = await _context.FormTable
-                .Where(f => f.UserId == userId && f.ApplicationStatus == "Saved")
-                .Select(f => new ApplicationCard
-                {
-                    Title = f.Title,
-                    Status = f.ApplicationStatus
-                })
-                .ToListAsync();
+            .Where(f => f.UserId == userId && f.ApplicationStatus == "Saved")
+            .Select(f => new ApplicationCard
+            {
+                ApplicationId = f.Id,
+                Title = f.Title,
+                Status = f.ApplicationStatus,
+                Amount = f.TotalBudget,
+                OtherAmount = f.OtherFunding1Amount,
+                PrimaryInvestigator = _context.Users
+                    .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                    .Select(u => u.FirstName + " " + u.LastName)
+                    .FirstOrDefault() ?? "N/A"
+            })
+            .ToListAsync();
 
             // Retrieve submitted / in-review applications
             InReviewApplications = await _context.FormTable
-                .Where(f => f.UserId == userId && f.ApplicationStatus == "Pending")
+                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee"))
                 .Select(f => new ApplicationCard
                 {
                     Title = f.Title,
@@ -71,10 +82,31 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Approved")
                 .Select(f => new ApprovedGrant
                 {
+                    ApplicationId = f.Id,
                     Title = f.Title,
-                    Amount = f.TotalBudget ?? 0m // or your approved amount field
+                    Amount = f.TotalBudget ?? 0m, // or your approved amount field
+                    PrimaryInvestigator = _context.Users
+                    .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                    .Select(u => u.FirstName + " " + u.LastName)
+                    .FirstOrDefault() ?? "N/A"
                 })
                 .ToListAsync();
+
+            ToReviewGrants = await _context.Reviews
+             .Include(r => r.FormTable)
+             .Where(r => r.ReviewerId == userId && r.ReviewDone == false)
+             .Select(r => new ApprovedGrant 
+             {
+                 ApplicationId = r.FormTable.Id,
+                 Title = r.FormTable.Title,
+                 Status = "Action Required: Pending Your Review",
+                 Amount = r.FormTable.TotalBudget,
+                 PrimaryInvestigator = _context.Users
+                     .Where(u => u.UserId == r.FormTable.PrincipalInvestigatorID)
+                     .Select(u => u.FirstName + " " + u.LastName)
+                     .FirstOrDefault() ?? "N/A"
+             })
+             .ToListAsync();
 
             // Example placeholder for due date
             ApplicationDueDate = DateTime.Today.AddDays(14);
@@ -83,13 +115,26 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
 
     public class ApplicationCard
     {
+        public int ApplicationId { get; set; } = 0;
         public string Title { get; set; } = "";
         public string Status { get; set; } = "";
+
+        public decimal? Amount { get; set; }
+        public float? OtherAmount { get; set; } = 0;
+
+        public string PrimaryInvestigator { get; set; } = "";
     }
 
     public class ApprovedGrant
     {
+        public int ApplicationId { get; set; } = 0;
+
         public string Title { get; set; } = "";
-        public decimal Amount { get; set; }
+        public string Status { get; set; } = "";
+
+        public decimal? Amount { get; set; }
+        public float? OtherAmount { get; set; } = 0;
+
+        public string PrimaryInvestigator { get; set; } = "";
     }
 }

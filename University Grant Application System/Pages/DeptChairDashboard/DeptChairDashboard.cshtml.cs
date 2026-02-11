@@ -17,6 +17,8 @@ namespace University_Grant_Application_System.Pages.DeptChairDashboard
         public List<ApplicationCard> SavedApplications { get; set; } = new();
         public List<ApplicationCard> InReviewApplications { get; set; } = new();
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
+
+        public List<ApplicationCard> ApplicationToReview { get; set; } = new();
         public async Task OnGetAsync()
         {
             // Get the logged-in user's email
@@ -45,20 +47,26 @@ namespace University_Grant_Application_System.Pages.DeptChairDashboard
             }
 
             var userId = currentUser.UserId;
+            var deptId = currentUser.DepartmentId;
 
             // Retrieve saved drafts
             SavedApplications = await _context.FormTable
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Saved")
                 .Select(f => new ApplicationCard
                 {
+                    ApplicationId = f.Id,
                     Title = f.Title,
-                    Status = f.ApplicationStatus
+                    Status = f.ApplicationStatus,
+                    PrimaryInvestigator = _context.Users
+                        .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "N/A"
                 })
                 .ToListAsync();
 
             // Retrieve submitted / in-review applications
             InReviewApplications = await _context.FormTable
-                .Where(f => f.UserId == userId && f.ApplicationStatus == "Pending")
+                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee"))
                 .Select(f => new ApplicationCard
                 {
                     Title = f.Title,
@@ -76,19 +84,40 @@ namespace University_Grant_Application_System.Pages.DeptChairDashboard
                 })
                 .ToListAsync();
 
-            // Example placeholder for due date
-            ApplicationDueDate = DateTime.Today.AddDays(14);
+            ApplicationToReview = await _context.FormTable
+                 .Include(f => f.User) // Include the applicant user data
+                 .Where(f => f.ApplicationStatus == "PendingDeptChair" &&
+                             f.User.DepartmentId == deptId)
+                 .Select(f => new ApplicationCard
+                 {
+                     ApplicationId = f.Id,
+                     Title = f.Title,
+                     Status = "Pending Review",
+                     PrimaryInvestigator = _context.Users
+                        .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "N/A"
+                 })
+                 .ToListAsync();
+             // Example placeholder for due date
+             ApplicationDueDate = DateTime.Today.AddDays(14);
         }
     }
 
     public class ApplicationCard
     {
+        public int ApplicationId { get; set; }
         public string Title { get; set; } = "";
         public string Status { get; set; } = "";
+
+        public string PrimaryInvestigator {  get; set; } = " ";
+        public decimal Amount { get; set; } = 0;
     }
 
     public class ApprovedGrant
     {
+        public int ApplicationId { get; set; }
+
         public string Title { get; set; } = "";
         public decimal Amount { get; set; }
     }

@@ -60,7 +60,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
 
             // Retrieve submitted / in-review applications
             InReviewApplications = await _context.FormTable
-                .Where(f => f.UserId == userId && f.ApplicationStatus == "Pending")
+                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee"))
                 .Select(f => new ApplicationCard
                 {
                     Title = f.Title,

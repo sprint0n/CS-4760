@@ -117,11 +117,22 @@
             </label>
         </div>
 
-        <div id="fileUploadSection" style="display:none;"> 
+        <div id="fileUploadSection" style="display:@(Model.HumansOrAnimals == true ? "block" : "none");"> 
             <div class="mb-3"> 
-                <label asp-for="UploadFile" class="form-label">
-                    IRB Documentation Approval
-                </label> <input asp-for="UploadFile" type="file" class="form-control" /> 
+                <label asp-for="UploadFile" class="form-label">IRB Documentation Approval</label>
+                @{
+                    var existingIRB = Model.ExistingFiles.FirstOrDefault(f => 
+                        f.Category == University_Grant_Application_System.Models.AttachmentType.IRB);
+                    if (existingIRB != null)
+                    {
+                        <div class="text-success mb-1">
+                            <small>Currently attached: @existingIRB.FileName</small>
+                            <input type="hidden" name="HasExistingIRB" value="true" />
+                        </div>
+                    }
+                }
+                
+                <input asp-for="UploadFile" type="file" class="form-control" /> 
                 <span asp-validation-for="UploadFile" class="text-danger"></span> 
             </div> 
         </div>
@@ -142,28 +153,37 @@
             </div>
         </div>
 
-        <!-- New supporting documents section -->
-        <div class="mt-4">
-            <h4>Supporting Documents</h4>
-            <p>One required document and two optional documents.</p>
+        <div class="mb-3">
+            <label asp-for="RequiredDocument" class="form-label">Required Supporting Document</label>
 
-            <div class="mb-3">
-                <label asp-for="RequiredDocument" class="form-label"></label>
-                <input asp-for="RequiredDocument" type="file" class="form-control" />
-                <span asp-validation-for="RequiredDocument" class="text-danger"></span>
-            </div>
+            @{
+                var existingReq = Model.ExistingFiles.FirstOrDefault(f => 
+                    f.Category == University_Grant_Application_System.Models.AttachmentType.SupportingDoc);
+                
+                if (existingReq != null)
+                {
+                    <div class="alert alert-success d-flex align-items-center p-2">
+                        <i class="bi bi-file-earmark-check-fill me-2"></i>
+                        <small>Current: <strong>@existingReq.FileName</strong></small>
+                        <input type="hidden" name="HasExistingRequiredDoc" value="true" />
+                    </div>
+                }
+            }
 
-            <div class="mb-3">
-                <label asp-for="OptionalDocument1" class="form-label"></label>
-                <input asp-for="OptionalDocument1" type="file" class="form-control" />
-                <span asp-validation-for="OptionalDocument1" class="text-danger"></span>
-            </div>
+            <input asp-for="RequiredDocument" type="file" class="form-control" />
+            <span asp-validation-for="RequiredDocument" class="text-danger"></span>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="OptionalDocument2" class="form-label"></label>
-                <input asp-for="OptionalDocument2" type="file" class="form-control" />
-                <span asp-validation-for="OptionalDocument2" class="text-danger"></span>
-            </div>
+        <div class="mb-3">
+            <label asp-for="OptionalDocument1" class="form-label"></label>
+            <input asp-for="OptionalDocument1" type="file" class="form-control" />
+            <span asp-validation-for="OptionalDocument1" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="OptionalDocument2" class="form-label"></label>
+            <input asp-for="OptionalDocument2" type="file" class="form-control" />
+            <span asp-validation-for="OptionalDocument2" class="text-danger"></span>
         </div>
 
         <h4>Other Sources of Funding (Max 4)</h4>

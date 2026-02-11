@@ -26,6 +26,7 @@ namespace University_Grant_Application_System.Models
         // Nullable text columns
         // -----------------------------
 
+
         public string? Description { get; set; }
         public string? Procedure { get; set; }
         public string? GrantPurpose { get; set; }
@@ -43,6 +44,7 @@ namespace University_Grant_Application_System.Models
         public float? OtherFunding3Amount { get; set; }
         public float? OtherFunding4Amount { get; set; }
 
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal? TotalBudget { get; set; }
 
         // -----------------------------
@@ -67,6 +69,10 @@ namespace University_Grant_Application_System.Models
 
         public int? PrincipalInvestigatorID { get; set; }
 
+
+        public bool? approvedByDeptChair { get; set; } = false;
+
+
         // -----------------------------
         // Navigation properties
         // -----------------------------
@@ -79,5 +85,7 @@ namespace University_Grant_Application_System.Models
         public virtual ICollection<EquipmentExpense> EquipmentExpenses { get; set; } = new List<EquipmentExpense>();
         public virtual ICollection<OtherExpense> OtherExpenses { get; set; } = new List<OtherExpense>();
         public virtual ICollection<UploadedFile> UploadedFiles { get; set; } = new List<UploadedFile>();
+
+        public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

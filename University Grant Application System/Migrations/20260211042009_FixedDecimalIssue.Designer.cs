@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University_Grant_Application_System.Data;
 
@@ -11,9 +12,11 @@ using University_Grant_Application_System.Data;
 namespace University_Grant_Application_System.Migrations
 {
     [DbContext(typeof(University_Grant_Application_SystemContext))]
-    partial class University_Grant_Application_SystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260211042009_FixedDecimalIssue")]
+    partial class FixedDecimalIssue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,8 +234,31 @@ namespace University_Grant_Application_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
 
+                    b.Property<string>("Area1Criteron")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Area1Score")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Area2Criteron")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Area2Score")
+                        .HasColumnType("real");
+
+                    b.Property<float>("DocumentationScore")
+                        .HasColumnType("real");
+
+                    b.Property<float>("EvaluationScore")
+                        .HasColumnType("real");
+
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
+
+                    b.Property<float>("ProcedureScore")
+                        .HasColumnType("real");
 
                     b.Property<bool>("ReviewDone")
                         .HasColumnType("bit");
@@ -240,11 +266,11 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<int>("ReviewerId")
                         .HasColumnType("int");
 
+                    b.Property<float>("TimelineScore")
+                        .HasColumnType("real");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<double>("totalScore")
-                        .HasColumnType("float");
 
                     b.HasKey("ReviewId");
 
@@ -323,10 +349,6 @@ namespace University_Grant_Application_System.Migrations
 
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
-
-                    b.Property<string>("StoredFileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UploadedAt")
                         .HasColumnType("datetime2");

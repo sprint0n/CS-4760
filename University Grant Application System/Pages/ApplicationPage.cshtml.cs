@@ -9,6 +9,7 @@ using University_Grant_Application_System.Models;
 namespace University_Grant_Application_System.Pages
 {
     // Helper class for the View (Income rows)
+
     public class IncomeSource
     {
         [Required]
@@ -128,7 +129,15 @@ namespace University_Grant_Application_System.Pages
         public List<OtherExpense> OtherExpenses { get; set; } = new();
 
         [BindProperty]
-        public int? DraftId { get; set; }  // Add this property to bind hidden draft ID from the form
+        public int? DraftId { get; set; }  
+
+        [BindProperty]
+        public bool HasExistingRequiredDoc { get; set; }
+
+        [BindProperty]
+        public bool HasExistingIRB { get; set; }
+
+        public List<UploadedFile> ExistingFiles { get ; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? draftId)
         {
@@ -173,18 +182,25 @@ namespace University_Grant_Application_System.Pages
 
                 if (draft != null)
                 {
+                    draftId = draft.Id;
                     GrantTitle = draft.Title;
                     Procedure = draft.Procedure;
                     GrantPurpose = draft.GrantPurpose;
                     PastBudget = draft.pastBudgets;
                     HasPastFunding = draft.pastFunding;
                     Timeline = draft.Timeline;
+                    DisseminationBudget = draft.DisseminationBudget?.ToString();
                     HumansOrAnimals = draft.isIRB;
 
                     PrimaryInvestigator = await _context.Users
                         .Where(u => u.UserId == draft.PrincipalInvestigatorID)
                         .Select(u => u.FirstName + " " + u.LastName)
                         .FirstOrDefaultAsync();
+
+                    ExistingFiles = await _context.UploadedFiles
+                       .Where(u => u.FormTableId == draft.Id)
+                       .ToListAsync();
+
 
                     PersonnelExpenses = draft.PersonnelExpenses.ToList();
                     EquipmentExpenses = draft.EquipmentExpenses.ToList();
@@ -208,6 +224,7 @@ namespace University_Grant_Application_System.Pages
                         new IncomeSource { SourceName = draft.OtherFunding4Name, Amount = (decimal)(draft.OtherFunding4Amount ?? 0) },
                     }.Where(f => !string.IsNullOrWhiteSpace(f.SourceName) || f.Amount > 0).ToList();
 
+                   
                     return Page();
                 }
             }
@@ -251,7 +268,6 @@ namespace University_Grant_Application_System.Pages
 
             var extension = Path.GetExtension(file.FileName);
             var uniqueName = $"{file.FileName}_{Guid.NewGuid()}{extension}";
-
             var filePath = Path.Combine(uploadFolder, uniqueName);
 
             using (var stream = System.IO.File.Create(filePath))
@@ -262,9 +278,36 @@ namespace University_Grant_Application_System.Pages
             return uniqueName;
         }
 
+        private void RecordFileUpload(int formId, string originalName, string uniqueName, AttachmentType category, string contentType, long size)
+        {
+            var upload = new UploadedFile
+            {
+                ID = Guid.NewGuid(),
+                FileName = originalName,
+                StoredFileName = uniqueName,
+                Category = category,
+                ContentType = contentType,
+                FileSize = size,
+                FormTableId = formId,
+                UploadedAt = DateTime.UtcNow,
+            };
+            _context.UploadedFiles.Add(upload);
+        }
+
+
         public async Task<IActionResult> OnPostAsync(string action)
         {
+            
             bool isSubmit = action == "Submit";
+
+            if (HasExistingRequiredDoc)
+            {
+                ModelState.Remove(nameof(RequiredDocument));
+            }
+            if (HasExistingIRB && HumansOrAnimals == true)
+            {
+                ModelState.Remove(nameof(UploadFile));
+            }
 
             // -----------------------------
             // Conditional validation for Submit
@@ -289,11 +332,25 @@ namespace University_Grant_Application_System.Pages
                 if (string.IsNullOrWhiteSpace(PrimaryInvestigator))
                     ModelState.AddModelError(nameof(PrimaryInvestigator), "Primary Investigator is required.");
 
-                if (RequiredDocument == null || RequiredDocument.Length == 0)
+                if (!HasExistingRequiredDoc && (RequiredDocument == null || RequiredDocument.Length == 0))
+                {
                     ModelState.AddModelError(nameof(RequiredDocument), "Required supporting document must be uploaded.");
+                }
+
+                if (HumansOrAnimals == true && !HasExistingIRB && (UploadFile == null || UploadFile.Length == 0))
+                {
+                    ModelState.AddModelError(nameof(UploadFile), "IRB Documentation is required.");
+                }
 
                 if (IncomeSources.Count > 4)
                     ModelState.AddModelError("", "You may enter a maximum of four income sources.");
+            }
+
+            // 4. Check Final ModelState
+            if (!ModelState.IsValid)
+            {
+                await PopulateSelectListsAsync();
+                return Page();
             }
 
             if (!ModelState.IsValid)
@@ -366,11 +423,15 @@ namespace University_Grant_Application_System.Pages
             // -----------------------------
             // Populate core fields
             // -----------------------------
-            formEntry.ApplicationStatus = isSubmit ? "Pending" : "Saved";
+            formEntry.ApplicationStatus = isSubmit ? "PendingDeptChair" : "Saved";
             formEntry.Title = GrantTitle;
             formEntry.Procedure = Procedure;
             formEntry.Timeline = Timeline;
             formEntry.GrantPurpose = GrantPurpose;
+            if (decimal.TryParse(DisseminationBudget, out decimal parsedDissemination))
+            {
+                formEntry.DisseminationBudget = (float)parsedDissemination;
+            }
             formEntry.pastBudgets = PastBudget ?? string.Empty;
             formEntry.pastFunding = HasPastFunding ?? false;
             formEntry.isIRB = HumansOrAnimals ?? false;
@@ -428,16 +489,16 @@ namespace University_Grant_Application_System.Pages
                 .ToList();
 
             formEntry.OtherFunding1Name = funding[0].SourceName ?? string.Empty;
-            formEntry.OtherFunding1Amount = (float?)funding[0].Amount;
+            formEntry.OtherFunding1Amount = (float)funding[0].Amount;
 
             formEntry.OtherFunding2Name = funding[1].SourceName ?? string.Empty;
-            formEntry.OtherFunding2Amount = (float?)funding[1].Amount;
+            formEntry.OtherFunding2Amount = (float)funding[1].Amount;
 
             formEntry.OtherFunding3Name = funding[2].SourceName ?? string.Empty;
-            formEntry.OtherFunding3Amount = (float?)funding[2].Amount;
+            formEntry.OtherFunding3Amount = (float)funding[2].Amount;
 
             formEntry.OtherFunding4Name = funding[3].SourceName ?? string.Empty;
-            formEntry.OtherFunding4Amount = (float?)funding[3].Amount;
+            formEntry.OtherFunding4Amount = (float)funding[3].Amount;
 
             // -----------------------------
             // Persist to database
@@ -445,6 +506,27 @@ namespace University_Grant_Application_System.Pages
             await _context.SaveChangesAsync();
 
             TempData["Message"] = isSubmit ? "Application submitted successfully!" : "Draft saved successfully!";
+
+
+            if (RequiredDocument != null && RequiredDocument.Length > 0)
+            {
+                string? reqUniqueName = await SaveFileAsync(RequiredDocument);
+                if (reqUniqueName != null)
+                {
+                    RecordFileUpload(formEntry.Id, RequiredDocument.FileName, reqUniqueName, AttachmentType.SupportingDoc, RequiredDocument.ContentType, RequiredDocument.Length);
+                }
+            }
+
+            if (UploadFile != null && UploadFile.Length > 0)
+            {
+                string? irbUniqueName = await SaveFileAsync(UploadFile);
+                if (irbUniqueName != null)
+                {
+                    RecordFileUpload(formEntry.Id, UploadFile.FileName, irbUniqueName, AttachmentType.IRB, UploadFile.ContentType, UploadFile.Length);
+                }
+            }
+
+            await _context.SaveChangesAsync(); 
 
             // -----------------------------
             // Redirect based on role

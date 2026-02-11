@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University_Grant_Application_System.Data;
 
@@ -11,9 +12,11 @@ using University_Grant_Application_System.Data;
 namespace University_Grant_Application_System.Migrations
 {
     [DbContext(typeof(University_Grant_Application_SystemContext))]
-    partial class University_Grant_Application_SystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260211051202_UpdatedReviewTable")]
+    partial class UpdatedReviewTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,8 +246,8 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<double>("totalScore")
-                        .HasColumnType("float");
+                    b.Property<float>("totalScore")
+                        .HasColumnType("real");
 
                     b.HasKey("ReviewId");
 
@@ -323,10 +326,6 @@ namespace University_Grant_Application_System.Migrations
 
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
-
-                    b.Property<string>("StoredFileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UploadedAt")
                         .HasColumnType("datetime2");

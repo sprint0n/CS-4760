@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{id:int}"
 @model University_Grant_Application_System.Pages.RubricModel
 @{
 }
@@ -27,7 +27,9 @@
                     <td>
                         <select asp-for="BudgetScore" class="form-select score-input" data-weight="3" data-section="area-one">
                             <option value="0">0</option>
+                            <option value="0.5">0.5</option>
                             <option value="1">1</option>
+                            <option value="1.5">1.5</option>
                             <option value="2">2</option>
                         </select>
                     </td>
@@ -40,7 +42,9 @@
                     <td>
                         <select asp-for="SupportScore" class="form-select score-input" data-weight="3" data-section="area-one">
                             <option value="0">0</option>
+                            <option value="0.5">0.5</option>
                             <option value="1">1</option>
+                            <option value="1.5">1.5</option>
                             <option value="2">2</option>
                         </select>
                     </td>
@@ -70,7 +74,9 @@
                         <td>
                             <select asp-for="ReputationScore" class="form-select score-input" data-weight="5" data-section="area-two">
                                 <option value="0">0</option>
+                                <option value="0.5">0.5</option>
                                 <option value="1">1</option>
+                                <option value="1.5">1.5</option>
                                 <option value="2">2</option>
 
                             </select>
@@ -84,7 +90,9 @@
                         <td>
                             <select asp-for="InnovationScore" class="form-select score-input" data-weight="5" data-section="area-two">
                                 <option value="0">0</option>
+                                <option value="0.5">0.5</option>
                                 <option value="1">1</option>
+                                <option value="1.5">1.5</option>
                                 <option value="2">2</option>
                             </select>
                         </td>
@@ -97,7 +105,9 @@
                         <td>
                             <select asp-for="CommunityScore" class="form-select score-input" data-weight="5" data-section="area-two">
                                 <option value="0">0</option>
+                                <option value="0.5">0.5</option>
                                 <option value="1">1</option>
+                                <option value="1.5">1.5</option>
                                 <option value="2">2</option>
                             </select>
                         </td>
@@ -125,7 +135,9 @@
                         <td>
                             <select asp-for="ProcedureScore" class="form-select score-input" data-weight="1">
                                 <option value="0">0</option>
+                                <option value="0.5">0.5</option>
                                 <option value="1">1</option>
+                                <option value="1.5">1.5</option>
                                 <option value="2">2</option>
                             </select>
                         </td>
@@ -138,7 +150,9 @@
                         <td>
                             <select asp-for="TimelineScore" class="form-select score-input" data-weight="1">
                                 <option value="0">0</option>
+                                <option value="0.5">0.5</option>
                                 <option value="1">1</option>
+                                <option value="1.5">1.5</option>
                                 <option value="2">2</option>
                             </select>
                         </td>
@@ -151,7 +165,9 @@
                         <td>
                             <select asp-for="EvaluationScore" class="form-select score-input" data-weight="3">
                                 <option value="0">0</option>
+                                <option value="0.5">0.5</option>
                                 <option value="1">1</option>
+                                <option value="1.5">1.5</option>
                                 <option value="2">2</option>
                             </select>
                         </td>
@@ -164,7 +180,9 @@
                         <td>
                             <select asp-for="EvidenceScore" class=" form-select score-input" data-weight="1">
                                 <option value="0">0</option>
+                                <option value="0.5">0.5</option>
                                 <option value="1">1</option>
+                                <option value="1.5">1.5</option>
                                 <option value="2">2</option>
                             </select>
                         </td>
@@ -176,7 +194,7 @@
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Submit Score</button>
-                <a asp-page="/CommitteeDashboard" class="btn btn-secondary">Cancel</a>
+                <a asp-page="/CommitteeDashboard/CommitteeDashboard" class="btn btn-secondary">Cancel</a>            
             </div>
     </form>
 
@@ -192,8 +210,8 @@
                 let total = 0;
 
                 scoreInputs.forEach(select => {
-                    const score = parseInt(select.value) || 0;
-                    const weight = parseInt(select.getAttribute('data-weight')) || 1;
+                    const score = parseFloat(select.value) || 0;
+                    const weight = parseFloat(select.getAttribute('data-weight')) || 1;
                     total += (score * weight);
                 });
 

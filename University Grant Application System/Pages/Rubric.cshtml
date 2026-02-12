@@ -25,7 +25,7 @@
                     <td>The project has some additional funding and/or contributions in kind. </td>
                     <td>The project has no budgetary support </td>
                     <td>
-                        <select asp-for="BudgetScore" class="form-select score-input" data-weight="3" data-section="area-one">
+                        <select asp-for="AreaOneScore" class="form-select score-input" data-weight="3" data-section="area-one">
                             <option value="0">0</option>
                             <option value="0.5">0.5</option>
                             <option value="1">1</option>
@@ -39,15 +39,6 @@
                     <td>The project has demonstrated significant support, in addition to the department and college, through letters of collaboration with other areas on campus or the community. </td>
                     <td>The project has demonstrated interest and commitment from the department and college with additional letters/emeails of support. </td>
                     <td>The project has the required general support from the department and college </td>
-                    <td>
-                        <select asp-for="SupportScore" class="form-select score-input" data-weight="3" data-section="area-one">
-                            <option value="0">0</option>
-                            <option value="0.5">0.5</option>
-                            <option value="1">1</option>
-                            <option value="1.5">1.5</option>
-                            <option value="2">2</option>
-                        </select>
-                    </td>
                 </tr>
             </tbody>
         </table>
@@ -72,7 +63,7 @@
                         <td>Reserach / presentation will generally imporve the Unveirstiy or Program reputation for example a state or local conference, performance, exhibition of importance, or a non-peer reviewed publication in your field.</td>
                         <td>Minimal to no impact on the University or Program reputation </td>
                         <td>
-                            <select asp-for="ReputationScore" class="form-select score-input" data-weight="5" data-section="area-two">
+                            <select asp-for="AreaTwoScore" class="form-select score-input" data-weight="5" data-section="area-two">
                                 <option value="0">0</option>
                                 <option value="0.5">0.5</option>
                                 <option value="1">1</option>
@@ -87,30 +78,12 @@
                         <td>The project indicates innovative teaching strategies or the implmentation / creation of high impact educational experiences to a coures, program or curriculum not currently incorporating these innovations.</td>
                         <td>The project indicates updates to a coures, program, curriculum, or activities that will imporve teaching or enhance student learning. </td>
                         <td>The project does not adequately demonstrate instructional imporvement or innovative teaching. </td>
-                        <td>
-                            <select asp-for="InnovationScore" class="form-select score-input" data-weight="5" data-section="area-two">
-                                <option value="0">0</option>
-                                <option value="0.5">0.5</option>
-                                <option value="1">1</option>
-                                <option value="1.5">1.5</option>
-                                <option value="2">2</option>
-                            </select>
-                        </td>
                     </tr>
                     <tr>
                         <td><strong>Community Educational Engagement (Weight:5)</strong></td>
                         <td>The project provdies real world learning opportunities for students with well articulated learning outcomes and impacts individuals/organizations in the community.</td>
                         <td>The project provides real world learning opportunities for students and impacts individuals/organizations in the community. Learning outcomes are implied rather than clearly specified. </td>
                         <td>The project has minimal to no student or community impact. </td>
-                        <td>
-                            <select asp-for="CommunityScore" class="form-select score-input" data-weight="5" data-section="area-two">
-                                <option value="0">0</option>
-                                <option value="0.5">0.5</option>
-                                <option value="1">1</option>
-                                <option value="1.5">1.5</option>
-                                <option value="2">2</option>
-                            </select>
-                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -208,11 +181,14 @@
 
             function calculateTotal() {
                 let total = 0;
+                let newTotal = 0;
 
                 scoreInputs.forEach(select => {
                     const score = parseFloat(select.value) || 0;
                     const weight = parseFloat(select.getAttribute('data-weight')) || 1;
-                    total += (score * weight);
+                    newtotal += (score * weight);
+                    total = newtotal / 24;
+
                 });
 
                 totalDisplay.textContent = total;
@@ -236,7 +212,7 @@
                     if (val > 0) {
                         document.querySelectorAll(`[data-section="${section}"]`).forEach(other => {
                             if (other !== this) {
-                                other.value = "0";
+                                other.value = "0 %";
                             }
                         });
                     }

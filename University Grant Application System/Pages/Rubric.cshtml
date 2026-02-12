@@ -180,39 +180,37 @@
             const totalDisplay = document.getElementById('totalScoreDisplay');
 
             function calculateTotal() {
-                let total = 0;
                 let newTotal = 0;
 
                 scoreInputs.forEach(select => {
                     const score = parseFloat(select.value) || 0;
                     const weight = parseFloat(select.getAttribute('data-weight')) || 1;
-                    newtotal += (score * weight);
-                    total = newtotal / 24;
-
+                    newTotal += (score * weight);
                 });
 
-                totalDisplay.textContent = total;
+                const percentage = (newTotal / 24) * 100;
+
+                totalDisplay.textContent = percentage.toFixed(2) + '%';
             }
 
             scoreInputs.forEach(select => {
                 select.addEventListener('change', calculateTotal);
             });
 
-
             calculateTotal();
         });
 
-                document.querySelectorAll('.score-input').forEach(select => {
+        document.querySelectorAll('.score-input').forEach(select => {
             select.addEventListener('change', function() {
                 const section = this.getAttribute('data-section');
 
                 if (section === 'area-one' || section === 'area-two') {
-                    const val = parseInt(this.value);
+                    const val = parseFloat(this.value);
 
                     if (val > 0) {
                         document.querySelectorAll(`[data-section="${section}"]`).forEach(other => {
                             if (other !== this) {
-                                other.value = "0 %";
+                                other.value = "0";  // Fixed: was "0 %"
                             }
                         });
                     }
@@ -221,4 +219,5 @@
             });
         });
     </script>
+}
 }

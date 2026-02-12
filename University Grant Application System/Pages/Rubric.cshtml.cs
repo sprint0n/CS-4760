@@ -38,18 +38,15 @@ namespace University_Grant_Application_System.Pages
         public async Task<IActionResult> OnPostAsync()
         {
             var userEmail = User.Identity?.Name;
-
-
             var currentUser = await _context.Users
                 .Include(u => u.Department)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);
 
-           
-         
+            double weightedTotal = (AreaOneScore * 3) + (AreaTwoScore * 5) +
+                                   ProcedureScore + TimelineScore +
+                                   (EvaluationScore * 3) + EvidenceScore;
 
-
-            TotalScore = AreaOneScore * 3 + AreaTwoScore * 5  + ProcedureScore +
-                         TimelineScore + EvaluationScore * 3 + EvidenceScore;
+            TotalScore = (weightedTotal / 24.0) * 100.0;
 
 
             var reviewToUpdate = await _context.Reviews

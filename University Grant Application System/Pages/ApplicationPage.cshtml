@@ -6,9 +6,13 @@
     {
         Layout = "_AdminLayout";
     }
-    else if (User.HasClaim("CommitteeStatus", "member") || User.HasClaim("CommitteeStatus", "chair"))
+    else if (User.HasClaim("CommitteeStatus", "chair"))
     {
         Layout = "_CommitteeLayout";
+    }
+    else if (User.HasClaim("CommitteeStatus", "member"))
+    {
+        Layout = "_ComMemberLayout";
     }
     else if (User.HasClaim("userType", "chair"))
     {

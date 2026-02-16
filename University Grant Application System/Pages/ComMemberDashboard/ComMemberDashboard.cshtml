@@ -1,0 +1,137 @@
+﻿@page
+@model University_Grant_Application_System.Pages.ComMemberDashboard.IndexModel
+@{
+    ViewData["Title"] = "Committee Dashboard";
+    Layout = "_ComMemberLayout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
+}
+
+<h1>Committee Member Dashboard</h1>
+
+<!-- Top Toolbar -->
+<section class="toolbar">
+    <div class="toolbar-left">
+        <h2>Due Date</h2>
+        <p class="due-date">
+            @Model.ApplicationDueDate.ToString("MMMM dd, yyyy")
+        </p>
+    </div>
+
+    <div class="toolbar-right">
+        <a asp-page="/ApplicationPage" class="btn btn-primary">
+            New Grant Application
+        </a>
+    </div>
+</section>
+
+<hr />
+
+<!-- Saved Applications -->
+<section class="applications-section">
+    <h3>Saved Grant Applications</h3>
+
+    <div class="horizontal-scroll">
+        @foreach (var app in Model.SavedApplications)
+        {
+            <div class="card application-card" style="padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <h4>@app.Title</h4>
+                <p>Status: @app.Status</p>
+
+                <div class="card-actions" style="display: flex; gap: 0.5rem;">
+                    <!-- Edit button -->
+                    <a asp-page="/ApplicationPage" asp-route-draftId="@app.ApplicationId" class="btn btn-primary btn-sm">
+                        Edit
+                    </a>
+
+                    <!-- Delete button -->
+                    <form method="post" asp-page-handler="DeleteDraft" style="display:inline;">
+                        <input type="hidden" name="draftId" value="@app.ApplicationId" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- In Review / Finished Applications -->
+<section class="applications-section">
+    <h3>Submitted Grant Applications</h3>
+
+    <div class="horizontal-scroll">
+        @foreach (var app in Model.InReviewApplications)
+        {
+            <div class="card application-card">
+                <h4>@app.Title</h4>
+                <p>Principal Investigator: @app.PrimaryInvestigator</p>
+                <div class="alert alert-info" role="alert">
+                    <p>RSPG Amount: $@app.Amount</p>
+                </div>
+                <p>Other Amount: $@app.OtherAmount</p>
+            </div>
+        }
+    </div>
+</section>
+
+<hr />
+
+<!-- Approved Grants -->
+<section class="approved-section">
+    <h3>Approved Grants</h3>
+
+    @if (Model.ApprovedGrants.Any())
+    {
+        <ul class="approved-list">
+            @foreach (var grant in Model.ApprovedGrants)
+            {
+                <li class="approved-item">
+                    <strong>@grant.Title</strong>
+                    <span class="amount">@grant.Amount.ToString()</span>
+                    <p>Primary Investigator: @grant.PrimaryInvestigator</p>
+                    <p>RSPG Amount: @grant.Amount</p>
+                    <p>Other Amount: @grant.OtherAmount</p>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="text-muted">No approved grants yet.</p>
+    }
+</section>
+
+
+<!-- To Review Grants -->
+<section class="applications-section mt-4">
+    <h3>Grants Awaiting Your Review</h3>
+    <div class="row">
+        @if (Model.ToReviewGrants != null && Model.ToReviewGrants.Any())
+        {
+            @foreach (var grant in Model.ToReviewGrants)
+            {
+                <div class="col-md-4">
+                    <div class="card border-warning mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">@grant.Title</h5>
+                            <p class="card-text">
+                                <strong>PI:</strong> @grant.PrimaryInvestigator<br />
+                                <strong>Amount:</strong> $@grant.Amount
+                            </p>
+                            <a asp-page="/Rubric" asp-route-id="@grant.ApplicationId" class="btn btn-warning w-100">
+                                <i class="bi bi-pencil-square"></i> Score Application
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <p class="text-muted italic">You have no pending applications to review at this time.</p>
+            </div>
+        }
+    </div>
+</section>

@@ -83,7 +83,12 @@ public class IndexModel : PageModel
 
         string status = user.committeeMemberStatus?.ToLower();
 
-        if (status == "member" || status == "chair")
+        if (status == "member")
+        {
+            return RedirectToPage("/ComMemberDashboard/ComMemberDashboard");
+        }
+
+        if (status == "chair")
         {
             return RedirectToPage("/CommitteeDashboard/CommitteeDashboard");
         }

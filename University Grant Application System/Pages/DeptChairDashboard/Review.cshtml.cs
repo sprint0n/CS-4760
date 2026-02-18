@@ -101,7 +101,7 @@ public class ReviewModel : PageModel
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToPage("/DeptChairDashboard");
+            return RedirectToPage("/DeptChairDashboard/DeptChairDashboard");
         }
     }
 }

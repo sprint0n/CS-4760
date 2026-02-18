@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace University_Grant_Application_System.Pages
 {

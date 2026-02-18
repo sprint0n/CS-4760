@@ -4,7 +4,7 @@
     ViewData["Title"] = "Allocation Page";
     Layout = "_CommitteeLayout";
 }
-<h1>Allocation Table</h1>
+<h1>Allocation Page</h1>
 
 <!-- Money totals -->
 <div class="row mb-4">
@@ -28,15 +28,61 @@
     </div>
 </div>
 
+<!-- Criteria Ranges Filters -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="d-flex align-items-end gap-2">
+            <div class="flex-grow-1">
+                <label for="fullFunds" class="form-label">Full Funding Score Criteria</label>
+                <div class="input-group">
+                    <input class="form-control" value="90" min="0" max="100" id="fullFunds" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+            <button id="applyFullFunding" class="btn btn-outline-primary">Apply</button>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="d-flex align-items-end gap-2">
+            <div class="flex-grow-1">
+                <label for="partialFunds1" class="form-label">Partial Funding Score Criteria</label>
+                <div class="input-group">
+                    <input class="form-control" value="80" min="0" max="100" id="partialFunds1" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+            <button id="applyPartialFunding" class="btn btn-outline-primary">Apply</button>
+        </div>
+    </div>
+
+    @* <div class="col-md-3">    TEMPORARILY NOT BEING USED. ASKING ABOUT THIS AT NEXT SPRINT MEETING
+        <div class="d-flex align-items-end gap-2">
+            <div class="flex-grow-1">
+                <label for="partialFunds2" class="form-label">2nd Partial Criteria</label>
+                <div class="input-group">
+                    <input class="form-control" value="70" min="0" max="100" id="partialFunds2" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+            <button class="btn btn-outline-primary">Apply</button>
+        </div>
+    </div> *@
+</div>
+
+
+
+
 <!-- Visible count -->
 <div class="row mb-4">
     <div class="col-md-6">
         <span id="visibleCount" class="fw-bold">0</span> of
-        <span id="totalCount" class="fw-bold">0</span> applications shown
+        <span id="totalCount" class="fw-bold">0</span> receive funding
     </div>
 </div>
 
-<!-- Table -->
+<!-- OG Table -->
+<h4 class="mt-4">Non-sorted Applications</h4>
 <table class="table">
     <thead>
         <tr>
@@ -46,6 +92,7 @@
             <th><strong>RSPG Total</strong></th>
             <th>Other Total</th>
             <th>Average Score</th>
+            <th>Allocated Funds</th>
         </tr>
     </thead>
     <tbody id="applicationsTableBody">
@@ -58,14 +105,70 @@
                 <td><strong>@app.RspgTotal.ToString("C")</strong></td>
                 <td>@app.OtherTotal.ToString("C")</td>
                 <td>@app.OverallScore.ToString("P1")</td>
+                <td class="allocated-funds"></td>
             </tr>
         }
     </tbody>
 </table>
 
+<!-- FULL FUNDING TABLE -->
+<h4 class="mt-4">Full Funding</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Submitted By</th>
+            <th>Principal Investigator</th>
+            <th><strong>RSPG Total</strong></th>
+            <th>Other Total</th>
+            <th>Average Score</th>
+            <th>Allocated Funds</th>
+        </tr>
+    </thead>
+    <tbody id="fullFundingTableBody"></tbody>
+</table>
+
+
+<!-- PARTIAL FUNDING TABLE -->
+<h4 class="mt-4">Partial Funding</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Submitted By</th>
+            <th>Principal Investigator</th>
+            <th><strong>RSPG Total</strong></th>
+            <th>Other Total</th>
+            <th>Average Score</th>
+            <th>Allocated Funds</th>
+        </tr>
+    </thead>
+    <tbody id="partialFundingTableBody"></tbody>
+</table>
+
+
+<!-- NO FUNDING TABLE -->
+<h4 class="mt-4">No Funding</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Submitted By</th>
+            <th>Principal Investigator</th>
+            <th><strong>RSPG Total</strong></th>
+            <th>Other Total</th>
+            <th>Average Score</th>
+            <th>Allocated Funds</th>
+        </tr>
+    </thead>
+    <tbody id="noFundingTableBody"></tbody>
+</table>
+
+
+
 @section Scripts {
 
-    <script>
+    @* <script>
         // Set total count on page load
         const tableBody = document.getElementById("applicationsTableBody");
         const totalCountEl = document.getElementById("totalCount");
@@ -100,6 +203,194 @@
             visibleCountEl.textContent =
                 tableBody.querySelectorAll("tr:not([style*='display: none'])").length;
         });
+    </script> *@
+
+    <script>
+        const fullFunds = document.getElementById("fullFunds");
+        const partial1 = document.getElementById("partialFunds1");
+
+        function clampToMax(input) {
+            const max = parseInt(input.max);
+            const value = parseInt(input.value);
+            if (value > max) input.value = max;
+        }
+
+        function updateMaxValues() {
+            // partial1 must always be less than fullFunds
+            partial1.max = fullFunds.value - 1;
+            clampToMax(partial1);
+        }
+
+        // Run once on page load
+        updateMaxValues();
+
+        // Update when user finishes editing fullFunds
+        fullFunds.addEventListener("change", updateMaxValues);
+
+        // Update when user finishes editing partialFunds1
+        partial1.addEventListener("change", updateMaxValues);
+
+        // Hard-block typing above max
+        partial1.addEventListener("input", () => clampToMax(partial1));
     </script>
+
+
+    <script>
+        // -----------------------------
+        // ELEMENT REFERENCES
+        // -----------------------------
+        const scoreFilter = document.getElementById("scoreFilter");
+        const scoreValueLabel = document.getElementById("scoreValue");
+
+        const fullFundingInput = document.getElementById("fullFunds");
+        const partialFundingInput = document.getElementById("partialFunds1");
+
+        const applyFullFundingBtn = document.getElementById("applyFullFunding");
+        const applyPartialFundingBtn = document.getElementById("applyPartialFunding");
+
+        const sourceBody = document.getElementById("applicationsTableBody");
+        const fullFundingBody = document.getElementById("fullFundingTableBody");
+        const partialFundingBody = document.getElementById("partialFundingTableBody");
+        const noFundingBody = document.getElementById("noFundingTableBody");
+
+        const totalCountEl = document.getElementById("totalCount");
+        const visibleCountEl = document.getElementById("visibleCount");
+
+        // -----------------------------
+        // HELPERS
+        // -----------------------------
+        function moveRow(row, targetBody) {
+            if (row.parentElement !== targetBody) {
+                targetBody.appendChild(row);
+            }
+        }
+
+        function setAllocatedFunds(row, value) {
+            const cell = row.querySelector(".allocated-funds");
+            if (cell) cell.textContent = value;
+        }
+
+        function getRspgTotal(row) {
+            const rspgCell = row.querySelector("td:nth-child(4)");
+            return rspgCell ? rspgCell.textContent.trim() : "";
+        }
+
+        function getAllRows() {
+            return document.querySelectorAll(
+                "#applicationsTableBody tr, #fullFundingTableBody tr, #partialFundingTableBody tr, #noFundingTableBody tr"
+            );
+        }
+
+        function updateCounts() {
+            const total = getAllRows().length;
+            const visible = total - noFundingBody.querySelectorAll("tr").length;
+
+            totalCountEl.textContent = total;
+            visibleCountEl.textContent = visible;
+        }
+
+        // -----------------------------
+        // NO FUNDING LOGIC (SLIDER)
+        // -----------------------------
+        function updateNoFundingTable() {
+            const minScore = parseFloat(scoreFilter.value);
+            scoreValueLabel.textContent = minScore + "%";
+
+            getAllRows().forEach(row => {
+                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
+
+                if (rowScore < minScore) {
+                    moveRow(row, noFundingBody);
+                    setAllocatedFunds(row, "$0");
+                } else {
+                    if (row.parentElement === noFundingBody) {
+                        moveRow(row, sourceBody);
+                        setAllocatedFunds(row, "");
+                    }
+                }
+            });
+
+            updateCounts();
+        }
+
+        // -----------------------------
+        // FULL FUNDING LOGIC
+        // -----------------------------
+        function calculatePartialFundingAmount(row) {
+            const rspgText = getRspgTotal(row); // "$4,500.00"
+            const numeric = parseFloat(rspgText.replace(/[^0-9.-]+/g, "")); // 4500
+            const partialAmount = numeric * 0.9;
+            return partialAmount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+        }
+
+
+        function updateFullFundingTable() {
+            const threshold = parseFloat(fullFundingInput.value);
+
+            getAllRows().forEach(row => {
+                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
+
+                // Skip rows in No Funding
+                if (row.parentElement === noFundingBody) return;
+
+                if (rowScore >= threshold) {
+                    moveRow(row, fullFundingBody);
+                    setAllocatedFunds(row, getRspgTotal(row));
+                } else {
+                    if (row.parentElement === fullFundingBody) {
+                        moveRow(row, sourceBody);
+                        setAllocatedFunds(row, "");
+                    }
+                }
+            });
+
+            updateCounts();
+        }
+
+        // -----------------------------
+        // PARTIAL FUNDING LOGIC
+        // -----------------------------
+        function updatePartialFundingTable() {
+            const fullThreshold = parseFloat(fullFundingInput.value);
+            const partialThreshold = parseFloat(partialFundingInput.value);
+
+            getAllRows().forEach(row => {
+                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
+
+                // Skip rows in No Funding
+                if (row.parentElement === noFundingBody) return;
+
+                // Must be >= partial AND < full
+                if (rowScore >= partialThreshold && rowScore < fullThreshold) {
+                    moveRow(row, partialFundingBody);
+
+                    setAllocatedFunds(row, calculatePartialFundingAmount(row));
+
+                } else {
+                    // If it was in Partial but no longer qualifies, return to source
+                    if (row.parentElement === partialFundingBody) {
+                        moveRow(row, sourceBody);
+                        setAllocatedFunds(row, "");
+                    }
+                }
+            });
+
+            updateCounts();
+        }
+
+        // -----------------------------
+        // EVENT LISTENERS
+        // -----------------------------
+        scoreFilter.addEventListener("input", updateNoFundingTable);
+        applyFullFundingBtn.addEventListener("click", updateFullFundingTable);
+        applyPartialFundingBtn.addEventListener("click", updatePartialFundingTable);
+
+        // Initialize on page load
+        updateNoFundingTable();
+    </script>
+
+
+
+
 
 }

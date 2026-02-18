@@ -1,0 +1,105 @@
+﻿@page
+@model University_Grant_Application_System.Pages.AllocationPageModel
+@{
+    ViewData["Title"] = "Allocation Page";
+    Layout = "_CommitteeLayout";
+}
+<h1>Allocation Table</h1>
+
+<!-- Money totals -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <label class="form-label">Total Money Available</label>
+        <input value="@Model.TotalMoneyAvailable.ToString("C")" class="form-control" readonly />
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Total Money Requested (RSPG Totals)</label>
+        <input value="@Model.TotalMoneyRequested.ToString("C")" class="form-control" readonly />
+    </div>
+</div>
+
+<!-- Slider -->
+<div class="row mb-2">
+    <div class="col-md-6">
+        <label for="scoreFilter" class="form-label">
+            Minimum Score Filter: <span id="scoreValue">0%</span>
+        </label>
+        <input type="range" class="form-range" min="0" max="100" step="1" id="scoreFilter" />
+    </div>
+</div>
+
+<!-- Visible count -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <span id="visibleCount" class="fw-bold">0</span> of
+        <span id="totalCount" class="fw-bold">0</span> applications shown
+    </div>
+</div>
+
+<!-- Table -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Submitted By</th>
+            <th>Principal Investigator</th>
+            <th><strong>RSPG Total</strong></th>
+            <th>Other Total</th>
+            <th>Average Score</th>
+        </tr>
+    </thead>
+    <tbody id="applicationsTableBody">
+        @foreach (var app in Model.Applications)
+        {
+            <tr data-score="@app.OverallScore">
+                <td>@app.Title</td>
+                <td>@app.SubmittedBy</td>
+                <td>@app.PrincipalInvestigator</td>
+                <td><strong>@app.RspgTotal.ToString("C")</strong></td>
+                <td>@app.OtherTotal.ToString("C")</td>
+                <td>@app.OverallScore.ToString("P1")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+
+    <script>
+        // Set total count on page load
+        const tableBody = document.getElementById("applicationsTableBody");
+        const totalCountEl = document.getElementById("totalCount");
+        const visibleCountEl = document.getElementById("visibleCount");
+
+        totalCountEl.textContent = tableBody.querySelectorAll("tr").length;
+
+        // Initially all rows are visible
+        visibleCountEl.textContent =
+            tableBody.querySelectorAll("tr:not([style*='display: none'])").length;
+
+        const scoreFilter = document.getElementById("scoreFilter");
+        const scoreValueLabel = document.getElementById("scoreValue");
+
+        scoreFilter.addEventListener("input", function () {
+            const minScore = parseFloat(scoreFilter.value);
+
+            // Update the label
+            scoreValueLabel.textContent = minScore + "%";
+
+            // Loop through all rows and hide/show based on score
+            tableBody.querySelectorAll("tr").forEach(row => {
+                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
+                if (rowScore >= minScore) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Update the visible count
+            visibleCountEl.textContent =
+                tableBody.querySelectorAll("tr:not([style*='display: none'])").length;
+        });
+    </script>
+
+}

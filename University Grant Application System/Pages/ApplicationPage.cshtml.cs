@@ -1,10 +1,17 @@
+using Humanizer.Localisation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using NuGet.Packaging;
+using NuGet.Protocol.Plugins;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Contracts;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace University_Grant_Application_System.Pages
 {
@@ -74,6 +81,14 @@ namespace University_Grant_Application_System.Pages
         [BindProperty]
         [Display(Name = "Grant Purpose")]
         public string? GrantPurpose { get; set; }
+
+        [BindProperty]
+        public string SelectedGrantTypeOption { get; set; }
+        public List<SelectListItem> GrantTypeOptions { get; set; }
+
+        [BindProperty]
+        public string SelectedStaffTypeOption { get; set; }
+        public List<SelectListItem> StaffTypeOptions { get; set; }
 
         [BindProperty]
         public string? Name { get; set; }
@@ -165,6 +180,29 @@ namespace University_Grant_Application_System.Pages
 
             await PopulateSelectListsAsync();
 
+            // ===============================
+            // add granttype options and staff type options
+            // ===============================
+            GrantTypeOptions = new List<SelectListItem>
+                    {
+
+                        new SelectListItem { Value = "1", Text = "Hemingway adjunct faculty grant spring semester" },
+                        new SelectListItem { Value = "2", Text = "Hemingway collaborative award spring semester" },
+                        new SelectListItem { Value = "3", Text = "Hemingway excellence award spring semester" },
+                        new SelectListItem { Value = "4", Text = "Hemingway new faculty grant spring semester" },
+                        new SelectListItem { Value = "5", Text = "Hemingway faculty vitality grant fall and spring" },
+                        new SelectListItem { Value = "6", Text = "Creative works grant fall and spring" },
+                        new SelectListItem { Value = "7", Text = "Research grant fall and spring" },
+                        new SelectListItem { Value = "8", Text = "Travel grant fall spring and summer" }
+                    };
+            StaffTypeOptions = new List<SelectListItem>
+                    {
+                        new SelectListItem { Value = "1", Text = "Contracted faculty" },
+                        new SelectListItem { Value = "2", Text = "Instructure / tenure" },
+                        new SelectListItem { Value = "3", Text = "Tenure track new faculty(first two years of tenure track)" },
+                        new SelectListItem { Value = "4", Text = "Adjunct faculty" }
+                    };
+
             // -----------------------------
             // Load draft if requested
             // -----------------------------
@@ -206,6 +244,8 @@ namespace University_Grant_Application_System.Pages
                     EquipmentExpenses = draft.EquipmentExpenses.ToList();
                     TravelExpenses = draft.TravelExpenses.ToList();
                     OtherExpenses = draft.OtherExpenses.ToList();
+
+                    
 
                     // ===============================
                     // Add placeholder rows if empty
@@ -440,6 +480,29 @@ namespace University_Grant_Application_System.Pages
                 .Where(u => (u.FirstName + " " + u.LastName) == PrimaryInvestigator)
                 .Select(u => u.UserId)
                 .FirstOrDefault();
+
+            // ===============================
+            // add granttype options and staff type options
+            // ===============================
+            GrantTypeOptions = new List<SelectListItem>
+                    {
+
+                        new SelectListItem { Value = "1", Text = "Hemingway adjunct faculty grant spring semester" },
+                        new SelectListItem { Value = "2", Text = "Hemingway collaborative award spring semester" },
+                        new SelectListItem { Value = "3", Text = "Hemingway excellence award spring semester" },
+                        new SelectListItem { Value = "4", Text = "Hemingway new faculty grant spring semester" },
+                        new SelectListItem { Value = "5", Text = "Hemingway faculty vitality grant fall and spring" },
+                        new SelectListItem { Value = "6", Text = "Creative works grant fall and spring" },
+                        new SelectListItem { Value = "7", Text = "Research grant fall and spring" },
+                        new SelectListItem { Value = "8", Text = "Travel grant fall spring and summer" }
+                    };
+            StaffTypeOptions = new List<SelectListItem>
+                    {
+                        new SelectListItem { Value = "1", Text = "Contracted faculty" },
+                        new SelectListItem { Value = "2", Text = "Instructure / tenure" },
+                        new SelectListItem { Value = "3", Text = "Tenure track new faculty(first two years of tenure track)" },
+                        new SelectListItem { Value = "4", Text = "Adjunct faculty" }
+                    };
 
             // -----------------------------
             // Add expenses

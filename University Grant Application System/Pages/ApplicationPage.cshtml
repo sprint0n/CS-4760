@@ -91,6 +91,20 @@
             <textarea asp-for="GrantPurpose" class="form-control" rows="4"></textarea>
             <span asp-validation-for="GrantPurpose" class="text-danger"></span>
         </div>
+                
+        <div class="mb-3">
+            <label asp-for="SelectedGrantTypeOption"></label>
+            <select asp-for="SelectedGrantTypeOption" asp-items="Model.GrantTypeOptions" class="form-control">
+                <option value="">-- Select an option --</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SelectedStaffTypeOption"></label>
+            <select asp-for="SelectedStaffTypeOption" asp-items="Model.StaffTypeOptions" class="form-control">
+                <option value="">-- Select an option --</option>
+            </select>
+        </div>
 
 
         <div>

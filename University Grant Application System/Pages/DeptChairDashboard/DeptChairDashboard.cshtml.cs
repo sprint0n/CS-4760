@@ -84,23 +84,18 @@ namespace University_Grant_Application_System.Pages.DeptChairDashboard
                 })
                 .ToListAsync();
 
-            ApplicationToReview = await _context.FormTable
-                 .Include(f => f.User) // Include the applicant user data
-                 .Where(f => f.ApplicationStatus == "PendingDeptChair" &&
-                             f.User.DepartmentId == deptId)
-                 .Select(f => new ApplicationCard
-                 {
-                     ApplicationId = f.Id,
-                     Title = f.Title,
-                     Status = "Pending Review",
-                     PrimaryInvestigator = _context.Users
-                        .Where(u => u.UserId == f.PrincipalInvestigatorID)
-                        .Select(u => u.FirstName + " " + u.LastName)
-                        .FirstOrDefault() ?? "N/A"
-                 })
-                 .ToListAsync();
-             // Example placeholder for due date
-             ApplicationDueDate = DateTime.Today.AddDays(14);
+            ApplicationToReview = await (from f in _context.FormTable
+              join pi in _context.Users on f.PrincipalInvestigatorID equals pi.UserId
+                where f.ApplicationStatus == "PendingDeptChair" && pi.DepartmentId == deptId
+                select new ApplicationCard
+                    {
+                        ApplicationId = f.Id,
+                        Title = f.Title,
+                        Status = "Pending Review",  
+                        PrimaryInvestigator = pi.FirstName + " " + pi.LastName
+                    }).ToListAsync();
+            // Example placeholder for due date
+            ApplicationDueDate = DateTime.Today.AddDays(14);
         }
     }
 

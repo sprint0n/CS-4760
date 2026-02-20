@@ -82,7 +82,13 @@ namespace University_Grant_Application_System.Pages
                 }
             }
 
-            return RedirectToPage("/CommitteeDashboard/CommitteeDashboard");
+            if (currentUser.committeeMemberStatus == "chair")
+            {
+                return RedirectToPage("/CommitteeDashboard/CommitteeDashboard");
+            }
+
+            return RedirectToPage("/ComMemberDashboard/ComMemberDashboard");
+
         }
     }
 }

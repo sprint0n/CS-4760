@@ -24,6 +24,10 @@
         white-space: nowrap;
     }
 
+    .wide-button {
+        width: 300px;
+    }
+
 </style>
 
 
@@ -39,6 +43,15 @@
         <label class="form-label">Total Money Requested (RSPG Totals)</label>
         <input value="@Model.TotalMoneyRequested.ToString("C")" class="form-control" readonly />
     </div>
+
+    <!-- NEW: Remainder Funding Percentage --> 
+    <div class="col-md-4"> 
+        <label for="remainderPercent" class="form-label">Remainder Funding Percentage</label> 
+        <div class="input-group"> 
+            <input class="form-control" value="50" min="0" max="100" id="remainderPercent" /> 
+            <span class="input-group-text">%</span> 
+        </div> 
+    </div>
 </div>
 
 <!-- Criteria Ranges Filters -->
@@ -48,7 +61,7 @@
     <div class="col-md-3">
         <div class="d-flex align-items-end gap-1">
             <div class="flex-grow-1">
-                <label for="fullFunds" class="form-label">Full Funding Score Criteria</label>
+                <label for="fullFunds" class="form-label">Full Funding Minimum Percentage</label>
                 <div class="input-group">
                     <input class="form-control" value="90" min="0" max="100" id="fullFunds" />
                     <span class="input-group-text">%</span>
@@ -61,7 +74,7 @@
     <div class="col-md-3">
         <div class="d-flex align-items-end gap-1">
             <div class="flex-grow-1">
-                <label for="partialFunds1" class="form-label">Partial Funding Score Criteria</label>
+                <label for="partialFunds1" class="form-label">Partial Funding Minimum Percentage</label>
                 <div class="input-group">
                     <input class="form-control" value="80" min="0" max="100" id="partialFunds1" />
                     <span class="input-group-text">%</span>
@@ -74,7 +87,7 @@
     <div class="col-md-3">
         <div class="d-flex align-items-end gap-1">
             <div class="flex-grow-1">
-                <label for="scoreFilter" class="form-label">No Funding Score Criteria</label>
+                <label for="scoreFilter" class="form-label">No Funding Cutoff Percentage</label>
                 <div class="input-group">
                     <input class="form-control" value="70" min="0" max="100" id="scoreFilter" />
                     <span class="input-group-text">%</span>
@@ -84,22 +97,60 @@
     </div>
 </div>
 
-<!-- APPLY ALL BUTTON -->
+<!-- APPLY ALL BOOST AND RESET BUTTON -->
 <div class="row mb-4">
-    <div class="col-md-12 d-flex justify-content-center">
-        <div class="d-flex align-items-center gap-3">
-            <!-- Fixed-size centered button -->
-            <button id="applyAllFunding" class="btn btn-primary" style="width: 260px;">
+    <div class="col-md-12 d-flex flex-column align-items-center">
+
+        <!-- Row with all three buttons -->
+        <div class="d-flex align-items-center gap-3 mb-2">
+
+            <!-- Apply Button -->
+            <button id="applyAllFunding" class="btn btn-primary wide-button">
                 Apply All Funding Criteria
             </button>
 
-            <!-- Unsaved changes warning -->
-            <div id="unsavedWarning" class="unsaved-warning">
-                Changes detected — click Apply
+            <!-- Boost Button -->
+            <button id="boostPartialFunding" class="btn btn-secondary wide-button">
+                Boost Partial Funding (if possible)
+            </button>
+
+            <!-- Reset Criteria Button -->
+            <button id="resetCriteria" class="btn btn-outline-danger wide-button">
+                Reset Criteria
+            </button>
+
+        </div>
+
+        <!-- Warning BELOW the buttons -->
+        <div id="unsavedWarning" class="unsaved-warning mt-1">
+            Changes detected — click Apply
+        </div>
+
+    </div>
+</div>
+
+
+<!-- REMAINING BUDGET DISPLAY -->
+<div class="row mb-2">
+    <div class="col-md-12 d-flex justify-content-center">
+        <div id="remainingBudgetText" class="fw-bold fs-5"></div>
+    </div>
+</div>
+
+<!-- REMAINING BUDGET PROGRESS BAR -->
+<div class="row mb-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="progress" style="height: 25px;">
+            <div id="remainingBudgetBar"
+                 class="progress-bar"
+                 role="progressbar"
+                 style="width: 100%;">
             </div>
         </div>
     </div>
 </div>
+
+
 
 
 
@@ -177,6 +228,22 @@
     <tbody id="partialFundingTableBody"></tbody>
 </table>
 
+<!-- REMAINDER FUNDING TABLE -->
+<h4 class="mt-4">Remainder Funding</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Submitted By</th>
+            <th>Principal Investigator</th>
+            <th><strong>RSPG Total</strong></th>
+            <th>Other Total</th>
+            <th>Average Score</th>
+            <th>Allocated Funds</th>
+        </tr>
+    </thead>
+    <tbody id="remainderFundingTableBody"></tbody>
+</table>
 
 <!-- NO FUNDING TABLE -->
 <h4 class="mt-4">No Funding</h4>
@@ -200,20 +267,31 @@
 @section Scripts {
 
     <!-- INPUT VALUES SCRIPT -->
+    <!-- INPUT VALUES SCRIPT -->
     <script>
         const fullFunds = document.getElementById("fullFunds");
         const partial1 = document.getElementById("partialFunds1");
         const noFunds = document.getElementById("scoreFilter");
+        const remainderPercent = document.getElementById("remainderPercent");
 
         const applyAllFundingBtn_UI = document.getElementById("applyAllFunding");
         const unsavedWarning = document.getElementById("unsavedWarning");
 
+        const resetCriteriaBtn = document.getElementById("resetCriteria");
+
         let lastApplied = {
             full: fullFunds.value,
             partial: partial1.value,
-            no: noFunds.value
+            no: noFunds.value,
+            remainder: remainderPercent.value
         };
 
+        // NEW: Prevent unsaved warning from showing during reset
+        let suppressUnsavedWarning = false;
+
+        // -----------------------------
+        // INPUT WARNING HELPERS
+        // -----------------------------
         function showInputWarning(input, message) {
             clearInputWarning(input);
             const warning = document.createElement("div");
@@ -228,11 +306,20 @@
             if (existing) existing.remove();
         }
 
+        // -----------------------------
+        // UNSAVED CHANGES WARNING
+        // -----------------------------
         function checkUnsavedChanges() {
+            if (suppressUnsavedWarning) {
+                unsavedWarning.style.display = "none";
+                return;
+            }
+
             if (
                 fullFunds.value !== lastApplied.full ||
                 partial1.value !== lastApplied.partial ||
-                noFunds.value !== lastApplied.no
+                noFunds.value !== lastApplied.no ||
+                remainderPercent.value !== lastApplied.remainder
             ) {
                 unsavedWarning.style.display = "inline-block";
             } else {
@@ -240,6 +327,9 @@
             }
         }
 
+        // -----------------------------
+        // CLAMP + HIERARCHY ENFORCEMENT
+        // -----------------------------
         function clampToMax(input) {
             const max = parseInt(input.max);
             const value = parseInt(input.value);
@@ -251,16 +341,19 @@
             const partialVal = parseInt(partial1.value);
             const noVal = parseInt(noFunds.value);
 
+            // FULL > PARTIAL
             if (!isNaN(partialVal) && partialVal >= fullVal) {
                 partial1.value = "";
                 showInputWarning(partial1, "Cleared: must be lower than Full Funding");
             } else clearInputWarning(partial1);
 
+            // FULL > NO FUNDING
             if (!isNaN(noVal) && noVal >= fullVal) {
                 noFunds.value = "";
                 showInputWarning(noFunds, "Cleared: must be lower than Full Funding");
             } else if (noFunds.value !== "") clearInputWarning(noFunds);
 
+            // PARTIAL > NO FUNDING
             const newPartialVal = parseInt(partial1.value);
             const newNoVal = parseInt(noFunds.value);
 
@@ -268,8 +361,48 @@
                 noFunds.value = "";
                 showInputWarning(noFunds, "Cleared: must be lower than Partial Funding");
             }
+
+            // Remainder percent must be 0–100
+            const remVal = parseInt(remainderPercent.value);
+            if (isNaN(remVal) || remVal < 0 || remVal > 100) {
+                showInputWarning(remainderPercent, "Must be between 0 and 100");
+            } else {
+                clearInputWarning(remainderPercent);
+            }
         }
 
+        // -----------------------------
+        // RESET CRITERIA (FULL PAGE INPUT RESET)
+        // -----------------------------
+        function resetCriteria() {
+            suppressUnsavedWarning = true;
+
+            // Reset values to defaults
+            fullFunds.value = 90;
+            partial1.value = 80;
+            noFunds.value = 70;
+            remainderPercent.value = 50;
+
+            // Clear warnings
+            clearInputWarning(fullFunds);
+            clearInputWarning(partial1);
+            clearInputWarning(noFunds);
+            clearInputWarning(remainderPercent);
+
+            // Recalculate hierarchy + max values
+            updateMaxValues();
+
+            // Re-enable unsaved warning AFTER reset completes
+            setTimeout(() => {
+                suppressUnsavedWarning = false;
+            }, 50);
+        }
+
+        resetCriteriaBtn.addEventListener("click", resetCriteria);
+
+        // -----------------------------
+        // UPDATE MAX VALUES
+        // -----------------------------
         function updateMaxValues() {
             enforceHierarchy();
 
@@ -285,27 +418,38 @@
             checkUnsavedChanges();
         }
 
+        // -----------------------------
+        // APPLY BUTTON
+        // -----------------------------
         applyAllFundingBtn_UI.addEventListener("click", () => {
             updateMaxValues(); // enforce hierarchy BEFORE funding logic runs
 
             lastApplied = {
                 full: fullFunds.value,
                 partial: partial1.value,
-                no: noFunds.value
+                no: noFunds.value,
+                remainder: remainderPercent.value
             };
 
             unsavedWarning.style.display = "none";
         });
 
+        // -----------------------------
+        // EVENT LISTENERS
+        // -----------------------------
         fullFunds.addEventListener("change", updateMaxValues);
         partial1.addEventListener("change", updateMaxValues);
         noFunds.addEventListener("change", updateMaxValues);
+        remainderPercent.addEventListener("change", updateMaxValues);
 
         partial1.addEventListener("input", () => { clampToMax(partial1); checkUnsavedChanges(); });
         noFunds.addEventListener("input", () => { clampToMax(noFunds); checkUnsavedChanges(); });
+        remainderPercent.addEventListener("input", checkUnsavedChanges);
 
         updateMaxValues();
     </script>
+
+
 
     <!-- APPLY FUNDING SCRIPT -->
     <script>
@@ -314,14 +458,27 @@
         const fullFundingInput = document.getElementById("fullFunds");
         const partialFundingInput = document.getElementById("partialFunds1");
         const noFundingInput = document.getElementById("scoreFilter");
+        const remainderPercentInput = document.getElementById("remainderPercent");
 
         const sourceBody = document.getElementById("applicationsTableBody");
         const fullFundingBody = document.getElementById("fullFundingTableBody");
         const partialFundingBody = document.getElementById("partialFundingTableBody");
+        const remainderFundingBody = document.getElementById("remainderFundingTableBody");
         const noFundingBody = document.getElementById("noFundingTableBody");
 
         const totalCountEl = document.getElementById("totalCount");
         const visibleCountEl = document.getElementById("visibleCount");
+
+        const totalMoneyAvailable = @Model.TotalMoneyAvailable;
+        const totalMoneyRequested = @Model.TotalMoneyRequested;
+
+        const boostPartialFundingBtn = document.getElementById("boostPartialFunding");
+        // const remainingBudgetDisplay = document.getElementById("remainingBudgetDisplay");
+
+        const remainingBudgetText = document.getElementById("remainingBudgetText");
+        const remainingBudgetBar = document.getElementById("remainingBudgetBar");
+
+        const resetCriteriaBtn_FUNDING = document.getElementById("resetCriteria");
 
         function moveRow(row, targetBody) {
             if (row.parentElement !== targetBody) targetBody.appendChild(row);
@@ -337,28 +494,148 @@
             return rspgCell ? rspgCell.textContent.trim() : "";
         }
 
+        function getRspgNumeric(row) {
+            return parseFloat(getRspgTotal(row).replace(/[^0-9.-]+/g, ""));
+        }
+
         function calculatePartialFundingAmount(row) {
-            const numeric = parseFloat(getRspgTotal(row).replace(/[^0-9.-]+/g, ""));
-            return (numeric * 0.9).toLocaleString("en-US", { style: "currency", currency: "USD" });
+            return (getRspgNumeric(row) * 0.9)
+                .toLocaleString("en-US", { style: "currency", currency: "USD" });
+        }
+
+        function calculateRemainderFundingAmount(row, percent) {
+            return (getRspgNumeric(row) * (percent / 100))
+                .toLocaleString("en-US", { style: "currency", currency: "USD" });
         }
 
         function getAllRows() {
             return document.querySelectorAll(
-                "#applicationsTableBody tr, #fullFundingTableBody tr, #partialFundingTableBody tr, #noFundingTableBody tr"
+                "#applicationsTableBody tr, #fullFundingTableBody tr, #partialFundingTableBody tr, #remainderFundingTableBody tr, #noFundingTableBody tr"
             );
         }
 
         function updateCounts() {
+            const fullCount = fullFundingBody.querySelectorAll("tr").length;
+            const partialCount = partialFundingBody.querySelectorAll("tr").length;
+            const remainderCount = remainderFundingBody.querySelectorAll("tr").length;
+
+            const receiving = fullCount + partialCount + remainderCount;
+
             const total = getAllRows().length;
-            const visible = total - noFundingBody.querySelectorAll("tr").length;
+
             totalCountEl.textContent = total;
-            visibleCountEl.textContent = visible;
+            visibleCountEl.textContent = receiving;
         }
+
+
+        function resetAllFunding() {
+
+            // 1. Move ALL rows back to the original table
+            const allRows = getAllRows();
+            allRows.forEach(row => {
+                moveRow(row, sourceBody);
+                setAllocatedFunds(row, "");
+            });
+
+            // 2. Clear all funding tables
+            fullFundingBody.innerHTML = "";
+            partialFundingBody.innerHTML = "";
+            remainderFundingBody.innerHTML = "";
+            noFundingBody.innerHTML = "";
+
+            // 3. Reset Remaining Budget display
+            updateRemainingBudgetDisplay();
+
+            // 4. Reset counts
+            updateCounts();
+        }
+
+
+        function computeRemainingBudget() {
+            let allocatedToFull = [...fullFundingBody.querySelectorAll("tr")]
+                .reduce((sum, row) => sum + getRspgNumeric(row), 0);
+
+            let allocatedToPartial = [...partialFundingBody.querySelectorAll("tr")]
+                .reduce((sum, row) => {
+                    const allocatedText = row.querySelector(".allocated-funds").textContent;
+                    const numeric = parseFloat(allocatedText.replace(/[^0-9.-]+/g, ""));
+                    return sum + numeric;
+                }, 0);
+
+
+            let allocatedToRemainder = [...remainderFundingBody.querySelectorAll("tr")]
+                .reduce((sum, row) => {
+                    const allocatedText = row.querySelector(".allocated-funds").textContent;
+                    const numeric = parseFloat(allocatedText.replace(/[^0-9.-]+/g, ""));
+                    return sum + numeric;
+                }, 0);
+
+            return totalMoneyAvailable - allocatedToFull - allocatedToPartial - allocatedToRemainder;
+        }
+
+        function updateRemainingBudgetDisplay() {
+            const remaining = computeRemainingBudget();
+
+            // Update text
+            remainingBudgetText.textContent =
+                "Remaining Budget: " + remaining.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+            // Calculate percentage
+            const percent = Math.max(0, Math.min(100, (remaining / totalMoneyAvailable) * 100));
+
+            // Update progress bar width
+            remainingBudgetBar.style.width = percent + "%";
+
+            // Color logic
+            if (percent > 60) {
+                remainingBudgetBar.className = "progress-bar bg-success";
+            } else if (percent > 30) {
+                remainingBudgetBar.className = "progress-bar bg-warning";
+            } else {
+                remainingBudgetBar.className = "progress-bar bg-danger";
+            }
+        }
+
+
+        function boostPartialFunding() {
+            const partialRows = [...partialFundingBody.querySelectorAll("tr")];
+
+            if (partialRows.length === 0) return;
+
+            // Total needed to fully fund all partial applicants
+            const needed = partialRows.reduce((sum, row) => {
+                const rspg = getRspgNumeric(row);
+                const currentAllocated = rspg * 0.9;
+                const difference = rspg - currentAllocated;
+                return sum + difference;
+            }, 0);
+
+            const remaining = computeRemainingBudget();
+
+            if (remaining >= needed) {
+                // Upgrade all partial applicants to full funding
+                partialRows.forEach(row => {
+                    setAllocatedFunds(row, getRspgTotal(row));
+                });
+
+                // Recalculate remaining budget AFTER updating allocations
+                updateRemainingBudgetDisplay();
+                updateCounts();
+            }
+        }
+
+
 
         function applyAllFundingCriteria() {
             const fullThreshold = parseFloat(fullFundingInput.value);
             const partialThreshold = parseFloat(partialFundingInput.value);
             const noFundingThreshold = parseFloat(noFundingInput.value);
+            const remainderPercent = parseFloat(remainderPercentInput.value);
+
+            // -----------------------------
+            // FIRST PASS: Sort rows into categories
+            // -----------------------------
+            let remainderRows = [];
 
             getAllRows().forEach(row => {
                 const rowScore = parseFloat(row.getAttribute("data-score") * 100);
@@ -375,9 +652,16 @@
                     return;
                 }
 
-                if (rowScore >= partialThreshold && rowScore < fullThreshold) {
+                if (rowScore >= partialThreshold) {
                     moveRow(row, partialFundingBody);
                     setAllocatedFunds(row, calculatePartialFundingAmount(row));
+                    return;
+                }
+
+                // Remainder Funding
+                if (rowScore >= noFundingThreshold) {
+                    moveRow(row, remainderFundingBody);
+                    remainderRows.push(row);
                     return;
                 }
 
@@ -385,13 +669,45 @@
                 setAllocatedFunds(row, "");
             });
 
+            // -----------------------------
+            // SECOND PASS: Allocate Remainder Funding
+            // -----------------------------
+            let totalRemainderRequested = remainderRows
+                .reduce((sum, row) => sum + getRspgNumeric(row), 0);
+
+            let allocatedToFull = [...fullFundingBody.querySelectorAll("tr")]
+                .reduce((sum, row) => sum + getRspgNumeric(row), 0);
+
+            let allocatedToPartial = [...partialFundingBody.querySelectorAll("tr")]
+                .reduce((sum, row) => sum + getRspgNumeric(row) * 0.9, 0);
+
+            let remainingBudget = totalMoneyAvailable - allocatedToFull - allocatedToPartial;
+
+            let fullyFundRemainder = totalRemainderRequested <= remainingBudget;
+
+            remainderRows.forEach(row => {
+                if (fullyFundRemainder) {
+                    setAllocatedFunds(row, getRspgTotal(row));
+                } else {
+                    setAllocatedFunds(row, calculateRemainderFundingAmount(row, remainderPercent));
+                }
+            });
+
             updateCounts();
+            updateRemainingBudgetDisplay();
+
         }
 
         applyAllFundingBtn_FUNDING.addEventListener("click", applyAllFundingCriteria);
+        boostPartialFundingBtn.addEventListener("click", boostPartialFunding);
+        resetCriteriaBtn_FUNDING.addEventListener("click", resetAllFunding);
+
 
         updateCounts();
+        updateRemainingBudgetDisplay();
+
     </script>
+
 
 
 

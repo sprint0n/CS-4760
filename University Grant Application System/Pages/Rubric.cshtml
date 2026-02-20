@@ -188,35 +188,31 @@
                     newTotal += (score * weight);
                 });
 
-                const percentage = (newTotal / 24) * 100;
-
+                const percentage = (newTotal / 28) * 100;
                 totalDisplay.textContent = percentage.toFixed(2) + '%';
             }
 
             scoreInputs.forEach(select => {
-                select.addEventListener('change', calculateTotal);
+                select.addEventListener('change', function () {
+                    const section = this.getAttribute('data-section');
+
+                    if (section === 'area-one' || section === 'area-two') {
+                        const val = parseFloat(this.value);
+
+                        if (val > 0) {
+                            document.querySelectorAll(`[data-section="${section}"]`).forEach(other => {
+                                if (other !== this) {
+                                    other.value = "0";
+                                }
+                            });
+                        }
+                    }
+
+                    calculateTotal();
+                });
             });
 
             calculateTotal();
-        });
-
-        document.querySelectorAll('.score-input').forEach(select => {
-            select.addEventListener('change', function() {
-                const section = this.getAttribute('data-section');
-
-                if (section === 'area-one' || section === 'area-two') {
-                    const val = parseFloat(this.value);
-
-                    if (val > 0) {
-                        document.querySelectorAll(`[data-section="${section}"]`).forEach(other => {
-                            if (other !== this) {
-                                other.value = "0";  // Fixed: was "0 %"
-                            }
-                        });
-                    }
-                }
-                calculateTotal();
-            });
         });
     </script>
 }

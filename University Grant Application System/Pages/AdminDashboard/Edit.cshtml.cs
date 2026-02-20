@@ -48,7 +48,7 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                 return Page();
             }
 
-            _context.Attach(User).State = EntityState.Modified;
+            _context.Attach(Users).State = EntityState.Modified;
 
             try
             {

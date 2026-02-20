@@ -4,6 +4,29 @@
     ViewData["Title"] = "Allocation Page";
     Layout = "_CommitteeLayout";
 }
+<style>
+    .input-warning {
+        margin-top: 4px;
+        font-size: 0.8rem;
+        color: #b30000;
+        background: #ffe6e6;
+        padding: 3px 6px;
+        border-radius: 4px;
+    }
+
+    .unsaved-warning {
+        font-size: 0.9rem;
+        color: #b30000;
+        background: #ffe6e6;
+        padding: 6px 10px;
+        border-radius: 4px;
+        display: none;
+        white-space: nowrap;
+    }
+
+</style>
+
+
 <h1>Allocation Page</h1>
 
 <!-- Money totals -->
@@ -18,20 +41,12 @@
     </div>
 </div>
 
-<!-- Slider -->
-<div class="row mb-2">
-    <div class="col-md-6">
-        <label for="scoreFilter" class="form-label">
-            Minimum Score Filter: <span id="scoreValue">0%</span>
-        </label>
-        <input type="range" class="form-range" min="0" max="100" step="1" id="scoreFilter" />
-    </div>
-</div>
-
 <!-- Criteria Ranges Filters -->
 <div class="row mb-4">
+
+    <!-- FULL FUNDING -->
     <div class="col-md-3">
-        <div class="d-flex align-items-end gap-2">
+        <div class="d-flex align-items-end gap-1">
             <div class="flex-grow-1">
                 <label for="fullFunds" class="form-label">Full Funding Score Criteria</label>
                 <div class="input-group">
@@ -39,12 +54,12 @@
                     <span class="input-group-text">%</span>
                 </div>
             </div>
-            <button id="applyFullFunding" class="btn btn-outline-primary">Apply</button>
         </div>
     </div>
 
+    <!-- PARTIAL FUNDING -->
     <div class="col-md-3">
-        <div class="d-flex align-items-end gap-2">
+        <div class="d-flex align-items-end gap-1">
             <div class="flex-grow-1">
                 <label for="partialFunds1" class="form-label">Partial Funding Score Criteria</label>
                 <div class="input-group">
@@ -52,22 +67,38 @@
                     <span class="input-group-text">%</span>
                 </div>
             </div>
-            <button id="applyPartialFunding" class="btn btn-outline-primary">Apply</button>
         </div>
     </div>
 
-    @* <div class="col-md-3">    TEMPORARILY NOT BEING USED. ASKING ABOUT THIS AT NEXT SPRINT MEETING
-        <div class="d-flex align-items-end gap-2">
+    <!-- NO FUNDING -->
+    <div class="col-md-3">
+        <div class="d-flex align-items-end gap-1">
             <div class="flex-grow-1">
-                <label for="partialFunds2" class="form-label">2nd Partial Criteria</label>
+                <label for="scoreFilter" class="form-label">No Funding Score Criteria</label>
                 <div class="input-group">
-                    <input class="form-control" value="70" min="0" max="100" id="partialFunds2" />
+                    <input class="form-control" value="70" min="0" max="100" id="scoreFilter" />
                     <span class="input-group-text">%</span>
                 </div>
             </div>
-            <button class="btn btn-outline-primary">Apply</button>
         </div>
-    </div> *@
+    </div>
+</div>
+
+<!-- APPLY ALL BUTTON -->
+<div class="row mb-4">
+    <div class="col-md-12 d-flex justify-content-center">
+        <div class="d-flex align-items-center gap-3">
+            <!-- Fixed-size centered button -->
+            <button id="applyAllFunding" class="btn btn-primary" style="width: 260px;">
+                Apply All Funding Criteria
+            </button>
+
+            <!-- Unsaved changes warning -->
+            <div id="unsavedWarning" class="unsaved-warning">
+                Changes detected — click Apply
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -168,85 +199,121 @@
 
 @section Scripts {
 
-    @* <script>
-        // Set total count on page load
-        const tableBody = document.getElementById("applicationsTableBody");
-        const totalCountEl = document.getElementById("totalCount");
-        const visibleCountEl = document.getElementById("visibleCount");
-
-        totalCountEl.textContent = tableBody.querySelectorAll("tr").length;
-
-        // Initially all rows are visible
-        visibleCountEl.textContent =
-            tableBody.querySelectorAll("tr:not([style*='display: none'])").length;
-
-        const scoreFilter = document.getElementById("scoreFilter");
-        const scoreValueLabel = document.getElementById("scoreValue");
-
-        scoreFilter.addEventListener("input", function () {
-            const minScore = parseFloat(scoreFilter.value);
-
-            // Update the label
-            scoreValueLabel.textContent = minScore + "%";
-
-            // Loop through all rows and hide/show based on score
-            tableBody.querySelectorAll("tr").forEach(row => {
-                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
-                if (rowScore >= minScore) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-
-            // Update the visible count
-            visibleCountEl.textContent =
-                tableBody.querySelectorAll("tr:not([style*='display: none'])").length;
-        });
-    </script> *@
-
+    <!-- INPUT VALUES SCRIPT -->
     <script>
         const fullFunds = document.getElementById("fullFunds");
         const partial1 = document.getElementById("partialFunds1");
+        const noFunds = document.getElementById("scoreFilter");
+
+        const applyAllFundingBtn_UI = document.getElementById("applyAllFunding");
+        const unsavedWarning = document.getElementById("unsavedWarning");
+
+        let lastApplied = {
+            full: fullFunds.value,
+            partial: partial1.value,
+            no: noFunds.value
+        };
+
+        function showInputWarning(input, message) {
+            clearInputWarning(input);
+            const warning = document.createElement("div");
+            warning.className = "input-warning";
+            warning.textContent = message;
+            input.parentElement.parentElement.appendChild(warning);
+        }
+
+        function clearInputWarning(input) {
+            const parent = input.parentElement.parentElement;
+            const existing = parent.querySelector(".input-warning");
+            if (existing) existing.remove();
+        }
+
+        function checkUnsavedChanges() {
+            if (
+                fullFunds.value !== lastApplied.full ||
+                partial1.value !== lastApplied.partial ||
+                noFunds.value !== lastApplied.no
+            ) {
+                unsavedWarning.style.display = "inline-block";
+            } else {
+                unsavedWarning.style.display = "none";
+            }
+        }
 
         function clampToMax(input) {
             const max = parseInt(input.max);
             const value = parseInt(input.value);
-            if (value > max) input.value = max;
+            if (!isNaN(value) && value > max) input.value = max;
+        }
+
+        function enforceHierarchy() {
+            const fullVal = parseInt(fullFunds.value);
+            const partialVal = parseInt(partial1.value);
+            const noVal = parseInt(noFunds.value);
+
+            if (!isNaN(partialVal) && partialVal >= fullVal) {
+                partial1.value = "";
+                showInputWarning(partial1, "Cleared: must be lower than Full Funding");
+            } else clearInputWarning(partial1);
+
+            if (!isNaN(noVal) && noVal >= fullVal) {
+                noFunds.value = "";
+                showInputWarning(noFunds, "Cleared: must be lower than Full Funding");
+            } else if (noFunds.value !== "") clearInputWarning(noFunds);
+
+            const newPartialVal = parseInt(partial1.value);
+            const newNoVal = parseInt(noFunds.value);
+
+            if (!isNaN(newNoVal) && !isNaN(newPartialVal) && newNoVal >= newPartialVal) {
+                noFunds.value = "";
+                showInputWarning(noFunds, "Cleared: must be lower than Partial Funding");
+            }
         }
 
         function updateMaxValues() {
-            // partial1 must always be less than fullFunds
-            partial1.max = fullFunds.value - 1;
+            enforceHierarchy();
+
+            const fullVal = parseInt(fullFunds.value);
+            const partialVal = parseInt(partial1.value);
+
+            partial1.max = fullVal - 1;
+            noFunds.max = !isNaN(partialVal) ? partialVal - 1 : fullVal - 2;
+
             clampToMax(partial1);
+            clampToMax(noFunds);
+
+            checkUnsavedChanges();
         }
 
-        // Run once on page load
-        updateMaxValues();
+        applyAllFundingBtn_UI.addEventListener("click", () => {
+            updateMaxValues(); // enforce hierarchy BEFORE funding logic runs
 
-        // Update when user finishes editing fullFunds
+            lastApplied = {
+                full: fullFunds.value,
+                partial: partial1.value,
+                no: noFunds.value
+            };
+
+            unsavedWarning.style.display = "none";
+        });
+
         fullFunds.addEventListener("change", updateMaxValues);
-
-        // Update when user finishes editing partialFunds1
         partial1.addEventListener("change", updateMaxValues);
+        noFunds.addEventListener("change", updateMaxValues);
 
-        // Hard-block typing above max
-        partial1.addEventListener("input", () => clampToMax(partial1));
+        partial1.addEventListener("input", () => { clampToMax(partial1); checkUnsavedChanges(); });
+        noFunds.addEventListener("input", () => { clampToMax(noFunds); checkUnsavedChanges(); });
+
+        updateMaxValues();
     </script>
 
-
+    <!-- APPLY FUNDING SCRIPT -->
     <script>
-        // -----------------------------
-        // ELEMENT REFERENCES
-        // -----------------------------
-        const scoreFilter = document.getElementById("scoreFilter");
-        const scoreValueLabel = document.getElementById("scoreValue");
+        const applyAllFundingBtn_FUNDING = document.getElementById("applyAllFunding");
 
         const fullFundingInput = document.getElementById("fullFunds");
         const partialFundingInput = document.getElementById("partialFunds1");
-
-        const applyFullFundingBtn = document.getElementById("applyFullFunding");
-        const applyPartialFundingBtn = document.getElementById("applyPartialFunding");
+        const noFundingInput = document.getElementById("scoreFilter");
 
         const sourceBody = document.getElementById("applicationsTableBody");
         const fullFundingBody = document.getElementById("fullFundingTableBody");
@@ -256,13 +323,8 @@
         const totalCountEl = document.getElementById("totalCount");
         const visibleCountEl = document.getElementById("visibleCount");
 
-        // -----------------------------
-        // HELPERS
-        // -----------------------------
         function moveRow(row, targetBody) {
-            if (row.parentElement !== targetBody) {
-                targetBody.appendChild(row);
-            }
+            if (row.parentElement !== targetBody) targetBody.appendChild(row);
         }
 
         function setAllocatedFunds(row, value) {
@@ -275,6 +337,11 @@
             return rspgCell ? rspgCell.textContent.trim() : "";
         }
 
+        function calculatePartialFundingAmount(row) {
+            const numeric = parseFloat(getRspgTotal(row).replace(/[^0-9.-]+/g, ""));
+            return (numeric * 0.9).toLocaleString("en-US", { style: "currency", currency: "USD" });
+        }
+
         function getAllRows() {
             return document.querySelectorAll(
                 "#applicationsTableBody tr, #fullFundingTableBody tr, #partialFundingTableBody tr, #noFundingTableBody tr"
@@ -284,110 +351,49 @@
         function updateCounts() {
             const total = getAllRows().length;
             const visible = total - noFundingBody.querySelectorAll("tr").length;
-
             totalCountEl.textContent = total;
             visibleCountEl.textContent = visible;
         }
 
-        // -----------------------------
-        // NO FUNDING LOGIC (SLIDER)
-        // -----------------------------
-        function updateNoFundingTable() {
-            const minScore = parseFloat(scoreFilter.value);
-            scoreValueLabel.textContent = minScore + "%";
-
-            getAllRows().forEach(row => {
-                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
-
-                if (rowScore < minScore) {
-                    moveRow(row, noFundingBody);
-                    setAllocatedFunds(row, "$0");
-                } else {
-                    if (row.parentElement === noFundingBody) {
-                        moveRow(row, sourceBody);
-                        setAllocatedFunds(row, "");
-                    }
-                }
-            });
-
-            updateCounts();
-        }
-
-        // -----------------------------
-        // FULL FUNDING LOGIC
-        // -----------------------------
-        function calculatePartialFundingAmount(row) {
-            const rspgText = getRspgTotal(row); // "$4,500.00"
-            const numeric = parseFloat(rspgText.replace(/[^0-9.-]+/g, "")); // 4500
-            const partialAmount = numeric * 0.9;
-            return partialAmount.toLocaleString("en-US", { style: "currency", currency: "USD" });
-        }
-
-
-        function updateFullFundingTable() {
-            const threshold = parseFloat(fullFundingInput.value);
-
-            getAllRows().forEach(row => {
-                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
-
-                // Skip rows in No Funding
-                if (row.parentElement === noFundingBody) return;
-
-                if (rowScore >= threshold) {
-                    moveRow(row, fullFundingBody);
-                    setAllocatedFunds(row, getRspgTotal(row));
-                } else {
-                    if (row.parentElement === fullFundingBody) {
-                        moveRow(row, sourceBody);
-                        setAllocatedFunds(row, "");
-                    }
-                }
-            });
-
-            updateCounts();
-        }
-
-        // -----------------------------
-        // PARTIAL FUNDING LOGIC
-        // -----------------------------
-        function updatePartialFundingTable() {
+        function applyAllFundingCriteria() {
             const fullThreshold = parseFloat(fullFundingInput.value);
             const partialThreshold = parseFloat(partialFundingInput.value);
+            const noFundingThreshold = parseFloat(noFundingInput.value);
 
             getAllRows().forEach(row => {
                 const rowScore = parseFloat(row.getAttribute("data-score") * 100);
 
-                // Skip rows in No Funding
-                if (row.parentElement === noFundingBody) return;
+                if (rowScore < noFundingThreshold) {
+                    moveRow(row, noFundingBody);
+                    setAllocatedFunds(row, "$0");
+                    return;
+                }
 
-                // Must be >= partial AND < full
+                if (rowScore >= fullThreshold) {
+                    moveRow(row, fullFundingBody);
+                    setAllocatedFunds(row, getRspgTotal(row));
+                    return;
+                }
+
                 if (rowScore >= partialThreshold && rowScore < fullThreshold) {
                     moveRow(row, partialFundingBody);
-
                     setAllocatedFunds(row, calculatePartialFundingAmount(row));
-
-                } else {
-                    // If it was in Partial but no longer qualifies, return to source
-                    if (row.parentElement === partialFundingBody) {
-                        moveRow(row, sourceBody);
-                        setAllocatedFunds(row, "");
-                    }
+                    return;
                 }
+
+                moveRow(row, sourceBody);
+                setAllocatedFunds(row, "");
             });
 
             updateCounts();
         }
 
-        // -----------------------------
-        // EVENT LISTENERS
-        // -----------------------------
-        scoreFilter.addEventListener("input", updateNoFundingTable);
-        applyFullFundingBtn.addEventListener("click", updateFullFundingTable);
-        applyPartialFundingBtn.addEventListener("click", updatePartialFundingTable);
+        applyAllFundingBtn_FUNDING.addEventListener("click", applyAllFundingCriteria);
 
-        // Initialize on page load
-        updateNoFundingTable();
+        updateCounts();
     </script>
+
+
 
 
 

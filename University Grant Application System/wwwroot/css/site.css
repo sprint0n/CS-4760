@@ -1,31 +1,928 @@
+/* =========================================================
+   University Grant Application System — Design System
+   Navy + Gold professional theme
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ----- CSS Custom Properties ----- */
+:root {
+  --primary:       #1e3a5f;
+  --primary-dark:  #142b47;
+  --primary-light: #2d5282;
+  --accent:        #c8a951;
+  --accent-hover:  #b8973e;
+  --accent-light:  #f7eed4;
+  --bg-body:       #f4f6f9;
+  --bg-card:       #ffffff;
+  --text-primary:  #1a202c;
+  --text-muted:    #64748b;
+  --border:        #e2e8f0;
+  --border-dark:   #cbd5e1;
+  --shadow-sm:     0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md:     0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg:     0 8px 24px rgba(0, 0, 0, 0.12);
+  --radius:        8px;
+  --radius-sm:     4px;
+  --radius-lg:     12px;
+}
+
+/* ----- Base ----- */
 html {
   font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
   position: relative;
   min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
+@media (min-width: 768px) {
+  html { font-size: 16px; }
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+body {
+  margin-bottom: 0;
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ----- Navbar ----- */
+.navbar-main {
+  background-color: var(--primary) !important;
+  border-bottom: 3px solid var(--accent) !important;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.navbar-main .navbar-brand {
+  color: var(--accent) !important;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.navbar-main .navbar-brand:hover {
+  color: #e6c96a !important;
+}
+
+.navbar-main .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  transition: color 0.15s ease;
+}
+
+.navbar-main .nav-link:hover,
+.navbar-main .nav-link:focus {
+  color: #ffffff !important;
+}
+
+.navbar-main .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.navbar-main .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255%2c 255%2c 255%2c 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Role badge in navbar */
+.badge-role {
+  background-color: var(--accent) !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 0.3em 0.65em;
+  border-radius: 20px;
+}
+
+/* ----- Cards ----- */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--primary);
+  padding: 0.875rem 1.25rem;
+}
+
+.card-header.card-header-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-bottom: none;
+}
+
+.card-header.card-header-accent {
+  background-color: var(--accent-light);
+  color: var(--primary);
+  border-bottom: 1px solid #e8d898;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* ----- Buttons ----- */
+.btn {
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #ffffff;
+}
+
+.btn-primary:active {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--primary);
+}
+
+/* Focus ring */
+.btn:focus,
+.btn:active:focus,
+.form-control:focus,
+.form-check-input:focus,
+.form-select:focus {
+  box-shadow: 0 0 0 0.2rem rgba(30, 58, 95, 0.25);
+  outline: none;
+}
+
+/* ----- Tables ----- */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table thead th {
+  background-color: #f1f5f9;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border-dark);
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.table-card-wrap {
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.table-card-wrap .table {
+  margin-bottom: 0;
+}
+
+/* ----- Forms ----- */
+.form-control,
+.form-select {
+  border-color: var(--border-dark);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-light);
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* ----- Page Header ----- */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1,
+.page-header h2 {
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.page-header p {
+  color: var(--text-muted);
+  margin-bottom: 0;
+}
+
+.page-divider {
+  border: none;
+  border-top: 2px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+/* ----- Dashboard header bar ----- */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard-header .due-date-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.dashboard-header .due-date-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* ----- Section title ----- */
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+/* ----- Status Badges ----- */
+.badge-status-saved {
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+.badge-status-review {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-status-denied {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* ----- Alert improvements ----- */
+.alert {
+  border-radius: var(--radius);
+  border: none;
+  font-weight: 500;
+}
+
+.alert-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.alert-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* ----- Login page ----- */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.login-brand .brand-title {
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.login-brand .brand-subtitle {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.875rem;
+}
+
+.login-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card h2 {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ----- Footer ----- */
+.footer {
+  background-color: var(--primary-dark);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 1rem 0;
+  margin-top: 3rem;
+}
+
+.footer a {
+  color: var(--accent);
+}
+
+.footer a:hover {
+  color: #e6c96a;
+}
+
+/* ----- Utility ----- */
+.text-primary-custom { color: var(--primary) !important; }
+.text-accent { color: var(--accent) !important; }
+.bg-primary-custom { background-color: var(--primary) !important; }
+
+.border-accent-left {
+  border-left: 4px solid var(--accent);
+}
+
+/* =========================================================
+   LOGIN PAGE — polished shield + card refinements
+   ========================================================= */
+
+.login-logo {
+  width: 72px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+}
+
+.login-card-header {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+.login-card-header h2 {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.login-card-header p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.login-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.25rem 0 1.5rem;
+}
+
+.login-link {
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+  color: var(--primary-dark);
+}
+
+.login-link-muted {
+  color: var(--text-muted);
+}
+
+.login-link-muted:hover {
+  color: var(--text-primary);
+}
+
+.login-footer-text {
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* Floating dark mode toggle on login page */
+.login-theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  z-index: 100;
+  padding: 0;
+}
+
+.login-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
+/* Navbar dark mode toggle button */
+.btn-theme-toggle {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.btn-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+}
+
+/* =========================================================
+   DARK MODE — html[data-theme="dark"]
+   Toggle via JS; persisted in localStorage
+   ========================================================= */
+
+html[data-theme="dark"] {
+  --bg-body:       #0f172a;
+  --bg-card:       #1e293b;
+  --text-primary:  #f1f5f9;
+  --text-muted:    #94a3b8;
+  --border:        #334155;
+  --border-dark:   #475569;
+  --accent-light:  #2d2714;
+  --shadow-sm:     0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md:     0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg:     0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] body {
+  background-color: #0f172a;
+  color: #f1f5f9;
+  --bs-body-bg: #0f172a;
+  --bs-body-color: #f1f5f9;
+  --bs-border-color: #334155;
+}
+
+html[data-theme="dark"] .card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .card-header {
+  background-color: #162032;
+  border-bottom-color: #334155;
+  color: #c8a951;
+}
+
+html[data-theme="dark"] .card-body {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .table thead th {
+  background-color: #162032;
+  color: #c8a951;
+  border-bottom-color: #475569;
+}
+
+html[data-theme="dark"] .table tbody td {
+  border-bottom-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .table-hover tbody tr:hover {
+  background-color: #263244;
+}
+
+html[data-theme="dark"] .table-hover tbody tr:hover td {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .table tbody tr.table-success {
+  background-color: #0d2e1f !important;
+}
+
+html[data-theme="dark"] .table tbody tr.table-success td {
+  color: #6ee7b7 !important;
+}
+
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select {
+  background-color: #263244;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .form-control::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"] .form-control:focus,
+html[data-theme="dark"] .form-select:focus {
+  background-color: #263244;
+  border-color: #c8a951;
+  color: #f1f5f9;
+  box-shadow: 0 0 0 0.2rem rgba(200, 169, 81, 0.2);
+}
+
+html[data-theme="dark"] .form-label {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .alert-success {
+  background-color: #0d2e1f;
+  color: #6ee7b7;
+}
+
+html[data-theme="dark"] .alert-danger {
+  background-color: #2d1515;
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .badge-status-saved {
+  background-color: #263244;
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .badge-status-review {
+  background-color: #2d2006;
+  color: #fbbf24;
+}
+
+html[data-theme="dark"] .badge-status-approved {
+  background-color: #0d2e1f;
+  color: #34d399;
+}
+
+html[data-theme="dark"] .badge-status-denied {
+  background-color: #2d1515;
+  color: #f87171;
+}
+
+html[data-theme="dark"] .text-muted {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .text-danger {
+  color: #f87171 !important;
+}
+
+html[data-theme="dark"] a {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] a:hover {
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .footer a,
+html[data-theme="dark"] .text-accent {
+  color: #c8a951 !important;
+}
+
+html[data-theme="dark"] .footer {
+  background-color: #0a1628;
+}
+
+html[data-theme="dark"] .dashboard-header {
+  background-color: #1e293b;
+  border-color: #334155;
+  border-left-color: #c8a951;
+}
+
+html[data-theme="dark"] .dashboard-header .due-date-value {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .application-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .application-card h4 {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .approved-item {
+  border-bottom-color: #334155;
+}
+
+/* Grant title text — force light colour over var(--primary) from FacultyViewIndex.css */
+html[data-theme="dark"] .approved-item strong {
+  color: #e2e8f0 !important;
+}
+
+/* Amount pill — swap hardcoded light-green for dark-mode-friendly tones */
+html[data-theme="dark"] .approved-item .amount {
+  background: #0d2e1f !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5 {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .section-title {
+  color: #c8a951 !important;
+}
+
+html[data-theme="dark"] .btn-outline-secondary {
+  color: #94a3b8;
+  border-color: #475569;
+}
+
+html[data-theme="dark"] .btn-outline-secondary:hover {
+  background-color: #263244;
+  color: #e2e8f0;
+  border-color: #64748b;
+}
+
+html[data-theme="dark"] .btn-outline-danger {
+  color: #f87171;
+  border-color: #ef4444;
+}
+
+html[data-theme="dark"] hr {
+  border-color: #334155;
+  opacity: 1;
+}
+
+/* Login page dark mode */
+html[data-theme="dark"] .login-page {
+  background: linear-gradient(135deg, #080f1f 0%, #0f1e36 100%);
+}
+
+html[data-theme="dark"] .login-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] .login-card-header h2 {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .login-card-header p {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .login-divider {
+  border-top-color: #334155;
+}
+
+html[data-theme="dark"] .login-link {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .login-link:hover {
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .login-link-muted {
+  color: #64748b;
+}
+
+/* =========================================================
+   DARK MODE — targeted fixes
+   ========================================================= */
+
+/* --- Fix 1: Admin table — chair row (table-success) ---
+   Bootstrap 5 sets --bs-table-* CSS vars on the <tr> itself,
+   which beats any td/tr selector. Override the vars directly. */
+html[data-theme="dark"] .table tr.table-success,
+html[data-theme="dark"] .table tr.table-success > td,
+html[data-theme="dark"] .table tr.table-success > th {
+  --bs-table-color:       #6ee7b7;
+  --bs-table-bg:          #0d2e1f;
+  --bs-table-border-color:#1a4a32;
+  --bs-table-hover-bg:    #142d20;
+  --bs-table-hover-color: #6ee7b7;
+  background-color: #0d2e1f !important;
+  color: #6ee7b7 !important;
+  border-color: #1a4a32 !important;
+}
+
+/* --- Fix 2: Rubric — table-light thead ---
+   Bootstrap sets --bs-table-bg on .table-light which overrides
+   our thead th rule. Override the variables AND the property. */
+html[data-theme="dark"] .table-light,
+html[data-theme="dark"] thead.table-light > tr > th,
+html[data-theme="dark"] thead.table-light > tr {
+  --bs-table-color:        #c8a951;
+  --bs-table-bg:           #162032;
+  --bs-table-border-color: #334155;
+  background-color: #162032 !important;
+  color: #c8a951 !important;
+  border-color: #334155 !important;
+}
+
+/* --- Fix 3: Rubric — alert-info percentage box --- */
+html[data-theme="dark"] .alert-info {
+  background-color: #0c2340;
+  color: #7dd3fc;
+  border-color: #1e4a7a;
+}
+
+html[data-theme="dark"] .alert-info h3,
+html[data-theme="dark"] .alert-info h4 {
+  color: #7dd3fc;
+}
+
+/* --- Fix 4: Rubric / Application — text-primary Bootstrap class --- */
+html[data-theme="dark"] .text-primary {
+  color: #93c5fd !important;
+}
+
+/* --- Fix 5: Application page — table-bordered borders --- */
+html[data-theme="dark"] .table-bordered > :not(caption) > * > * {
+  border-color: #334155;
+}
+
+/* --- Fix 6: Application page — checkboxes (form-check-input) ---
+   Bootstrap renders these white by default. */
+html[data-theme="dark"] .form-check-input {
+  background-color: #263244;
+  border-color: #475569;
+}
+
+html[data-theme="dark"] .form-check-input:checked {
+  background-color: var(--accent, #c8a951);
+  border-color: var(--accent, #c8a951);
+  /* Re-encode Bootstrap's checkmark in a dark-friendly colour */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%231e3a5f' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+}
+
+html[data-theme="dark"] .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(200, 169, 81, 0.25);
+  border-color: var(--accent, #c8a951);
+}
+
+html[data-theme="dark"] .form-check-label {
+  color: #e2e8f0;
+}
+
+/* --- Fix 7: Application page — file input button ---
+   The "Choose File" / "Browse" button inside a file input
+   inherits a white background from the browser default. */
+html[data-theme="dark"] input[type="file"].form-control::file-selector-button {
+  background-color: #2d3e52;
+  color: #e2e8f0;
+  border-color: #475569;
+  border-right-color: #475569;
+}
+
+html[data-theme="dark"] input[type="file"].form-control:hover::file-selector-button {
+  background-color: #364d65;
+  color: #ffffff;
+}
+
+/* --- Fix 8: Application page — readonly / disabled inputs ---
+   Bootstrap applies --bs-secondary-bg (#e9ecef) to readonly fields. */
+html[data-theme="dark"] .form-control[readonly],
+html[data-theme="dark"] .form-control:disabled {
+  background-color: #1a2535 !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+/* --- Fix 9: Application page — btn-secondary ---
+   Ensure it stays visible on dark backgrounds. */
+html[data-theme="dark"] .btn-secondary {
+  background-color: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .btn-secondary:hover,
+html[data-theme="dark"] .btn-secondary:focus {
+  background-color: #3d4f64;
+  border-color: #64748b;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .btn-secondary:active {
+  background-color: #2d3a4a !important;
+  border-color: #475569 !important;
+  color: #ffffff !important;
+}
+
+/* --- Fix 10: Income source border box --- */
+html[data-theme="dark"] .income-source.border {
+  border-color: #334155 !important;
+  background-color: #1a2535;
+  border-radius: var(--radius-sm, 4px);
+}
+
+/* Smooth theme transitions */
+body,
+.card,
+.card-header,
+.form-control,
+.form-select,
+.dashboard-header,
+.application-card,
+.login-card,
+.login-page {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }

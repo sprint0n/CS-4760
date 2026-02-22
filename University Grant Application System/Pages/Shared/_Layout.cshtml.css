@@ -1,48 +1,42 @@
-﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+/* Scoped styles for _Layout.cshtml — supplements site.css */
 
 a.navbar-brand {
   white-space: normal;
-  text-align: center;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 a {
-  color: #0077cc;
+  color: var(--primary, #1e3a5f);
+}
+
+a:hover {
+  color: var(--primary-dark, #142b47);
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background-color: var(--primary, #1e3a5f);
+  border-color: var(--primary, #1e3a5f);
+  color: #ffffff;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark, #142b47);
+  border-color: var(--primary-dark, #142b47);
 }
 
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: var(--primary, #1e3a5f);
+  border-color: var(--primary-dark, #142b47);
+  color: #ffffff;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
 }
 
 button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
 }

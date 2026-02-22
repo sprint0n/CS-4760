@@ -688,7 +688,7 @@ html[data-theme="dark"] .dashboard-header {
 }
 
 html[data-theme="dark"] .dashboard-header .due-date-value {
-  color: #e2e8f0;
+  color: #e2e8f0 !important;
 }
 
 html[data-theme="dark"] .application-card {
@@ -697,15 +697,22 @@ html[data-theme="dark"] .application-card {
 }
 
 html[data-theme="dark"] .application-card h4 {
-  color: #e2e8f0;
+  color: #e2e8f0 !important;
 }
 
 html[data-theme="dark"] .approved-item {
   border-bottom-color: #334155;
 }
 
+/* Grant title text — force light colour over var(--primary) from FacultyViewIndex.css */
 html[data-theme="dark"] .approved-item strong {
-  color: #e2e8f0;
+  color: #e2e8f0 !important;
+}
+
+/* Amount pill — swap hardcoded light-green for dark-mode-friendly tones */
+html[data-theme="dark"] .approved-item .amount {
+  background: #0d2e1f !important;
+  color: #34d399 !important;
 }
 
 html[data-theme="dark"] h1,
@@ -713,11 +720,11 @@ html[data-theme="dark"] h2,
 html[data-theme="dark"] h3,
 html[data-theme="dark"] h4,
 html[data-theme="dark"] h5 {
-  color: #e2e8f0;
+  color: #e2e8f0 !important;
 }
 
 html[data-theme="dark"] .section-title {
-  color: #c8a951;
+  color: #c8a951 !important;
 }
 
 html[data-theme="dark"] .btn-outline-secondary {
@@ -774,6 +781,137 @@ html[data-theme="dark"] .login-link:hover {
 
 html[data-theme="dark"] .login-link-muted {
   color: #64748b;
+}
+
+/* =========================================================
+   DARK MODE — targeted fixes
+   ========================================================= */
+
+/* --- Fix 1: Admin table — chair row (table-success) ---
+   Bootstrap 5 sets --bs-table-* CSS vars on the <tr> itself,
+   which beats any td/tr selector. Override the vars directly. */
+html[data-theme="dark"] .table tr.table-success,
+html[data-theme="dark"] .table tr.table-success > td,
+html[data-theme="dark"] .table tr.table-success > th {
+  --bs-table-color:       #6ee7b7;
+  --bs-table-bg:          #0d2e1f;
+  --bs-table-border-color:#1a4a32;
+  --bs-table-hover-bg:    #142d20;
+  --bs-table-hover-color: #6ee7b7;
+  background-color: #0d2e1f !important;
+  color: #6ee7b7 !important;
+  border-color: #1a4a32 !important;
+}
+
+/* --- Fix 2: Rubric — table-light thead ---
+   Bootstrap sets --bs-table-bg on .table-light which overrides
+   our thead th rule. Override the variables AND the property. */
+html[data-theme="dark"] .table-light,
+html[data-theme="dark"] thead.table-light > tr > th,
+html[data-theme="dark"] thead.table-light > tr {
+  --bs-table-color:        #c8a951;
+  --bs-table-bg:           #162032;
+  --bs-table-border-color: #334155;
+  background-color: #162032 !important;
+  color: #c8a951 !important;
+  border-color: #334155 !important;
+}
+
+/* --- Fix 3: Rubric — alert-info percentage box --- */
+html[data-theme="dark"] .alert-info {
+  background-color: #0c2340;
+  color: #7dd3fc;
+  border-color: #1e4a7a;
+}
+
+html[data-theme="dark"] .alert-info h3,
+html[data-theme="dark"] .alert-info h4 {
+  color: #7dd3fc;
+}
+
+/* --- Fix 4: Rubric / Application — text-primary Bootstrap class --- */
+html[data-theme="dark"] .text-primary {
+  color: #93c5fd !important;
+}
+
+/* --- Fix 5: Application page — table-bordered borders --- */
+html[data-theme="dark"] .table-bordered > :not(caption) > * > * {
+  border-color: #334155;
+}
+
+/* --- Fix 6: Application page — checkboxes (form-check-input) ---
+   Bootstrap renders these white by default. */
+html[data-theme="dark"] .form-check-input {
+  background-color: #263244;
+  border-color: #475569;
+}
+
+html[data-theme="dark"] .form-check-input:checked {
+  background-color: var(--accent, #c8a951);
+  border-color: var(--accent, #c8a951);
+  /* Re-encode Bootstrap's checkmark in a dark-friendly colour */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%231e3a5f' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+}
+
+html[data-theme="dark"] .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(200, 169, 81, 0.25);
+  border-color: var(--accent, #c8a951);
+}
+
+html[data-theme="dark"] .form-check-label {
+  color: #e2e8f0;
+}
+
+/* --- Fix 7: Application page — file input button ---
+   The "Choose File" / "Browse" button inside a file input
+   inherits a white background from the browser default. */
+html[data-theme="dark"] input[type="file"].form-control::file-selector-button {
+  background-color: #2d3e52;
+  color: #e2e8f0;
+  border-color: #475569;
+  border-right-color: #475569;
+}
+
+html[data-theme="dark"] input[type="file"].form-control:hover::file-selector-button {
+  background-color: #364d65;
+  color: #ffffff;
+}
+
+/* --- Fix 8: Application page — readonly / disabled inputs ---
+   Bootstrap applies --bs-secondary-bg (#e9ecef) to readonly fields. */
+html[data-theme="dark"] .form-control[readonly],
+html[data-theme="dark"] .form-control:disabled {
+  background-color: #1a2535 !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+/* --- Fix 9: Application page — btn-secondary ---
+   Ensure it stays visible on dark backgrounds. */
+html[data-theme="dark"] .btn-secondary {
+  background-color: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .btn-secondary:hover,
+html[data-theme="dark"] .btn-secondary:focus {
+  background-color: #3d4f64;
+  border-color: #64748b;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .btn-secondary:active {
+  background-color: #2d3a4a !important;
+  border-color: #475569 !important;
+  color: #ffffff !important;
+}
+
+/* --- Fix 10: Income source border box --- */
+html[data-theme="dark"] .income-source.border {
+  border-color: #334155 !important;
+  background-color: #1a2535;
+  border-radius: var(--radius-sm, 4px);
 }
 
 /* Smooth theme transitions */

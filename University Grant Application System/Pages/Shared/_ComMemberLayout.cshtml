@@ -1,9 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - University_Grant_Application_System</title>
+    <title>@ViewData["Title"] - Grant Portal</title>
+    <script>(function(){var t=localStorage.getItem('grant-portal-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');})()</script>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -13,44 +14,52 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-md navbar-dark navbar-main">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/ComMemberDashboard/ComMemberDashboard">University Grant Application System</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" asp-area="" asp-page="/ComMemberDashboard/ComMemberDashboard">Grant Portal</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ComMemberDashboard/ComMemberDashboard">Home</a>
+                            <a class="nav-link" asp-area="" asp-page="/ComMemberDashboard/ComMemberDashboard">Home</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto align-items-center gap-2">
+                        <li class="nav-item">
+                            <button id="themeToggle" class="btn-theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                                <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                                </svg>
+                                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="display:none">
+                                    <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                                </svg>
+                            </button>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Logout</a> <!-- This only takes you to login page, doesn't clear user from cache -->
-                        </li>
-                        @*
-                            Comment Out for now
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/AdminDashboard/Index">Admin Dashboard</a>
+                            <span class="badge badge-role">Committee Member</span>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ApplicationPage">Application</a>
+                            <a class="nav-link" asp-area="" asp-page="/Index">Logout</a>
                         </li>
-                        *@
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="container py-4">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer">
         <div class="container">
-            &copy; 2026 - University_Grant_Application_System - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2026 University Grant Application System &mdash;
+            <a asp-area="" asp-page="/Privacy">Privacy Policy</a>
         </div>
     </footer>
 

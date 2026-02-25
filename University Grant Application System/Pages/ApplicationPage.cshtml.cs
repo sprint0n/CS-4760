@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using NuGet.Packaging;
 using NuGet.Protocol.Plugins;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 using University_Grant_Application_System.Data;
@@ -80,10 +81,13 @@ namespace University_Grant_Application_System.Pages
         public string? GrantPurpose { get; set; }
 
         [BindProperty]
+        [Display(Name = "Select Grant Type")]
         public string SelectedGrantTypeOption { get; set; }
+     
         public List<SelectListItem> GrantTypeOptions { get; set; }
 
         [BindProperty]
+        [Display(Name = "Select Staff Type")]
         public string SelectedStaffTypeOption { get; set; }
         public List<SelectListItem> StaffTypeOptions { get; set; }
 
@@ -148,6 +152,46 @@ namespace University_Grant_Application_System.Pages
         public bool HasExistingIRB { get; set; }
 
         public List<UploadedFile> ExistingFiles { get; set; } = new();
+
+        private List<SelectListItem> GetSortedGrantTypeOptions()
+        {
+            var allOptions = new List<(int Id, string Text)>
+            {
+                (1, "Hemingway Adjunct Faculty Grant - Spring Semester"),
+                (2, "Hemingway Collaborative Award - Spring Semester"),
+                (3, "Hemingway Excellence Award - Spring Semester"),
+                (4, "Hemingway New Faculty Grant - Spring Semester"),
+                (5, "Hemingway Faculty Vitality Grant - Fall and Spring"),
+                (6, "Creative Works Grant - Fall and Spring"),
+                (7, "Research Grant - Fall and Spring"),
+                (8, "Travel Grant - Fall, Spring, and Summer")
+            };
+
+            int currentMonth = DateTime.Now.Month;
+
+
+            return allOptions.OrderByDescending(opt =>
+            {
+                if (currentMonth >= 8 || currentMonth <= 1) 
+                {
+                    if (opt.Text.Contains("Fall")) return 2;
+                    if (opt.Text.Contains("Spring")) return 0;
+                }
+                else if (currentMonth >= 2 && currentMonth <= 7) 
+                {
+                    if (opt.Text.Contains("Spring")) return 2;
+                    if (opt.Text.Contains("Fall")) return 0;
+                }
+                return 1; 
+            })
+            .ThenBy(opt => opt.Id) 
+            .Select(opt => new SelectListItem
+            {
+                Value = opt.Id.ToString(),
+                Text = opt.Text
+            })
+            .ToList();
+        }
 
         public async Task<IActionResult> OnGetAsync(int? draftId)
         {

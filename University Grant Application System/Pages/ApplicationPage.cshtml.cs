@@ -153,6 +153,17 @@ namespace University_Grant_Application_System.Pages
 
         public List<UploadedFile> ExistingFiles { get; set; } = new();
 
+        private List<SelectListItem> PopulateStaffTypeOptions()
+        {
+            return new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "1", Text = "Contracted faculty" },
+                    new SelectListItem { Value = "2", Text = "Instructure / tenure" },
+                    new SelectListItem { Value = "3", Text = "Tenure track new faculty (first two years of tenure track)" },
+                    new SelectListItem { Value = "4", Text = "Adjunct faculty" }
+                };
+        }
+
         private List<SelectListItem> GetSortedGrantTypeOptions()
         {
             var allOptions = new List<(int Id, string Text)>
@@ -210,24 +221,9 @@ namespace University_Grant_Application_System.Pages
 
             await PopulateSelectListsAsync();
 
-            GrantTypeOptions = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "1", Text = "Hemingway adjunct faculty grant spring semester" },
-                new SelectListItem { Value = "2", Text = "Hemingway collaborative award spring semester" },
-                new SelectListItem { Value = "3", Text = "Hemingway excellence award spring semester" },
-                new SelectListItem { Value = "4", Text = "Hemingway new faculty grant spring semester" },
-                new SelectListItem { Value = "5", Text = "Hemingway faculty vitality grant fall and spring" },
-                new SelectListItem { Value = "6", Text = "Creative works grant fall and spring" },
-                new SelectListItem { Value = "7", Text = "Research grant fall and spring" },
-                new SelectListItem { Value = "8", Text = "Travel grant fall spring and summer" }
-            };
-            StaffTypeOptions = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "1", Text = "Contracted faculty" },
-                new SelectListItem { Value = "2", Text = "Instructure / tenure" },
-                new SelectListItem { Value = "3", Text = "Tenure track new faculty(first two years of tenure track)" },
-                new SelectListItem { Value = "4", Text = "Adjunct faculty" }
-            };
+            GrantTypeOptions = GetSortedGrantTypeOptions();
+
+            StaffTypeOptions = PopulateStaffTypeOptions();
 
             if (draftId.HasValue)
             {
@@ -359,6 +355,9 @@ namespace University_Grant_Application_System.Pages
             if (!ModelState.IsValid)
             {
                 await PopulateSelectListsAsync();
+                GrantTypeOptions = GetSortedGrantTypeOptions();
+                StaffTypeOptions = PopulateStaffTypeOptions();
+                 
                 return Page();
             }
 

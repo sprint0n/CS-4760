@@ -26,6 +26,9 @@ namespace University_Grant_Application_System.Pages
         [BindProperty] public double TimelineScore { get; set; }
         [BindProperty] public double EvaluationScore { get; set; }
         [BindProperty] public double EvidenceScore { get; set; }
+
+        [BindProperty] public string Comments { get; set; }
+
         [BindProperty(Name = "id", SupportsGet = true)]
         public int ApplicationId { get; set; }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University_Grant_Application_System.Data;
 
@@ -11,9 +12,11 @@ using University_Grant_Application_System.Data;
 namespace University_Grant_Application_System.Migrations
 {
     [DbContext(typeof(University_Grant_Application_SystemContext))]
-    partial class University_Grant_Application_SystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260220050701_DropdownDatabaseFields")]
+    partial class DropdownDatabaseFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,11 +66,14 @@ namespace University_Grant_Application_System.Migrations
 
             modelBuilder.Entity("University_Grant_Application_System.Models.EquipmentExpense", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("EquipmentExpenseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EquipmentExpenseId"));
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("EquipmentName")
                         .HasColumnType("nvarchar(max)");
@@ -75,16 +81,7 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("RSPGAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
+                    b.HasKey("EquipmentExpenseId");
 
                     b.HasIndex("FormTableId");
 
@@ -183,28 +180,22 @@ namespace University_Grant_Application_System.Migrations
 
             modelBuilder.Entity("University_Grant_Application_System.Models.OtherExpense", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("OtherExpensesId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OtherExpensesId"));
 
                     b.Property<decimal?>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("OtherExpenseName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("OtherExpensesId");
 
                     b.HasIndex("FormTableId");
 
@@ -220,7 +211,7 @@ namespace University_Grant_Application_System.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -228,17 +219,11 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("TaxedAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
 
@@ -303,28 +288,22 @@ namespace University_Grant_Application_System.Migrations
 
             modelBuilder.Entity("University_Grant_Application_System.Models.TravelExpense", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TravelExpenseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TravelExpenseId"));
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("RSPGAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("TravelName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("TravelExpenseId");
 
                     b.HasIndex("FormTableId");
 
@@ -442,11 +421,13 @@ namespace University_Grant_Application_System.Migrations
 
             modelBuilder.Entity("University_Grant_Application_System.Models.EquipmentExpense", b =>
                 {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", null)
+                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
                         .WithMany("EquipmentExpenses")
                         .HasForeignKey("FormTableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("FormTable");
                 });
 
             modelBuilder.Entity("University_Grant_Application_System.Models.FormTable", b =>
@@ -462,20 +443,24 @@ namespace University_Grant_Application_System.Migrations
 
             modelBuilder.Entity("University_Grant_Application_System.Models.OtherExpense", b =>
                 {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", null)
+                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
                         .WithMany("OtherExpenses")
                         .HasForeignKey("FormTableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("FormTable");
                 });
 
             modelBuilder.Entity("University_Grant_Application_System.Models.PersonnelExpense", b =>
                 {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", null)
+                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
                         .WithMany("PersonnelExpenses")
                         .HasForeignKey("FormTableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("FormTable");
                 });
 
             modelBuilder.Entity("University_Grant_Application_System.Models.Review", b =>
@@ -508,11 +493,13 @@ namespace University_Grant_Application_System.Migrations
 
             modelBuilder.Entity("University_Grant_Application_System.Models.TravelExpense", b =>
                 {
-                    b.HasOne("University_Grant_Application_System.Models.FormTable", null)
+                    b.HasOne("University_Grant_Application_System.Models.FormTable", "FormTable")
                         .WithMany("TravelExpenses")
                         .HasForeignKey("FormTableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("FormTable");
                 });
 
             modelBuilder.Entity("University_Grant_Application_System.Models.UploadedFile", b =>

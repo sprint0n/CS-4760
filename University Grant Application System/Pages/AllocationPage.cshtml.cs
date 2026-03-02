@@ -70,7 +70,7 @@ namespace University_Grant_Application_System.Pages
                                           (decimal)(f.OtherFunding4Amount ?? 0),
 
                                       OverallScore = sg != null
-                                            ? (sg.AverageScore / 18.0)
+                                            ? (sg.AverageScore / 100.0)
                                             : 0
                                   })
                                   .ToListAsync();

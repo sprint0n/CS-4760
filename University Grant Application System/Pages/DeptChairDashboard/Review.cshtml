@@ -78,7 +78,7 @@
                 </thead>
                 <tbody>
                     @foreach(var e in Model.Application.EquipmentExpenses) {
-                        <tr><td>@e.EquipmentName</td><td>@e.Amount?.ToString("C")</td></tr>
+                        <tr><td>@e.EquipmentName</td><td>@e.RSPGAmount?.ToString("C")</td></tr>
                     }
                 </tbody>
             </table>

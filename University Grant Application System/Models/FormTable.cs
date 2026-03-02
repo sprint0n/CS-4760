@@ -33,6 +33,10 @@ namespace University_Grant_Application_System.Models
         public string? Timeline { get; set; }
         public string? pastBudgets { get; set; }
 
+        public string? grantTypeSelection { get; set; }
+
+        public string? staffTypeSelection { get; set; }
+
         // -----------------------------
         // Nullable numerics (REAL / DECIMAL)
         // -----------------------------

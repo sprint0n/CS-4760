@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model University_Grant_Application_System.Pages.CommitteeDashboard.IndexModel
 @{
     ViewData["Title"] = "Committee Dashboard";
@@ -8,130 +8,165 @@
     <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
 }
 
-<h1>Committee Chair Dashboard</h1>
-
-<!-- Top Toolbar -->
-<section class="toolbar">
-    <div class="toolbar-left">
-        <h2>Due Date</h2>
-        <p class="due-date">
-            @Model.ApplicationDueDate.ToString("MMMM dd, yyyy")
-        </p>
+<!-- Dashboard header: due date + action -->
+<div class="dashboard-header">
+    <div>
+        <div class="due-date-label">Application Due Date</div>
+        <p class="due-date-value">@Model.ApplicationDueDate.ToString("MMMM dd, yyyy")</p>
     </div>
+    <a asp-page="/ApplicationPage" class="btn btn-primary">
+        + New Application
+    </a>
+</div>
 
-    <div class="toolbar-right">
-        <a asp-page="/ApplicationPage" class="btn btn-primary">
-            New Grant Application
-        </a>
+<!-- Due Date Notification -->
+@{
+    var daysUntilDue = (Model.ApplicationDueDate - DateTime.Today).Days;
+}
+@if (daysUntilDue < 0)
+{
+    <div class="alert alert-due-date alert-due-overdue mb-4">
+        <strong>Applications are past due.</strong> The deadline was @Model.ApplicationDueDate.ToString("MMMM dd, yyyy").
     </div>
-</section>
-
-<hr />
-
-<!-- Saved Applications -->
-<section class="applications-section">
-    <h3>Saved Grant Applications</h3>
-
-    <div class="horizontal-scroll">
-        @foreach (var app in Model.SavedApplications)
-        {
-            <div class="card application-card" style="padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                <h4>@app.Title</h4>
-                <p>Status: @app.Status</p>
-
-                <div class="card-actions" style="display: flex; gap: 0.5rem;">
-                    <!-- Edit button -->
-                    <a asp-page="/ApplicationPage" asp-route-draftId="@app.ApplicationId" class="btn btn-primary btn-sm">
-                        Edit
-                    </a>
-
-                    <!-- Delete button -->
-                    <form method="post" asp-page-handler="DeleteDraft" style="display:inline;">
-                        <input type="hidden" name="draftId" value="@app.ApplicationId" />
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                </div>
-            </div>
-        }
+}
+else if (daysUntilDue <= 7)
+{
+    <div class="alert alert-due-date alert-due-warning mb-4">
+        <strong>Applications due soon!</strong> Only <strong>@daysUntilDue day@(daysUntilDue != 1 ? "s" : "")</strong> remaining until the deadline on @Model.ApplicationDueDate.ToString("MMMM dd, yyyy").
     </div>
-</section>
+}
 
-<!-- In Review / Finished Applications -->
-<section class="applications-section">
-    <h3>Submitted Grant Applications</h3>
-
-    <div class="horizontal-scroll">
-        @foreach (var app in Model.InReviewApplications)
-        {
-            <div class="card application-card">
-                <h4>@app.Title</h4>
-                <p>Principal Investigator: @app.PrimaryInvestigator</p>
-                <div class="alert alert-info" role="alert">
-                    <p>RSPG Amount: $@app.Amount</p>
-                </div>
-                <p>Other Amount: $@app.OtherAmount</p>
-            </div>
-        }
+<!-- Grants Awaiting Your Review -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="section-title mb-0 border-0 pb-0">Grants Awaiting Your Review</span>
     </div>
-</section>
-
-<hr />
-
-<!-- Approved Grants -->
-<section class="approved-section">
-    <h3>Approved Grants</h3>
-
-    @if (Model.ApprovedGrants.Any())
-    {
-        <ul class="approved-list">
-            @foreach (var grant in Model.ApprovedGrants)
-            {
-                <li class="approved-item">
-                    <strong>@grant.Title</strong>
-                    <span class="amount">@grant.Amount.ToString()</span>
-                    <p>Primary Investigator: @grant.PrimaryInvestigator</p>
-                    <p>RSPG Amount: @grant.Amount</p>
-                    <p>Other Amount: @grant.OtherAmount</p>
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p class="text-muted">No approved grants yet.</p>
-    }
-</section>
-
-
-<!-- To Review Grants --> 
-<section class="applications-section mt-4">
-    <h3>Grants Awaiting Your Review</h3>
-    <div class="row">
+    <div class="card-body">
         @if (Model.ToReviewGrants != null && Model.ToReviewGrants.Any())
         {
-            @foreach (var grant in Model.ToReviewGrants)
-            {
-                <div class="col-md-4">
-                    <div class="card border-warning mb-3 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title text-dark">@grant.Title</h5>
-                            <p class="card-text">
-                                <strong>PI:</strong> @grant.PrimaryInvestigator<br />
-                                <strong>Amount:</strong> $@grant.Amount
-                            </p>
-                            <a asp-page="/Rubric" asp-route-id="@grant.ApplicationId" class="btn btn-warning w-100">
-                                <i class="bi bi-pencil-square"></i> Score Application
+            <div class="horizontal-scroll">
+                @foreach (var grant in Model.ToReviewGrants)
+                {
+                    <div class="application-card">
+                        <h4>@grant.Title</h4>
+                        <p class="card-status">
+                            <span class="badge badge-status-review">Pending Review</span>
+                        </p>
+                        <p class="card-detail"><strong>PI:</strong> @grant.PrimaryInvestigator</p>
+                        <p class="card-detail"><strong>Amount:</strong> @(grant.Amount?.ToString("C") ?? "$0.00")</p>
+                        <div class="card-actions">
+                            <a asp-page="/Rubric" asp-route-id="@grant.ApplicationId" class="btn btn-accent btn-sm w-100">
+                                Score Application
                             </a>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         }
         else
         {
-            <div class="col-12">
-                <p class="text-muted italic">You have no pending applications to review at this time.</p>
+            <div class="empty-state">
+                <p class="text-muted">You have no pending applications to review at this time.</p>
             </div>
         }
     </div>
-</section>
+</div>
+
+<!-- Saved Applications -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="section-title mb-0 border-0 pb-0">Saved Applications</span>
+    </div>
+    <div class="card-body">
+        @if (Model.SavedApplications.Any())
+        {
+            <div class="horizontal-scroll">
+                @foreach (var app in Model.SavedApplications)
+                {
+                    <div class="application-card">
+                        <h4>@app.Title</h4>
+                        <p class="card-status">
+                            <span class="badge badge-status-saved">@app.Status</span>
+                        </p>
+                        <div class="card-actions">
+                            <a asp-page="/ApplicationPage" asp-route-draftId="@app.ApplicationId" class="btn btn-primary btn-sm">
+                                Edit
+                            </a>
+                            <form method="post" asp-page-handler="DeleteDraft">
+                                <input type="hidden" name="draftId" value="@app.ApplicationId" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <p class="text-muted">No saved applications yet. Start a new one above.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Submitted Applications -->
+<div class="card mb-4">
+    <div class="card-header">
+        <span class="section-title mb-0 border-0 pb-0">Submitted Applications</span>
+    </div>
+    <div class="card-body">
+        @if (Model.InReviewApplications.Any())
+        {
+            <div class="horizontal-scroll">
+                @foreach (var app in Model.InReviewApplications)
+                {
+                    <div class="application-card">
+                        <h4>@app.Title</h4>
+                        <p class="card-status">
+                            <span class="badge badge-status-review">@app.Status</span>
+                        </p>
+                        <p class="card-detail"><strong>PI:</strong> @app.PrimaryInvestigator</p>
+                        <p class="card-detail"><strong>RSPG Amount:</strong> @(app.Amount?.ToString("C") ?? "$0.00")</p>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <p class="text-muted">No applications currently under review.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Approved Grants -->
+<div class="card">
+    <div class="card-header">
+        <span class="section-title mb-0 border-0 pb-0">Approved Grants</span>
+    </div>
+    <div class="card-body">
+        @if (Model.ApprovedGrants.Any())
+        {
+            <ul class="approved-list">
+                @foreach (var grant in Model.ApprovedGrants)
+                {
+                    <li class="approved-item">
+                        <div>
+                            <strong>@grant.Title</strong>
+                            <span class="d-block text-muted" style="font-size: 0.85rem;">PI: @grant.PrimaryInvestigator</span>
+                        </div>
+                        <span class="amount">@(grant.Amount?.ToString("C") ?? "$0.00")</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="empty-state">
+                <p class="text-muted">No approved grants yet.</p>
+            </div>
+        }
+    </div>
+</div>

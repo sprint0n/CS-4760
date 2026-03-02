@@ -787,9 +787,7 @@ html[data-theme="dark"] .login-link-muted {
    DARK MODE — targeted fixes
    ========================================================= */
 
-/* --- Fix 1: Admin table — chair row (table-success) ---
-   Bootstrap 5 sets --bs-table-* CSS vars on the <tr> itself,
-   which beats any td/tr selector. Override the vars directly. */
+
 html[data-theme="dark"] .table tr.table-success,
 html[data-theme="dark"] .table tr.table-success > td,
 html[data-theme="dark"] .table tr.table-success > th {
@@ -803,9 +801,7 @@ html[data-theme="dark"] .table tr.table-success > th {
   border-color: #1a4a32 !important;
 }
 
-/* --- Fix 2: Rubric — table-light thead ---
-   Bootstrap sets --bs-table-bg on .table-light which overrides
-   our thead th rule. Override the variables AND the property. */
+
 html[data-theme="dark"] .table-light,
 html[data-theme="dark"] thead.table-light > tr > th,
 html[data-theme="dark"] thead.table-light > tr {
@@ -817,7 +813,6 @@ html[data-theme="dark"] thead.table-light > tr {
   border-color: #334155 !important;
 }
 
-/* --- Fix 3: Rubric — alert-info percentage box --- */
 html[data-theme="dark"] .alert-info {
   background-color: #0c2340;
   color: #7dd3fc;
@@ -829,18 +824,17 @@ html[data-theme="dark"] .alert-info h4 {
   color: #7dd3fc;
 }
 
-/* --- Fix 4: Rubric / Application — text-primary Bootstrap class --- */
+
 html[data-theme="dark"] .text-primary {
   color: #93c5fd !important;
 }
 
-/* --- Fix 5: Application page — table-bordered borders --- */
+
 html[data-theme="dark"] .table-bordered > :not(caption) > * > * {
   border-color: #334155;
 }
 
-/* --- Fix 6: Application page — checkboxes (form-check-input) ---
-   Bootstrap renders these white by default. */
+
 html[data-theme="dark"] .form-check-input {
   background-color: #263244;
   border-color: #475569;
@@ -862,9 +856,7 @@ html[data-theme="dark"] .form-check-label {
   color: #e2e8f0;
 }
 
-/* --- Fix 7: Application page — file input button ---
-   The "Choose File" / "Browse" button inside a file input
-   inherits a white background from the browser default. */
+
 html[data-theme="dark"] input[type="file"].form-control::file-selector-button {
   background-color: #2d3e52;
   color: #e2e8f0;
@@ -877,8 +869,7 @@ html[data-theme="dark"] input[type="file"].form-control:hover::file-selector-but
   color: #ffffff;
 }
 
-/* --- Fix 8: Application page — readonly / disabled inputs ---
-   Bootstrap applies --bs-secondary-bg (#e9ecef) to readonly fields. */
+
 html[data-theme="dark"] .form-control[readonly],
 html[data-theme="dark"] .form-control:disabled {
   background-color: #1a2535 !important;
@@ -886,8 +877,7 @@ html[data-theme="dark"] .form-control:disabled {
   border-color: #334155 !important;
 }
 
-/* --- Fix 9: Application page — btn-secondary ---
-   Ensure it stays visible on dark backgrounds. */
+
 html[data-theme="dark"] .btn-secondary {
   background-color: #334155;
   border-color: #475569;
@@ -907,11 +897,73 @@ html[data-theme="dark"] .btn-secondary:active {
   color: #ffffff !important;
 }
 
-/* --- Fix 10: Income source border box --- */
 html[data-theme="dark"] .income-source.border {
   border-color: #334155 !important;
   background-color: #1a2535;
   border-radius: var(--radius-sm, 4px);
+}
+
+
+html[data-theme="dark"] .bg-light {
+  background-color: #1a2535 !important;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .nav-tabs {
+  border-bottom-color: #334155;
+}
+
+html[data-theme="dark"] .nav-tabs .nav-link {
+  color: #94a3b8;
+  border-color: transparent;
+}
+
+html[data-theme="dark"] .nav-tabs .nav-link:hover,
+html[data-theme="dark"] .nav-tabs .nav-link:focus {
+  color: #e2e8f0;
+  border-color: #475569 #475569 #334155;
+}
+
+html[data-theme="dark"] .nav-tabs .nav-link.active {
+  background-color: var(--bg-card, #1e293b);
+  color: #c8a951;
+  border-color: #334155 #334155 var(--bg-card, #1e293b);
+}
+
+html[data-theme="dark"] .personnel-row.border,
+html[data-theme="dark"] .equipment-row.border,
+html[data-theme="dark"] .travel-row.border,
+html[data-theme="dark"] .other-row.border {
+  border-color: #334155 !important;
+  background-color: #1a2535;
+  border-radius: var(--radius-sm, 4px);
+}
+
+html[data-theme="dark"] .card-header.bg-primary {
+  background-color: var(--primary-dark, #142b47) !important;
+  border-bottom-color: #334155;
+}
+
+html[data-theme="dark"] .shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+
+html[data-theme="dark"] .alert-due-warning {
+  background-color: #2d2006;
+  color: #fbbf24;
+  border-left-color: #f59e0b;
+}
+
+html[data-theme="dark"] .alert-due-overdue {
+  background-color: #2d1515;
+  color: #f87171;
+  border-left-color: #ef4444;
+}
+
+
+html[data-theme="dark"] .card-detail {
+  color: #94a3b8;
 }
 
 /* Smooth theme transitions */

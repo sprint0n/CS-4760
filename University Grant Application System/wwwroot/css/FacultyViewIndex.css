@@ -140,6 +140,13 @@
     white-space: nowrap;
 }
 
+/* Card detail text */
+.card-detail {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted, #64748b);
+}
+
 /* Empty state */
 .empty-state {
     text-align: center;
@@ -150,4 +157,25 @@
 .empty-state p {
     margin: 0;
     font-size: 0.9rem;
+}
+
+/* Due date notification alerts */
+.alert-due-date {
+    border-radius: var(--radius, 8px);
+    border: none;
+    border-left: 4px solid;
+    font-size: 0.9rem;
+    padding: 0.85rem 1.25rem;
+}
+
+.alert-due-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-left-color: #f59e0b;
+}
+
+.alert-due-overdue {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left-color: #ef4444;
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University_Grant_Application_System.Data;
 
@@ -11,9 +12,11 @@ using University_Grant_Application_System.Data;
 namespace University_Grant_Application_System.Migrations
 {
     [DbContext(typeof(University_Grant_Application_SystemContext))]
-    partial class University_Grant_Application_SystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260225053003_pramish")]
+    partial class pramish
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,9 +162,6 @@ namespace University_Grant_Application_System.Migrations
                     b.Property<bool?>("approvedByDeptChair")
                         .HasColumnType("bit");
 
-                    b.Property<string>("grantTypeSelection")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool?>("isIRB")
                         .HasColumnType("bit");
 
@@ -170,9 +170,6 @@ namespace University_Grant_Application_System.Migrations
 
                     b.Property<bool?>("pastFunding")
                         .HasColumnType("bit");
-
-                    b.Property<string>("staffTypeSelection")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

@@ -1,20 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace University_Grant_Application_System.Models;
 
-namespace University_Grant_Application_System.Models
+public class OtherExpense
 {
-    public class OtherExpense
-    {
-        [Key]
-        public int OtherExpensesId { get; set; }
-
-        public int FormTableId { get; set; }
-        [ForeignKey("FormTableId")]
-        public virtual FormTable? FormTable { get; set; }
-
-        public string? OtherExpenseName { get; set; }
-
-        [Column(TypeName = "decimal(18, 2)")]
-        public decimal? Amount { get; set; }
-    }
+    public int Id { get; set; }
+    public string? OtherExpenseName { get; set; }
+    public decimal? Amount { get; set; } // This is the RSPG Amount
+    public decimal? OtherAmount1 { get; set; } // Add this
+    public decimal? OtherAmount2 { get; set; } // Add this
+    public int FormTableId { get; set; }
 }

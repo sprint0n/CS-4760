@@ -34,8 +34,16 @@ namespace University_Grant_Application_System.Pages
 
         public double TotalScore { get; set; }
 
-        public void OnGet() {
-           
+        public string UserRole { get; set; } = string.Empty;
+
+        public async Task OnGetAsync() {
+            var userEmail = User.Identity?.Name;
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (currentUser != null)
+            {
+                UserRole = currentUser.committeeMemberStatus ?? string.Empty;
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()

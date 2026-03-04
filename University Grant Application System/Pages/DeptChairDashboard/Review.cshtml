@@ -39,15 +39,15 @@
         </div>
         <div class="mb-3">
             <label><strong>Purpose:</strong></label>
-            <div class="p-2 border bg-white" style="white-space: pre-wrap;">@Model.Application.GrantPurpose</div>
+            <div class="p-2 border bg-light" style="white-space: pre-wrap;">@Model.Application.GrantPurpose</div>
         </div>
         <div class="mb-3">
             <label><strong>Procedure:</strong></label>
-            <div class="p-2 border bg-white">@Model.Application.Procedure</div>
+            <div class="p-2 border bg-light">@Model.Application.Procedure</div>
         </div>
         <div class="mb-3">
             <label><strong>Timeline:</strong></label>
-            <div class="p-2 border bg-white">@Model.Application.Timeline</div>
+            <div class="p-2 border bg-light">@Model.Application.Timeline</div>
         </div>
     </section>
 
@@ -117,7 +117,7 @@
     </div>
 </div>
 
-    <div class="mt-5 p-4 border shadow-sm bg-white">
+    <div class="mt-5 p-4 border shadow-sm bg-light">
         <h4>Department Chair Decision</h4>
         <form method="post" asp-page-handler="Action" asp-route-id="@Model.Application.Id">
             <div class="d-flex gap-3">

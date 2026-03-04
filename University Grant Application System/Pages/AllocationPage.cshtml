@@ -1,17 +1,20 @@
-﻿@page
+@page
 @model University_Grant_Application_System.Pages.AllocationPageModel
 @{
     ViewData["Title"] = "Allocation Page";
     Layout = "_CommitteeLayout";
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
+}
 <style>
     .input-warning {
         margin-top: 6px;
         font-size: 0.9rem;
-        color: #b30000;
-        background: #fff0f0;
+        color: #991b1b;
+        background: #fee2e2;
         padding: 6px 8px;
-        border-radius: 4px;
+        border-radius: var(--radius-sm, 4px);
     }
 
     .criteria-row {
@@ -26,10 +29,10 @@
         margin-top: 8px;
         max-height: 240px;
         overflow-y: auto;
-        border: 1px solid #e6e6e6;
+        border: 1px solid var(--border, #e2e8f0);
         padding: 8px;
-        border-radius: 6px;
-        background: #fafafa;
+        border-radius: var(--radius, 8px);
+        background: var(--bg-card, #ffffff);
     }
 
     .criteria-item {
@@ -43,108 +46,156 @@
     .hidden {
         display: none;
     }
+
+    /* Dark mode support for allocation-specific styles */
+    html[data-theme="dark"] .input-warning {
+        color: #fca5a5;
+        background: #2d1515;
+    }
+
+    html[data-theme="dark"] .criteria-list {
+        border-color: var(--border, #334155);
+        background: var(--bg-card, #1e293b);
+    }
 </style>
 
-<h1>Allocation Page</h1>
-
-<div class="mb-3">
-    <button id="openCriteriaBtn" class="btn btn-primary">Set Funding Criteria</button>
-    <button id="reopenCriteriaBtn" class="btn btn-outline-secondary hidden">Edit Funding Criteria</button>
-</div>
-
-<!-- Totals (always visible) -->
-<div class="row mb-3">
-    <div class="col-md-4">
-        <label class="form-label">Total Money Available</label>
-        <input value="@Model.TotalMoneyAvailable.ToString("C")" class="form-control" readonly />
+<!-- Page Header -->
+<div class="dashboard-header">
+    <div>
+        <div class="due-date-label">Fund Allocation</div>
+        <p class="due-date-value">Distribute Funding to Approved Applications</p>
     </div>
-    <div class="col-md-4">
-        <label class="form-label">Total Money Requested (RSPG Totals)</label>
-        <input value="@Model.TotalMoneyRequested.ToString("C")" class="form-control" readonly />
+    <div class="d-flex gap-2">
+        <button id="openCriteriaBtn" class="btn btn-primary">Set Funding Criteria</button>
+        <button id="reopenCriteriaBtn" class="btn btn-accent hidden">Edit Funding Criteria</button>
     </div>
 </div>
 
-<!-- Placeholder where tables will be injected after Apply -->
+<!-- Budget Overview -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="section-title mb-0 border-0 pb-0">Budget Overview</span>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Total Money Available</label>
+                <input value="@Model.TotalMoneyAvailable.ToString("C")" class="form-control" readonly />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Total Money Requested (RSPG Totals)</label>
+                <input value="@Model.TotalMoneyRequested.ToString("C")" class="form-control" readonly />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Allocated Tables (shown after Apply) -->
 <div id="tablesContainer" class="hidden">
     <!-- Full Funding table -->
-    <h4 class="mt-4">Full Funding</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Submitted By</th>
-                <th>Principal Investigator</th>
-                <th><strong>RSPG Total</strong></th>
-                <th>Other Total</th>
-                <th>Average Score</th>
-                <th>Allocated Funds</th>
-            </tr>
-        </thead>
-        <tbody id="fullFundingTableBody"></tbody>
-    </table>
+    <div class="card mb-4">
+        <div class="card-header">
+            <span class="section-title mb-0 border-0 pb-0">Full Funding</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitted By</th>
+                        <th>Principal Investigator</th>
+                        <th><strong>RSPG Total</strong></th>
+                        <th>Other Total</th>
+                        <th>Average Score</th>
+                        <th>Allocated Funds</th>
+                    </tr>
+                </thead>
+                <tbody id="fullFundingTableBody"></tbody>
+            </table>
+        </div>
+    </div>
 
-    <!-- Partial tables container -->
+    <!-- Partial tables container (dynamically generated) -->
     <div id="partialFundingTablesContainer"></div>
 
     <!-- No Funding table -->
-    <h4 class="mt-4">No Funding</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Submitted By</th>
-                <th>Principal Investigator</th>
-                <th><strong>RSPG Total</strong></th>
-                <th>Other Total</th>
-                <th>Average Score</th>
-                <th>Allocated Funds</th>
-            </tr>
-        </thead>
-        <tbody id="noFundingTableBody"></tbody>
-    </table>
-
-    <!-- Boost / Remaining -->
-    <div class="d-flex gap-2 mb-3">
-        <button id="boostPartialFunding" class="btn btn-secondary">Boost Partial Funding (if possible)</button>
-        <button id="clearAllocationsBtn" class="btn btn-outline-danger">Clear Allocations & Reset View</button>
+    <div class="card mb-4">
+        <div class="card-header">
+            <span class="section-title mb-0 border-0 pb-0">No Funding</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitted By</th>
+                        <th>Principal Investigator</th>
+                        <th><strong>RSPG Total</strong></th>
+                        <th>Other Total</th>
+                        <th>Average Score</th>
+                        <th>Allocated Funds</th>
+                    </tr>
+                </thead>
+                <tbody id="noFundingTableBody"></tbody>
+            </table>
+        </div>
     </div>
 
-    <div id="remainingBudgetText" class="fw-bold mb-2"></div>
-    <div class="progress mb-4" style="height: 20px;">
-        <div id="remainingBudgetBar" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+    <!-- Boost / Remaining -->
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+            <span class="section-title mb-0 border-0 pb-0">Budget Summary</span>
+        </div>
+        <div class="card-body">
+            <div class="d-flex gap-2 mb-3">
+                <button id="boostPartialFunding" class="btn btn-secondary">Boost Partial Funding (if possible)</button>
+                <button id="clearAllocationsBtn" class="btn btn-outline-danger">Clear Allocations & Reset View</button>
+            </div>
+
+            <div id="remainingBudgetText" class="fw-bold mb-2"></div>
+            <div class="progress" style="height: 20px;">
+                <div id="remainingBudgetBar" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Original unsorted applications table (shown until Apply) -->
 <div id="originalApplicationsContainer">
-    <h4 class="mt-4">Non-sorted Applications</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Submitted By</th>
-                <th>Principal Investigator</th>
-                <th><strong>RSPG Total</strong></th>
-                <th>Other Total</th>
-                <th>Average Score</th>
-                <th>Allocated Funds</th>
-            </tr>
-        </thead>
-        <tbody id="applicationsTableBody">
-            @foreach (var app in Model.Applications)
-            {
-                <tr data-score="@app.OverallScore">
-                    <td>@app.Title</td>
-                    <td>@app.SubmittedBy</td>
-                    <td>@app.PrincipalInvestigator</td>
-                    <td><strong>@app.RspgTotal.ToString("C")</strong></td>
-                    <td>@app.OtherTotal.ToString("C")</td>
-                    <td>@app.OverallScore.ToString("P1")</td>
-                    <td class="allocated-funds"></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card mb-4">
+        <div class="card-header">
+            <span class="section-title mb-0 border-0 pb-0">Non-sorted Applications</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitted By</th>
+                        <th>Principal Investigator</th>
+                        <th><strong>RSPG Total</strong></th>
+                        <th>Other Total</th>
+                        <th>Average Score</th>
+                        <th>Allocated Funds</th>
+                    </tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                    @foreach (var app in Model.Applications)
+                    {
+                        <tr data-score="@app.OverallScore">
+                            <td>@app.Title</td>
+                            <td>@app.SubmittedBy</td>
+                            <td>@app.PrincipalInvestigator</td>
+                            <td><strong>@app.RspgTotal.ToString("C")</strong></td>
+                            <td>@app.OtherTotal.ToString("C")</td>
+                            <td>@app.OverallScore.ToString("P1")</td>
+                            <td class="allocated-funds"></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Criteria Setup Modal -->
@@ -512,12 +563,22 @@
         }
 
         function makeTableForPartial(p) {
-            const header = document.createElement('h4');
-            header.className = 'mt-4';
-            header.textContent = `${p.min}% - ${p.max}%`;
+            // Create card wrapper matching the design system
+            const card = document.createElement('div');
+            card.className = 'card mb-4';
+
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'card-header';
+            const headerSpan = document.createElement('span');
+            headerSpan.className = 'section-title mb-0 border-0 pb-0';
+            headerSpan.textContent = `Partial: ${p.min}% - ${p.max}% (${p.allocPercent}% allocation)`;
+            cardHeader.appendChild(headerSpan);
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-0';
 
             const table = document.createElement('table');
-            table.className = 'table';
+            table.className = 'table mb-0';
 
             const thead = document.createElement('thead');
             thead.innerHTML = `
@@ -537,9 +598,11 @@
 
             table.appendChild(thead);
             table.appendChild(tbody);
+            cardBody.appendChild(table);
+            card.appendChild(cardHeader);
+            card.appendChild(cardBody);
 
-            partialTablesContainer.appendChild(header);
-            partialTablesContainer.appendChild(table);
+            partialTablesContainer.appendChild(card);
 
             return tbody.id;
         }
@@ -573,7 +636,7 @@
                 allocPercent: p.allocPercent,
                 tableBodyId: makeTableForPartial(p)
             }));
-            
+
 
             // build criteria list in order: full, partials..., none
             const criteriaList = [fullCriterion, ...partialCriteria, noneCriterion];
@@ -605,39 +668,6 @@
             }
 
             updateRemainingBudgetDisplay();
-        }
-
-        function makeTableForPartial(p) {
-            const header = document.createElement('h4');
-            header.className = 'mt-4';
-            header.textContent = `${p.min}% - ${p.max}%`;
-
-            const table = document.createElement('table');
-            table.className = 'table';
-
-            const thead = document.createElement('thead');
-            thead.innerHTML = `
-                <tr>
-                    <th>Title</th>
-                    <th>Submitted By</th>
-                    <th>Principal Investigator</th>
-                    <th><strong>RSPG Total</strong></th>
-                    <th>Other Total</th>
-                    <th>Average Score</th>
-                    <th>Allocated Funds</th>
-                </tr>
-            `;
-
-            const tbody = document.createElement('tbody');
-            tbody.id = `range_${p.min}_${p.max}`;
-
-            table.appendChild(thead);
-            table.appendChild(tbody);
-
-            partialTablesContainer.appendChild(header);
-            partialTablesContainer.appendChild(table);
-
-            return tbody.id;
         }
 
         function sumAllocated() {

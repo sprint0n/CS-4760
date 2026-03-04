@@ -6,35 +6,54 @@
 }
 <style>
     .input-warning {
-        margin-top: 4px;
-        font-size: 0.8rem;
-        color: #b30000;
-        background: #ffe6e6;
-        padding: 3px 6px;
-        border-radius: 4px;
-    }
-
-    .unsaved-warning {
+        margin-top: 6px;
         font-size: 0.9rem;
         color: #b30000;
-        background: #ffe6e6;
-        padding: 6px 10px;
+        background: #fff0f0;
+        padding: 6px 8px;
         border-radius: 4px;
+    }
+
+    .criteria-row {
+        display: grid;
+        grid-template-columns: 80px 80px 100px 80px;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .criteria-list {
+        margin-top: 8px;
+        max-height: 240px;
+        overflow-y: auto;
+        border: 1px solid #e6e6e6;
+        padding: 8px;
+        border-radius: 6px;
+        background: #fafafa;
+    }
+
+    .criteria-item {
+        display: grid;
+        grid-template-columns: 80px 80px 100px 80px 80px;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .hidden {
         display: none;
-        white-space: nowrap;
     }
-
-    .wide-button {
-        width: 300px;
-    }
-
 </style>
-
 
 <h1>Allocation Page</h1>
 
-<!-- Money totals -->
-<div class="row mb-4">
+<div class="mb-3">
+    <button id="openCriteriaBtn" class="btn btn-primary">Set Funding Criteria</button>
+    <button id="reopenCriteriaBtn" class="btn btn-outline-secondary hidden">Edit Funding Criteria</button>
+</div>
+
+<!-- Totals (always visible) -->
+<div class="row mb-3">
     <div class="col-md-4">
         <label class="form-label">Total Money Available</label>
         <input value="@Model.TotalMoneyAvailable.ToString("C")" class="form-control" readonly />
@@ -43,676 +62,702 @@
         <label class="form-label">Total Money Requested (RSPG Totals)</label>
         <input value="@Model.TotalMoneyRequested.ToString("C")" class="form-control" readonly />
     </div>
-
-    <!-- NEW: Remainder Funding Percentage --> 
-    <div class="col-md-4"> 
-        <label for="remainderPercent" class="form-label">Remainder Funding Percentage</label> 
-        <div class="input-group"> 
-            <input class="form-control" value="50" min="0" max="100" id="remainderPercent" /> 
-            <span class="input-group-text">%</span> 
-        </div> 
-    </div>
 </div>
 
-<!-- Criteria Ranges Filters -->
-<div class="row mb-4">
-
-    <!-- FULL FUNDING -->
-    <div class="col-md-3">
-        <div class="d-flex align-items-end gap-1">
-            <div class="flex-grow-1">
-                <label for="fullFunds" class="form-label">Full Funding Minimum Percentage</label>
-                <div class="input-group">
-                    <input class="form-control" value="90" min="0" max="100" id="fullFunds" />
-                    <span class="input-group-text">%</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PARTIAL FUNDING -->
-    <div class="col-md-3">
-        <div class="d-flex align-items-end gap-1">
-            <div class="flex-grow-1">
-                <label for="partialFunds1" class="form-label">Partial Funding Minimum Percentage</label>
-                <div class="input-group">
-                    <input class="form-control" value="80" min="0" max="100" id="partialFunds1" />
-                    <span class="input-group-text">%</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- NO FUNDING -->
-    <div class="col-md-3">
-        <div class="d-flex align-items-end gap-1">
-            <div class="flex-grow-1">
-                <label for="scoreFilter" class="form-label">No Funding Cutoff Percentage</label>
-                <div class="input-group">
-                    <input class="form-control" value="70" min="0" max="100" id="scoreFilter" />
-                    <span class="input-group-text">%</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- APPLY ALL BOOST AND RESET BUTTON -->
-<div class="row mb-4">
-    <div class="col-md-12 d-flex flex-column align-items-center">
-
-        <!-- Row with all three buttons -->
-        <div class="d-flex align-items-center gap-3 mb-2">
-
-            <!-- Apply Button -->
-            <button id="applyAllFunding" class="btn btn-primary wide-button">
-                Apply All Funding Criteria
-            </button>
-
-            <!-- Boost Button -->
-            <button id="boostPartialFunding" class="btn btn-secondary wide-button">
-                Boost Partial Funding (if possible)
-            </button>
-
-            <!-- Reset Criteria Button -->
-            <button id="resetCriteria" class="btn btn-outline-danger wide-button">
-                Reset Criteria
-            </button>
-
-        </div>
-
-        <!-- Warning BELOW the buttons -->
-        <div id="unsavedWarning" class="unsaved-warning mt-1">
-            Changes detected — click Apply
-        </div>
-
-    </div>
-</div>
-
-
-<!-- REMAINING BUDGET DISPLAY -->
-<div class="row mb-2">
-    <div class="col-md-12 d-flex justify-content-center">
-        <div id="remainingBudgetText" class="fw-bold fs-5"></div>
-    </div>
-</div>
-
-<!-- REMAINING BUDGET PROGRESS BAR -->
-<div class="row mb-4">
-    <div class="col-md-6 offset-md-3">
-        <div class="progress" style="height: 25px;">
-            <div id="remainingBudgetBar"
-                 class="progress-bar"
-                 role="progressbar"
-                 style="width: 100%;">
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-
-<!-- Visible count -->
-<div class="row mb-4">
-    <div class="col-md-6">
-        <span id="visibleCount" class="fw-bold">0</span> of
-        <span id="totalCount" class="fw-bold">0</span> receive funding
-    </div>
-</div>
-
-<!-- OG Table -->
-<h4 class="mt-4">Non-sorted Applications</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Submitted By</th>
-            <th>Principal Investigator</th>
-            <th><strong>RSPG Total</strong></th>
-            <th>Other Total</th>
-            <th>Average Score</th>
-            <th>Allocated Funds</th>
-        </tr>
-    </thead>
-    <tbody id="applicationsTableBody">
-        @foreach (var app in Model.Applications)
-        {
-            <tr data-score="@app.OverallScore">
-                <td>@app.Title</td>
-                <td>@app.SubmittedBy</td>
-                <td>@app.PrincipalInvestigator</td>
-                <td><strong>@app.RspgTotal.ToString("C")</strong></td>
-                <td>@app.OtherTotal.ToString("C")</td>
-                <td>@app.OverallScore.ToString("P1")</td>
-                <td class="allocated-funds"></td>
+<!-- Placeholder where tables will be injected after Apply -->
+<div id="tablesContainer" class="hidden">
+    <!-- Full Funding table -->
+    <h4 class="mt-4">Full Funding</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Submitted By</th>
+                <th>Principal Investigator</th>
+                <th><strong>RSPG Total</strong></th>
+                <th>Other Total</th>
+                <th>Average Score</th>
+                <th>Allocated Funds</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody id="fullFundingTableBody"></tbody>
+    </table>
 
-<!-- FULL FUNDING TABLE -->
-<h4 class="mt-4">Full Funding</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Submitted By</th>
-            <th>Principal Investigator</th>
-            <th><strong>RSPG Total</strong></th>
-            <th>Other Total</th>
-            <th>Average Score</th>
-            <th>Allocated Funds</th>
-        </tr>
-    </thead>
-    <tbody id="fullFundingTableBody"></tbody>
-</table>
+    <!-- Partial tables container -->
+    <div id="partialFundingTablesContainer"></div>
 
+    <!-- No Funding table -->
+    <h4 class="mt-4">No Funding</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Submitted By</th>
+                <th>Principal Investigator</th>
+                <th><strong>RSPG Total</strong></th>
+                <th>Other Total</th>
+                <th>Average Score</th>
+                <th>Allocated Funds</th>
+            </tr>
+        </thead>
+        <tbody id="noFundingTableBody"></tbody>
+    </table>
 
-<!-- PARTIAL FUNDING TABLE -->
-<h4 class="mt-4">Partial Funding</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Submitted By</th>
-            <th>Principal Investigator</th>
-            <th><strong>RSPG Total</strong></th>
-            <th>Other Total</th>
-            <th>Average Score</th>
-            <th>Allocated Funds</th>
-        </tr>
-    </thead>
-    <tbody id="partialFundingTableBody"></tbody>
-</table>
+    <!-- Boost / Remaining -->
+    <div class="d-flex gap-2 mb-3">
+        <button id="boostPartialFunding" class="btn btn-secondary">Boost Partial Funding (if possible)</button>
+        <button id="clearAllocationsBtn" class="btn btn-outline-danger">Clear Allocations & Reset View</button>
+    </div>
 
-<!-- REMAINDER FUNDING TABLE -->
-<h4 class="mt-4">Remainder Funding</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Submitted By</th>
-            <th>Principal Investigator</th>
-            <th><strong>RSPG Total</strong></th>
-            <th>Other Total</th>
-            <th>Average Score</th>
-            <th>Allocated Funds</th>
-        </tr>
-    </thead>
-    <tbody id="remainderFundingTableBody"></tbody>
-</table>
+    <div id="remainingBudgetText" class="fw-bold mb-2"></div>
+    <div class="progress mb-4" style="height: 20px;">
+        <div id="remainingBudgetBar" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+    </div>
+</div>
 
-<!-- NO FUNDING TABLE -->
-<h4 class="mt-4">No Funding</h4>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Submitted By</th>
-            <th>Principal Investigator</th>
-            <th><strong>RSPG Total</strong></th>
-            <th>Other Total</th>
-            <th>Average Score</th>
-            <th>Allocated Funds</th>
-        </tr>
-    </thead>
-    <tbody id="noFundingTableBody"></tbody>
-</table>
+<!-- Original unsorted applications table (shown until Apply) -->
+<div id="originalApplicationsContainer">
+    <h4 class="mt-4">Non-sorted Applications</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Submitted By</th>
+                <th>Principal Investigator</th>
+                <th><strong>RSPG Total</strong></th>
+                <th>Other Total</th>
+                <th>Average Score</th>
+                <th>Allocated Funds</th>
+            </tr>
+        </thead>
+        <tbody id="applicationsTableBody">
+            @foreach (var app in Model.Applications)
+            {
+                <tr data-score="@app.OverallScore">
+                    <td>@app.Title</td>
+                    <td>@app.SubmittedBy</td>
+                    <td>@app.PrincipalInvestigator</td>
+                    <td><strong>@app.RspgTotal.ToString("C")</strong></td>
+                    <td>@app.OtherTotal.ToString("C")</td>
+                    <td>@app.OverallScore.ToString("P1")</td>
+                    <td class="allocated-funds"></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
+<!-- Criteria Setup Modal -->
+<div class="modal" id="criteriaModal" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set Funding Criteria</h5>
+                <button type="button" class="btn-close" id="closeModalX" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Funding Minimum % (whole number)</label>
+                        <input id="modalFullMin" type="number" class="form-control" min="1" max="100" value="90" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">No Funding Cutoff % (whole number)</label>
+                        <input id="modalNoneMax" type="number" class="form-control" min="0" max="99" value="70" />
+                    </div>
+                </div>
 
+                <hr />
+
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Partial Funding Brackets</strong>
+                        <div>
+                            <input id="newMin" type="number" class="form-control d-inline-block" style="width:80px;" placeholder="Min" />
+                            <input id="newMax" type="number" class="form-control d-inline-block" style="width:80px; margin-left:6px;" placeholder="Max" />
+                            <input id="newAlloc" type="number" class="form-control d-inline-block" style="width:100px; margin-left:6px;" placeholder="Alloc %" />
+                            <button id="addBracketBtn" class="btn btn-sm btn-secondary" style="margin-left:8px;">Add</button>
+                        </div>
+                    </div>
+
+                    <div id="bracketsList" class="criteria-list">
+                        <!-- bracket rows injected here -->
+                    </div>
+
+                    <div id="modalValidationErrors" class="input-warning" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="me-auto text-muted">You can edit or delete brackets here before applying.</div>
+                <button id="cancelModalBtn" class="btn btn-outline-secondary">Cancel</button>
+                <button id="applyFundsModalBtn" class="btn btn-primary">Apply Funds</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
-
-    <!-- INPUT VALUES SCRIPT -->
-    <!-- INPUT VALUES SCRIPT -->
     <script>
-        const fullFunds = document.getElementById("fullFunds");
-        const partial1 = document.getElementById("partialFunds1");
-        const noFunds = document.getElementById("scoreFilter");
-        const remainderPercent = document.getElementById("remainderPercent");
-
-        const applyAllFundingBtn_UI = document.getElementById("applyAllFunding");
-        const unsavedWarning = document.getElementById("unsavedWarning");
-
-        const resetCriteriaBtn = document.getElementById("resetCriteria");
-
-        let lastApplied = {
-            full: fullFunds.value,
-            partial: partial1.value,
-            no: noFunds.value,
-            remainder: remainderPercent.value
+        /* -------------------------
+           Data model and helpers
+           ------------------------- */
+        let criteriaModel = {
+            fullMin: 90,
+            noneMax: 70,
+            partials: [] // { id, min, max, allocPercent }
         };
 
-        // NEW: Prevent unsaved warning from showing during reset
-        let suppressUnsavedWarning = false;
+        const totalMoneyAvailable = @Model.TotalMoneyAvailable;
 
-        // -----------------------------
-        // INPUT WARNING HELPERS
-        // -----------------------------
-        function showInputWarning(input, message) {
-            clearInputWarning(input);
-            const warning = document.createElement("div");
-            warning.className = "input-warning";
-            warning.textContent = message;
-            input.parentElement.parentElement.appendChild(warning);
+        function uid() {
+            return 'id_' + Math.random().toString(36).slice(2, 9);
         }
 
-        function clearInputWarning(input) {
-            const parent = input.parentElement.parentElement;
-            const existing = parent.querySelector(".input-warning");
-            if (existing) existing.remove();
+        function clampInt(v, min, max) {
+            v = parseInt(v, 10);
+            if (isNaN(v)) return null;
+            return Math.max(min, Math.min(max, v));
         }
 
-        // -----------------------------
-        // UNSAVED CHANGES WARNING
-        // -----------------------------
-        function checkUnsavedChanges() {
-            if (suppressUnsavedWarning) {
-                unsavedWarning.style.display = "none";
+        function formatCurrency(n) {
+            return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        }
+
+        /* -------------------------
+           Modal open/close and UI
+           ------------------------- */
+        const openCriteriaBtn = document.getElementById('openCriteriaBtn');
+        const reopenCriteriaBtn = document.getElementById('reopenCriteriaBtn');
+        const criteriaModal = document.getElementById('criteriaModal');
+        const closeModalX = document.getElementById('closeModalX');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+
+        const modalFullMin = document.getElementById('modalFullMin');
+        const modalNoneMax = document.getElementById('modalNoneMax');
+        const bracketsList = document.getElementById('bracketsList');
+        const addBracketBtn = document.getElementById('addBracketBtn');
+        const newMinInput = document.getElementById('newMin');
+        const newMaxInput = document.getElementById('newMax');
+        const newAllocInput = document.getElementById('newAlloc');
+        const modalValidationErrors = document.getElementById('modalValidationErrors');
+        const applyFundsModalBtn = document.getElementById('applyFundsModalBtn');
+
+        const tablesContainer = document.getElementById('tablesContainer');
+        const originalAppsContainer = document.getElementById('originalApplicationsContainer');
+
+        function showModal() {
+            // populate modal fields from model
+            modalFullMin.value = criteriaModel.fullMin;
+            modalNoneMax.value = criteriaModel.noneMax;
+            renderBracketsList();
+            modalValidationErrors.style.display = 'none';
+            criteriaModal.style.display = 'block';
+        }
+
+        function hideModal() {
+            criteriaModal.style.display = 'none';
+        }
+
+        openCriteriaBtn.addEventListener('click', () => {
+            // If tables are visible, user is starting fresh; keep existing model if any
+            showModal();
+        });
+        reopenCriteriaBtn.addEventListener('click', () => {
+            showModal();
+        });
+        closeModalX.addEventListener('click', hideModal);
+        cancelModalBtn.addEventListener('click', () => {
+            hideModal();
+        });
+
+        /* -------------------------
+           Bracket list management
+           ------------------------- */
+        function renderBracketsList() {
+            bracketsList.innerHTML = '';
+            if (!criteriaModel.partials || criteriaModel.partials.length === 0) {
+                const p = document.createElement('div');
+                p.style.fontStyle = 'italic';
+                p.textContent = 'No partial brackets added yet.';
+                bracketsList.appendChild(p);
                 return;
             }
 
-            if (
-                fullFunds.value !== lastApplied.full ||
-                partial1.value !== lastApplied.partial ||
-                noFunds.value !== lastApplied.no ||
-                remainderPercent.value !== lastApplied.remainder
-            ) {
-                unsavedWarning.style.display = "inline-block";
-            } else {
-                unsavedWarning.style.display = "none";
+            // sort by min ascending for editing clarity
+            const sorted = [...criteriaModel.partials].sort((a,b) => a.min - b.min);
+            for (const b of sorted) {
+                const row = document.createElement('div');
+                row.className = 'criteria-item';
+
+                const minInput = document.createElement('input');
+                minInput.type = 'number';
+                minInput.value = b.min;
+                minInput.className = 'form-control';
+                minInput.style.width = '80px';
+                minInput.addEventListener('change', () => {
+                    const v = clampInt(minInput.value, 0, 100);
+                    if (v === null) return;
+                    b.min = v;
+                });
+
+                const maxInput = document.createElement('input');
+                maxInput.type = 'number';
+                maxInput.value = b.max;
+                maxInput.className = 'form-control';
+                maxInput.style.width = '80px';
+                maxInput.addEventListener('change', () => {
+                    const v = clampInt(maxInput.value, 0, 100);
+                    if (v === null) return;
+                    b.max = v;
+                });
+
+                const allocInput = document.createElement('input');
+                allocInput.type = 'number';
+                allocInput.value = b.allocPercent;
+                allocInput.className = 'form-control';
+                allocInput.style.width = '100px';
+                allocInput.addEventListener('change', () => {
+                    const v = clampInt(allocInput.value, 1, 100);
+                    if (v === null) return;
+                    b.allocPercent = v;
+                });
+
+                const labelSpan = document.createElement('div');
+                labelSpan.textContent = `${b.min}% - ${b.max}%`;
+                labelSpan.style.paddingTop = '6px';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-sm btn-outline-danger';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => {
+                    criteriaModel.partials = criteriaModel.partials.filter(x => x.id !== b.id);
+                    renderBracketsList();
+                });
+
+                row.appendChild(minInput);
+                row.appendChild(maxInput);
+                row.appendChild(allocInput);
+                row.appendChild(labelSpan);
+                row.appendChild(deleteBtn);
+
+                bracketsList.appendChild(row);
             }
         }
 
-        // -----------------------------
-        // CLAMP + HIERARCHY ENFORCEMENT
-        // -----------------------------
-        function clampToMax(input) {
-            const max = parseInt(input.max);
-            const value = parseInt(input.value);
-            if (!isNaN(value) && value > max) input.value = max;
-        }
+        addBracketBtn.addEventListener('click', () => {
+            modalValidationErrors.style.display = 'none';
+            const min = clampInt(newMinInput.value, 0, 100);
+            const max = clampInt(newMaxInput.value, 0, 100);
+            const alloc = clampInt(newAllocInput.value, 1, 100);
 
-        function enforceHierarchy() {
-            const fullVal = parseInt(fullFunds.value);
-            const partialVal = parseInt(partial1.value);
-            const noVal = parseInt(noFunds.value);
-
-            // FULL > PARTIAL
-            if (!isNaN(partialVal) && partialVal >= fullVal) {
-                partial1.value = "";
-                showInputWarning(partial1, "Cleared: must be lower than Full Funding");
-            } else clearInputWarning(partial1);
-
-            // FULL > NO FUNDING
-            if (!isNaN(noVal) && noVal >= fullVal) {
-                noFunds.value = "";
-                showInputWarning(noFunds, "Cleared: must be lower than Full Funding");
-            } else if (noFunds.value !== "") clearInputWarning(noFunds);
-
-            // PARTIAL > NO FUNDING
-            const newPartialVal = parseInt(partial1.value);
-            const newNoVal = parseInt(noFunds.value);
-
-            if (!isNaN(newNoVal) && !isNaN(newPartialVal) && newNoVal >= newPartialVal) {
-                noFunds.value = "";
-                showInputWarning(noFunds, "Cleared: must be lower than Partial Funding");
+            if (min === null || max === null || alloc === null) {
+                showModalError('Min, Max, and Allocation must be whole numbers.');
+                return;
+            }
+            if (min >= max) {
+                showModalError('Min must be less than Max.');
+                return;
             }
 
-            // Remainder percent must be 0–100
-            const remVal = parseInt(remainderPercent.value);
-            if (isNaN(remVal) || remVal < 0 || remVal > 100) {
-                showInputWarning(remainderPercent, "Must be between 0 and 100");
-            } else {
-                clearInputWarning(remainderPercent);
+            // enforce min >= noneMax and max <= fullMin at add time for UX (but final validation runs on Apply)
+            const fullMinVal = clampInt(modalFullMin.value, 1, 100);
+            const noneMaxVal = clampInt(modalNoneMax.value, 0, 99);
+            if (min < noneMaxVal || max > fullMinVal) {
+                showModalError(`Bracket must be within cutoff (${noneMaxVal}%) and full min (${fullMinVal}%).`);
+                return;
             }
-        }
 
-        // -----------------------------
-        // RESET CRITERIA (FULL PAGE INPUT RESET)
-        // -----------------------------
-        function resetCriteria() {
-            suppressUnsavedWarning = true;
-
-            // Reset values to defaults
-            fullFunds.value = 90;
-            partial1.value = 80;
-            noFunds.value = 70;
-            remainderPercent.value = 50;
-
-            // Clear warnings
-            clearInputWarning(fullFunds);
-            clearInputWarning(partial1);
-            clearInputWarning(noFunds);
-            clearInputWarning(remainderPercent);
-
-            // Recalculate hierarchy + max values
-            updateMaxValues();
-
-            // Re-enable unsaved warning AFTER reset completes
-            setTimeout(() => {
-                suppressUnsavedWarning = false;
-            }, 50);
-        }
-
-        resetCriteriaBtn.addEventListener("click", resetCriteria);
-
-        // -----------------------------
-        // UPDATE MAX VALUES
-        // -----------------------------
-        function updateMaxValues() {
-            enforceHierarchy();
-
-            const fullVal = parseInt(fullFunds.value);
-            const partialVal = parseInt(partial1.value);
-
-            partial1.max = fullVal - 1;
-            noFunds.max = !isNaN(partialVal) ? partialVal - 1 : fullVal - 2;
-
-            clampToMax(partial1);
-            clampToMax(noFunds);
-
-            checkUnsavedChanges();
-        }
-
-        // -----------------------------
-        // APPLY BUTTON
-        // -----------------------------
-        applyAllFundingBtn_UI.addEventListener("click", () => {
-            updateMaxValues(); // enforce hierarchy BEFORE funding logic runs
-
-            lastApplied = {
-                full: fullFunds.value,
-                partial: partial1.value,
-                no: noFunds.value,
-                remainder: remainderPercent.value
-            };
-
-            unsavedWarning.style.display = "none";
+            const newBracket = { id: uid(), min, max, allocPercent: alloc };
+            criteriaModel.partials.push(newBracket);
+            newMinInput.value = '';
+            newMaxInput.value = '';
+            newAllocInput.value = '';
+            renderBracketsList();
         });
 
-        // -----------------------------
-        // EVENT LISTENERS
-        // -----------------------------
-        fullFunds.addEventListener("change", updateMaxValues);
-        partial1.addEventListener("change", updateMaxValues);
-        noFunds.addEventListener("change", updateMaxValues);
-        remainderPercent.addEventListener("change", updateMaxValues);
-
-        partial1.addEventListener("input", () => { clampToMax(partial1); checkUnsavedChanges(); });
-        noFunds.addEventListener("input", () => { clampToMax(noFunds); checkUnsavedChanges(); });
-        remainderPercent.addEventListener("input", checkUnsavedChanges);
-
-        updateMaxValues();
-    </script>
-
-
-
-    <!-- APPLY FUNDING SCRIPT -->
-    <script>
-        const applyAllFundingBtn_FUNDING = document.getElementById("applyAllFunding");
-
-        const fullFundingInput = document.getElementById("fullFunds");
-        const partialFundingInput = document.getElementById("partialFunds1");
-        const noFundingInput = document.getElementById("scoreFilter");
-        const remainderPercentInput = document.getElementById("remainderPercent");
-
-        const sourceBody = document.getElementById("applicationsTableBody");
-        const fullFundingBody = document.getElementById("fullFundingTableBody");
-        const partialFundingBody = document.getElementById("partialFundingTableBody");
-        const remainderFundingBody = document.getElementById("remainderFundingTableBody");
-        const noFundingBody = document.getElementById("noFundingTableBody");
-
-        const totalCountEl = document.getElementById("totalCount");
-        const visibleCountEl = document.getElementById("visibleCount");
-
-        const totalMoneyAvailable = @Model.TotalMoneyAvailable;
-        const totalMoneyRequested = @Model.TotalMoneyRequested;
-
-        const boostPartialFundingBtn = document.getElementById("boostPartialFunding");
-        // const remainingBudgetDisplay = document.getElementById("remainingBudgetDisplay");
-
-        const remainingBudgetText = document.getElementById("remainingBudgetText");
-        const remainingBudgetBar = document.getElementById("remainingBudgetBar");
-
-        const resetCriteriaBtn_FUNDING = document.getElementById("resetCriteria");
-
-        function moveRow(row, targetBody) {
-            if (row.parentElement !== targetBody) targetBody.appendChild(row);
+        /* -------------------------
+           Validation logic (on Apply)
+           ------------------------- */
+        function showModalError(msg) {
+            modalValidationErrors.textContent = msg;
+            modalValidationErrors.style.display = 'block';
         }
 
-        function setAllocatedFunds(row, value) {
-            const cell = row.querySelector(".allocated-funds");
-            if (cell) cell.textContent = value;
+        function validateCriteriaModel() {
+            modalValidationErrors.style.display = 'none';
+
+            // read full and none from modal inputs (allow user to change before apply)
+            const fullMin = clampInt(modalFullMin.value, 1, 100);
+            const noneMax = clampInt(modalNoneMax.value, 0, 99);
+
+            if (fullMin === null || noneMax === null) {
+                showModalError('Full Funding and No Funding must be whole numbers.');
+                return { ok: false };
+            }
+            if (noneMax >= fullMin) {
+                showModalError('No Funding cutoff must be less than Full Funding minimum.');
+                return { ok: false };
+            }
+
+            // copy partials and ensure integer constraints
+            const partials = criteriaModel.partials.map(p => ({
+                id: p.id,
+                min: clampInt(p.min, 0, 100),
+                max: clampInt(p.max, 0, 100),
+                allocPercent: clampInt(p.allocPercent, 1, 100)
+            }));
+
+            // basic checks
+            for (const p of partials) {
+                if (p.min === null || p.max === null || p.allocPercent === null) {
+                    showModalError('All bracket values must be whole numbers.');
+                    return { ok: false };
+                }
+                if (p.min >= p.max) {
+                    showModalError(`Bracket ${p.min}% - ${p.max}% invalid: Min must be less than Max.`);
+                    return { ok: false };
+                }
+                if (p.min < noneMax || p.max > fullMin) {
+                    showModalError(`Bracket ${p.min}% - ${p.max}% must lie between cutoff (${noneMax}%) and full min (${fullMin}%).`);
+                    return { ok: false };
+                }
+            }
+
+            // check overlaps and coverage between noneMax and fullMin
+            // sort by min ascending
+            partials.sort((a,b) => a.min - b.min);
+
+            // check for overlaps and gaps
+            let cursor = noneMax;
+            for (let i = 0; i < partials.length; i++) {
+                const p = partials[i];
+                if (p.min > cursor) {
+                    // gap
+                    showModalError(`Gap detected: ${cursor}% to ${p.min}% is not covered.`);
+                    return { ok: false };
+                }
+                if (p.min < cursor) {
+                    // overlap with previous
+                    showModalError(`Overlap detected at ${p.min}% in bracket ${p.min}% - ${p.max}%.`);
+                    return { ok: false };
+                }
+                // advance cursor to p.max
+                cursor = p.max;
+            }
+
+            if (cursor < fullMin) {
+                showModalError(`Gap detected: ${cursor}% to ${fullMin}% is not covered.`);
+                return { ok: false };
+            }
+
+            // all good
+            return { ok: true, fullMin, noneMax, partials };
         }
 
-        function getRspgTotal(row) {
-            const rspgCell = row.querySelector("td:nth-child(4)");
-            return rspgCell ? rspgCell.textContent.trim() : "";
+        /* -------------------------
+           Allocation engine & table generation
+           ------------------------- */
+        const applicationsBody = document.getElementById('applicationsTableBody');
+        const fullBody = document.getElementById('fullFundingTableBody');
+        const partialTablesContainer = document.getElementById('partialFundingTablesContainer');
+        const noBody = document.getElementById('noFundingTableBody');
+        const boostBtn = document.getElementById('boostPartialFunding');
+        const clearAllocationsBtn = document.getElementById('clearAllocationsBtn');
+        const remainingText = document.getElementById('remainingBudgetText');
+        const remainingBar = document.getElementById('remainingBudgetBar');
+
+        function clearAllTables() {
+            // move all rows back to original applications body and clear allocations
+            const allRows = document.querySelectorAll('#fullFundingTableBody tr, #noFundingTableBody tr, #partialFundingTablesContainer tbody tr');
+            allRows.forEach(r => {
+                setAllocatedFunds(r, 0);
+                applicationsBody.appendChild(r);
+            });
+            // clear table bodies
+            fullBody.innerHTML = '';
+            noBody.innerHTML = '';
+            partialTablesContainer.innerHTML = '';
         }
 
-        function getRspgNumeric(row) {
-            return parseFloat(getRspgTotal(row).replace(/[^0-9.-]+/g, ""));
+        function setAllocatedFunds(row, amount) {
+            const cell = row.querySelector('td:nth-child(7)');
+            if (!cell) return;
+            if (!amount || amount <= 0) {
+                cell.textContent = '$0.00';
+            } else {
+                cell.textContent = formatCurrency(amount);
+            }
         }
 
-        function calculatePartialFundingAmount(row) {
-            return (getRspgNumeric(row) * 0.9)
-                .toLocaleString("en-US", { style: "currency", currency: "USD" });
+        function getRspgTotalFromRow(row) {
+            const cell = row.querySelector('td:nth-child(4)');
+            if (!cell) return 0;
+            const text = cell.textContent.replace(/[^0-9.\-]/g, '');
+            const v = parseFloat(text);
+            return isNaN(v) ? 0 : v;
         }
 
-        function calculateRemainderFundingAmount(row, percent) {
-            return (getRspgNumeric(row) * (percent / 100))
-                .toLocaleString("en-US", { style: "currency", currency: "USD" });
+        function getScoreFromRow(row) {
+            const attr = row.getAttribute('data-score');
+            if (attr != null) {
+                const v = parseFloat(attr);
+                if (!isNaN(v)) return v * 100;
+            }
+            const cell = row.querySelector('td:nth-child(6)');
+            if (!cell) return 0;
+            const text = cell.textContent.replace('%', '').trim();
+            const v = parseFloat(text);
+            return isNaN(v) ? 0 : v;
         }
 
-        function getAllRows() {
-            return document.querySelectorAll(
-                "#applicationsTableBody tr, #fullFundingTableBody tr, #partialFundingTableBody tr, #remainderFundingTableBody tr, #noFundingTableBody tr"
-            );
+        function makeTableForPartial(p) {
+            const header = document.createElement('h4');
+            header.className = 'mt-4';
+            header.textContent = `${p.min}% - ${p.max}%`;
+
+            const table = document.createElement('table');
+            table.className = 'table';
+
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Title</th>
+                    <th>Submitted By</th>
+                    <th>Principal Investigator</th>
+                    <th><strong>RSPG Total</strong></th>
+                    <th>Other Total</th>
+                    <th>Average Score</th>
+                    <th>Allocated Funds</th>
+                </tr>
+            `;
+
+            const tbody = document.createElement('tbody');
+            tbody.id = `range_${p.min}_${p.max}`;
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+
+            partialTablesContainer.appendChild(header);
+            partialTablesContainer.appendChild(table);
+
+            return tbody.id;
         }
 
-        function updateCounts() {
-            const fullCount = fullFundingBody.querySelectorAll("tr").length;
-            const partialCount = partialFundingBody.querySelectorAll("tr").length;
-            const remainderCount = remainderFundingBody.querySelectorAll("tr").length;
+        function applyCriteriaAndRenderTables(validated) {
+            // validated: { fullMin, noneMax, partials }
+            // clear any previous tables and allocations
+            clearAllTables();
 
-            const receiving = fullCount + partialCount + remainderCount;
+            // show containers
+            tablesContainer.classList.remove('hidden');
+            reopenCriteriaBtn.classList.remove('hidden');
 
-            const total = getAllRows().length;
+            // hide non-sorted container
+            originalAppsContainer.classList.add('hidden');
 
-            totalCountEl.textContent = total;
-            visibleCountEl.textContent = receiving;
-        }
+            // create full and none criteria entries
+            const fullCriterion = { type: 'full', min: validated.fullMin, max: 100, tableBodyId: 'fullFundingTableBody', allocPercent: 100 };
+            const noneCriterion = { type: 'none', min: 0, max: validated.noneMax, tableBodyId: 'noFundingTableBody', allocPercent: 0 };
 
-
-        function resetAllFunding() {
-
-            // 1. Move ALL rows back to the original table
-            const allRows = getAllRows();
-            allRows.forEach(row => {
-                moveRow(row, sourceBody);
-                setAllocatedFunds(row, "");
+            // create partial criteria sorted by min descending for table order
+            validated.partials.sort((a,b) => {
+                if (b.min !== a.min) return b.min - a.min;
+                return b.max - a.max;
             });
 
-            // 2. Clear all funding tables
-            fullFundingBody.innerHTML = "";
-            partialFundingBody.innerHTML = "";
-            remainderFundingBody.innerHTML = "";
-            noFundingBody.innerHTML = "";
+            const partialCriteria = validated.partials.map(p => ({
+                type: 'partial',
+                min: p.min,
+                max: p.max,
+                allocPercent: p.allocPercent,
+                tableBodyId: makeTableForPartial(p)
+            }));
+            
 
-            // 3. Reset Remaining Budget display
+            // build criteria list in order: full, partials..., none
+            const criteriaList = [fullCriterion, ...partialCriteria, noneCriterion];
+
+            // move rows from original applications into appropriate table and set allocations
+            // gather all original rows (they are in applicationsBody)
+            const rows = Array.from(applicationsBody.querySelectorAll('tr'));
+            // sort rows by score descending
+            rows.sort((a,b) => getScoreFromRow(b) - getScoreFromRow(a));
+
+            for (const row of rows) {
+                const score = getScoreFromRow(row);
+                const rspg = getRspgTotalFromRow(row);
+                let matched = false;
+                for (const c of criteriaList) {
+                    if (score >= c.min && score < c.max) {
+                        const allocAmount = Math.round(rspg * (c.allocPercent / 100));
+                        setAllocatedFunds(row, allocAmount);
+                        const body = document.getElementById(c.tableBodyId);
+                        if (body) body.appendChild(row);
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    // If no match (shouldn't happen), leave in original table
+                    applicationsBody.appendChild(row);
+                }
+            }
+
             updateRemainingBudgetDisplay();
-
-            // 4. Reset counts
-            updateCounts();
         }
 
+        function makeTableForPartial(p) {
+            const header = document.createElement('h4');
+            header.className = 'mt-4';
+            header.textContent = `${p.min}% - ${p.max}%`;
 
-        function computeRemainingBudget() {
-            let allocatedToFull = [...fullFundingBody.querySelectorAll("tr")]
-                .reduce((sum, row) => sum + getRspgNumeric(row), 0);
+            const table = document.createElement('table');
+            table.className = 'table';
 
-            let allocatedToPartial = [...partialFundingBody.querySelectorAll("tr")]
-                .reduce((sum, row) => {
-                    const allocatedText = row.querySelector(".allocated-funds").textContent;
-                    const numeric = parseFloat(allocatedText.replace(/[^0-9.-]+/g, ""));
-                    return sum + numeric;
-                }, 0);
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Title</th>
+                    <th>Submitted By</th>
+                    <th>Principal Investigator</th>
+                    <th><strong>RSPG Total</strong></th>
+                    <th>Other Total</th>
+                    <th>Average Score</th>
+                    <th>Allocated Funds</th>
+                </tr>
+            `;
 
+            const tbody = document.createElement('tbody');
+            tbody.id = `range_${p.min}_${p.max}`;
 
-            let allocatedToRemainder = [...remainderFundingBody.querySelectorAll("tr")]
-                .reduce((sum, row) => {
-                    const allocatedText = row.querySelector(".allocated-funds").textContent;
-                    const numeric = parseFloat(allocatedText.replace(/[^0-9.-]+/g, ""));
-                    return sum + numeric;
-                }, 0);
+            table.appendChild(thead);
+            table.appendChild(tbody);
 
-            return totalMoneyAvailable - allocatedToFull - allocatedToPartial - allocatedToRemainder;
+            partialTablesContainer.appendChild(header);
+            partialTablesContainer.appendChild(table);
+
+            return tbody.id;
+        }
+
+        function sumAllocated() {
+            let total = 0;
+            const allocatedRows = document.querySelectorAll('#fullFundingTableBody tr, #partialFundingTablesContainer tbody tr');
+            allocatedRows.forEach(r => {
+                const cell = r.querySelector('td:nth-child(7)');
+                if (!cell || cell.textContent.trim() == "$0.00") return;
+                const text = cell.textContent.replace(/[^0-9.\-]/g, '');
+                const v = parseFloat(text);
+                if (!isNaN(v)) total += v;
+            });
+            return total;
         }
 
         function updateRemainingBudgetDisplay() {
-            const remaining = computeRemainingBudget();
-
-            // Update text
-            remainingBudgetText.textContent =
-                "Remaining Budget: " + remaining.toLocaleString("en-US", { style: "currency", currency: "USD" });
-
-            // Calculate percentage
-            const percent = Math.max(0, Math.min(100, (remaining / totalMoneyAvailable) * 100));
-
-            // Update progress bar width
-            remainingBudgetBar.style.width = percent + "%";
-
-            // Color logic
-            if (percent > 60) {
-                remainingBudgetBar.className = "progress-bar bg-success";
-            } else if (percent > 30) {
-                remainingBudgetBar.className = "progress-bar bg-warning";
+            const allocated = sumAllocated();
+            const remaining = totalMoneyAvailable - allocated;
+            remainingText.textContent = `Remaining Budget: ${formatCurrency(remaining)}`;
+            let pct = 100;
+            if (totalMoneyAvailable > 0) pct = Math.max(0, Math.min(100, (remaining / totalMoneyAvailable) * 100));
+            remainingBar.style.width = pct + '%';
+            if (remaining < 0) {
+                remainingBar.classList.remove('bg-success');
+                remainingBar.classList.add('bg-danger');
             } else {
-                remainingBudgetBar.className = "progress-bar bg-danger";
+                remainingBar.classList.remove('bg-danger');
+                remainingBar.classList.add('bg-success');
             }
         }
 
+        /* -------------------------
+           Boost logic
+           ------------------------- */
+        boostBtn.addEventListener('click', () => {
+            // collect all partial rows and compute extra needed to bring them to 100%
+            const partialBodies = Array.from(document.querySelectorAll('#partialFundingTablesContainer tbody'));
+            let partialRows = [];
+            partialBodies.forEach(b => partialRows = partialRows.concat(Array.from(b.querySelectorAll('tr'))));
 
-        function boostPartialFunding() {
-            const partialRows = [...partialFundingBody.querySelectorAll("tr")];
-
-            if (partialRows.length === 0) return;
-
-            // Total needed to fully fund all partial applicants
-            const needed = partialRows.reduce((sum, row) => {
-                const rspg = getRspgNumeric(row);
-                const currentAllocated = rspg * 0.9;
-                const difference = rspg - currentAllocated;
-                return sum + difference;
-            }, 0);
-
-            const remaining = computeRemainingBudget();
-
-            if (remaining >= needed) {
-                // Upgrade all partial applicants to full funding
-                partialRows.forEach(row => {
-                    setAllocatedFunds(row, getRspgTotal(row));
-                });
-
-                // Recalculate remaining budget AFTER updating allocations
+            if (partialRows.length === 0) {
                 updateRemainingBudgetDisplay();
-                updateCounts();
+                return;
             }
-        }
 
+            const allocatedBefore = sumAllocated();
+            const remainingBefore = totalMoneyAvailable - allocatedBefore;
 
+            let extraNeeded = 0;
+            const rowsToUpgrade = [];
 
-        function applyAllFundingCriteria() {
-            const fullThreshold = parseFloat(fullFundingInput.value);
-            const partialThreshold = parseFloat(partialFundingInput.value);
-            const noFundingThreshold = parseFloat(noFundingInput.value);
-            const remainderPercent = parseFloat(remainderPercentInput.value);
-
-            // -----------------------------
-            // FIRST PASS: Sort rows into categories
-            // -----------------------------
-            let remainderRows = [];
-
-            getAllRows().forEach(row => {
-                const rowScore = parseFloat(row.getAttribute("data-score") * 100);
-
-                if (rowScore < noFundingThreshold) {
-                    moveRow(row, noFundingBody);
-                    setAllocatedFunds(row, "$0");
-                    return;
+            for (const row of partialRows) {
+                const rspg = getRspgTotalFromRow(row);
+                const cell = row.querySelector('td:nth-child(7)');
+                let current = 0;
+                if (cell && cell.textContent.trim() !== '$0.00') {
+                    const text = cell.textContent.replace(/[^0-9.\-]/g, '');
+                    const v = parseFloat(text);
+                    if (!isNaN(v)) current = v;
                 }
-
-                if (rowScore >= fullThreshold) {
-                    moveRow(row, fullFundingBody);
-                    setAllocatedFunds(row, getRspgTotal(row));
-                    return;
+                const diff = rspg - current;
+                if (diff > 0) {
+                    extraNeeded += diff;
+                    rowsToUpgrade.push({ row, fullAmount: rspg });
                 }
+            }
 
-                if (rowScore >= partialThreshold) {
-                    moveRow(row, partialFundingBody);
-                    setAllocatedFunds(row, calculatePartialFundingAmount(row));
-                    return;
+            if (extraNeeded <= remainingBefore) {
+                for (const info of rowsToUpgrade) {
+                    setAllocatedFunds(info.row, info.fullAmount);
                 }
+            }
 
-                // Remainder Funding
-                if (rowScore >= noFundingThreshold) {
-                    moveRow(row, remainderFundingBody);
-                    remainderRows.push(row);
-                    return;
-                }
-
-                moveRow(row, sourceBody);
-                setAllocatedFunds(row, "");
-            });
-
-            // -----------------------------
-            // SECOND PASS: Allocate Remainder Funding
-            // -----------------------------
-            let totalRemainderRequested = remainderRows
-                .reduce((sum, row) => sum + getRspgNumeric(row), 0);
-
-            let allocatedToFull = [...fullFundingBody.querySelectorAll("tr")]
-                .reduce((sum, row) => sum + getRspgNumeric(row), 0);
-
-            let allocatedToPartial = [...partialFundingBody.querySelectorAll("tr")]
-                .reduce((sum, row) => sum + getRspgNumeric(row) * 0.9, 0);
-
-            let remainingBudget = totalMoneyAvailable - allocatedToFull - allocatedToPartial;
-
-            let fullyFundRemainder = totalRemainderRequested <= remainingBudget;
-
-            remainderRows.forEach(row => {
-                if (fullyFundRemainder) {
-                    setAllocatedFunds(row, getRspgTotal(row));
-                } else {
-                    setAllocatedFunds(row, calculateRemainderFundingAmount(row, remainderPercent));
-                }
-            });
-
-            updateCounts();
             updateRemainingBudgetDisplay();
+        });
 
-        }
+        /* -------------------------
+           Clear / Reset view
+           ------------------------- */
+        clearAllocationsBtn.addEventListener('click', () => {
+            // move all rows back to original and hide tables
+            clearAllTables();
+            tablesContainer.classList.add('hidden');
+            reopenCriteriaBtn.classList.add('hidden');
 
-        applyAllFundingBtn_FUNDING.addEventListener("click", applyAllFundingCriteria);
-        boostPartialFundingBtn.addEventListener("click", boostPartialFunding);
-        resetCriteriaBtn_FUNDING.addEventListener("click", resetAllFunding);
+            // show non-sorted table
+            originalAppsContainer.classList.remove('hidden');
+        });
 
+        /* -------------------------
+           Apply button inside modal
+           ------------------------- */
+        applyFundsModalBtn.addEventListener('click', () => {
+            // update model from modal inputs
+            criteriaModel.fullMin = clampInt(modalFullMin.value, 1, 100);
+            criteriaModel.noneMax = clampInt(modalNoneMax.value, 0, 99);
 
-        updateCounts();
-        updateRemainingBudgetDisplay();
+            const validation = validateCriteriaModel();
+            if (!validation.ok) return;
 
+            // apply and render tables
+            applyCriteriaAndRenderTables(validation);
+            hideModal();
+        });
+
+        /* -------------------------
+           Initialization
+           ------------------------- */
+        document.addEventListener('DOMContentLoaded', () => {
+            // initial state: hide tables and original apps (they will be shown after Apply)
+            tablesContainer.classList.add('hidden');
+            reopenCriteriaBtn.classList.add('hidden');
+
+            // ensure model defaults
+            criteriaModel.fullMin = clampInt(modalFullMin.value, 1, 100);
+            criteriaModel.noneMax = clampInt(modalNoneMax.value, 0, 99);
+            criteriaModel.partials = [];
+
+            // render empty brackets list
+            renderBracketsList();
+        });
     </script>
-
-
-
-
-
-
-
-
 }

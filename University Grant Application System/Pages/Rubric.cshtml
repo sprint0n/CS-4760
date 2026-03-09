@@ -1,6 +1,7 @@
 ﻿@page "{id:int}"
 @model University_Grant_Application_System.Pages.RubricModel
 @{
+    Layout = Model.UserRole == "chair" ? "_CommitteeLayout" : "_ComMemberLayout";
 }
 
 <div class="container mt-4">

@@ -33,7 +33,7 @@
                     <div class="application-card">
                         <h4>@app.Title</h4>
                         <p class="card-status">
-                            <span class="badge badge-status-review">@app.Status</span>
+                            <span class="badge badge-status-review">@Model.GetStatusDisplay(app.Status)</span>
                         </p>
                         <p class="card-detail"><strong>PI:</strong> @app.PrimaryInvestigator</p>
                         <div class="card-actions">
@@ -68,7 +68,7 @@
                     <div class="application-card">
                         <h4>@app.Title</h4>
                         <p class="card-status">
-                            <span class="badge badge-status-saved">@app.Status</span>
+                            <span class="badge badge-status-saved">Saved</span>
                         </p>
                         <div class="card-actions">
                             <a asp-page="/ApplicationPage" asp-route-draftId="@app.ApplicationId" class="btn btn-primary btn-sm">
@@ -106,7 +106,7 @@
                     <div class="application-card">
                         <h4>@app.Title</h4>
                         <p class="card-status">
-                            <span class="badge badge-status-review">@app.Status</span>
+                            <span class="badge badge-status-review">@Model.GetStatusDisplay(app.Status)</span>
                         </p>
                     </div>
                 }

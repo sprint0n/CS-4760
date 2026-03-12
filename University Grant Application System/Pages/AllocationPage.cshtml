@@ -158,6 +158,11 @@
             </div>
         </div>
     </div>
+
+    <button id="downloadExcelBtn" class="btn btn-success">
+        Download Funded Grants Excel
+    </button>
+
 </div>
 
 <!-- Original unsorted applications table (shown until Apply) -->
@@ -182,7 +187,12 @@
                 <tbody id="applicationsTableBody">
                     @foreach (var app in Model.Applications)
                     {
-                        <tr data-score="@app.OverallScore">
+                        <tr data-score="@app.OverallScore"
+                            data-title="@app.Title"
+                            data-firstname="@app.FirstName"
+                            data-lastname="@app.LastName"
+                            data-accountindex="@app.AccountIndex">
+
                             <td>@app.Title</td>
                             <td>@app.SubmittedBy</td>
                             <td>@app.PrincipalInvestigator</td>
@@ -249,6 +259,9 @@
 </div>
 
 @section Scripts {
+    <!--Needed for excel-->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
     <script>
         /* -------------------------
            Data model and helpers
@@ -789,5 +802,55 @@
             // render empty brackets list
             renderBracketsList();
         });
+
+        const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+
+        downloadExcelBtn.addEventListener('click', () => {
+
+            const rows = [];
+
+            // Excel header row
+            rows.push([
+                "Grant Title",
+                "First Name",
+                "Last Name",
+                "AccountIndex",
+                "Total"
+            ]);
+
+            // Get all funded rows (full + partial)
+            const fundedRows = document.querySelectorAll(
+                '#fullFundingTableBody tr, #partialFundingTablesContainer tbody tr'
+            );
+
+            fundedRows.forEach(row => {
+
+                const title = row.dataset.title;
+                const firstName = row.dataset.firstname;
+                const lastName = row.dataset.lastname;
+                const accountIndex = row.dataset.accountindex;
+
+                const total = row.querySelector('td:nth-child(7)').textContent.trim();
+
+                rows.push([
+                    title,
+                    firstName,
+                    lastName,
+                    accountIndex,
+                    total
+                ]);
+            });
+
+            // Convert rows → worksheet
+            const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+            // Create workbook
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Funded Grants");
+
+            // Download file
+            XLSX.writeFile(workbook, "FundedGrantApplications.xlsx");
+        });
+
     </script>
 }

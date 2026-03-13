@@ -3,6 +3,28 @@
 
 @{
     ViewData["Title"] = "Edit";
+
+    // Dynamically assign the layout based on the logged-in user's role
+    if (User.HasClaim("IsAdmin", "True"))
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (User.HasClaim("CommitteeStatus", "chair"))
+    {
+        Layout = "_CommitteeLayout";
+    }
+    else if (User.HasClaim("CommitteeStatus", "member"))
+    {
+        Layout = "_ComMemberLayout";
+    }
+    else if (User.HasClaim("userType", "chair"))
+    {
+        Layout = "_DeptChairLayout";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
 }
 
 <h1>Edit</h1>
@@ -61,5 +83,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

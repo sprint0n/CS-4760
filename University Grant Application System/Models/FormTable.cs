@@ -41,7 +41,7 @@ namespace University_Grant_Application_System.Models
         // Nullable numerics (REAL / DECIMAL)
         // -----------------------------
 
-        public float? DisseminationBudget { get; set; }
+        public string? DisseminationBudget { get; set; }
 
         public float? OtherFunding1Amount { get; set; }
         public float? OtherFunding2Amount { get; set; }

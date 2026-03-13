@@ -246,6 +246,9 @@ namespace University_Grant_Application_System.Pages
                     PastBudget = draft.pastBudgets;
                     HasPastFunding = draft.pastFunding;
                     Timeline = draft.Timeline;
+                    SelectedGrantTypeOption = draft.grantTypeSelection;
+                    SelectedStaffTypeOption = draft.staffTypeSelection;
+                    
                     DisseminationBudget = draft.DisseminationBudget?.ToString();
                     HumansOrAnimals = draft.isIRB;
 
@@ -313,6 +316,20 @@ namespace University_Grant_Application_System.Pages
 
         private void RecordFileUpload(int formId, string originalName, string uniqueName, AttachmentType category, string contentType, long size)
         {
+            var existingFile = _context.UploadedFiles
+                .FirstOrDefault(f => f.FormTableId == formId && f.Category == category);
+
+            if (existingFile != null)
+            {
+                var filePath = Path.Combine("wwwroot", "uploads", existingFile.StoredFileName);
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                _context.UploadedFiles.Remove(existingFile);
+            }
+
             var upload = new UploadedFile
             {
                 ID = Guid.NewGuid(),
@@ -398,11 +415,10 @@ namespace University_Grant_Application_System.Pages
             formEntry.Title = GrantTitle;
             formEntry.Procedure = Procedure;
             formEntry.Timeline = Timeline;
+            formEntry.grantTypeSelection = SelectedGrantTypeOption;
+            formEntry.staffTypeSelection = SelectedStaffTypeOption;
             formEntry.GrantPurpose = GrantPurpose;
-            if (decimal.TryParse(DisseminationBudget, out decimal parsedDissemination))
-            {
-                formEntry.DisseminationBudget = (float)parsedDissemination;
-            }
+            formEntry.DisseminationBudget = DisseminationBudget;
             formEntry.pastBudgets = PastBudget ?? string.Empty;
             formEntry.pastFunding = HasPastFunding ?? false;
             formEntry.isIRB = HumansOrAnimals ?? false;
@@ -443,15 +459,40 @@ namespace University_Grant_Application_System.Pages
             formEntry.TotalBudget = CalculateTotalBudget(formEntry);
 
             // Save Income Sources (Max 4)
-            var funding = IncomeSources.Where(f => !string.IsNullOrWhiteSpace(f.SourceName)).Take(4).Concat(Enumerable.Repeat(new IncomeSource(), 4)).Take(4).ToList();
-            formEntry.OtherFunding1Name = funding[0].SourceName ?? string.Empty;
-            formEntry.OtherFunding1Amount = (float)funding[0].Amount;
-            formEntry.OtherFunding2Name = funding[1].SourceName ?? string.Empty;
-            formEntry.OtherFunding2Amount = (float)funding[1].Amount;
-            formEntry.OtherFunding3Name = funding[2].SourceName ?? string.Empty;
-            formEntry.OtherFunding3Amount = (float)funding[2].Amount;
-            formEntry.OtherFunding4Name = funding[3].SourceName ?? string.Empty;
-            formEntry.OtherFunding4Amount = (float)funding[3].Amount;
+            var funding = IncomeSources
+                .Where(f => !string.IsNullOrWhiteSpace(f.SourceName))
+                .Take(4)
+                .ToList();
+
+            formEntry.OtherFunding1Name = string.Empty;
+            formEntry.OtherFunding1Amount = 0;
+            formEntry.OtherFunding2Name = string.Empty;
+            formEntry.OtherFunding2Amount = 0;
+            formEntry.OtherFunding3Name = string.Empty;
+            formEntry.OtherFunding3Amount = 0;
+            formEntry.OtherFunding4Name = string.Empty;
+            formEntry.OtherFunding4Amount = 0;
+
+            if (funding.Count > 0)
+            {
+                formEntry.OtherFunding1Name = funding[0].SourceName;
+                formEntry.OtherFunding1Amount = (float)funding[0].Amount;
+            }
+            if (funding.Count > 1)
+            {
+                formEntry.OtherFunding2Name = funding[1].SourceName;
+                formEntry.OtherFunding2Amount = (float)funding[1].Amount;
+            }
+            if (funding.Count > 2)
+            {
+                formEntry.OtherFunding3Name = funding[2].SourceName;
+                formEntry.OtherFunding3Amount = (float)funding[2].Amount;
+            }
+            if (funding.Count > 3)
+            {
+                formEntry.OtherFunding4Name = funding[3].SourceName;
+                formEntry.OtherFunding4Amount = (float)funding[3].Amount;
+            }
 
             await _context.SaveChangesAsync();
 
@@ -465,6 +506,17 @@ namespace University_Grant_Application_System.Pages
             {
                 var irbName = await SaveFileAsync(UploadFile);
                 if (irbName != null) RecordFileUpload(formEntry.Id, UploadFile.FileName, irbName, AttachmentType.IRB, UploadFile.ContentType, UploadFile.Length);
+            }
+            if (OptionalDocument1 != null)
+            {
+                var opt1Name = await SaveFileAsync(OptionalDocument1);
+                if (opt1Name != null) RecordFileUpload(formEntry.Id, OptionalDocument1.FileName, opt1Name, AttachmentType.OptionalDoc1, OptionalDocument1.ContentType, OptionalDocument1.Length);
+            }
+
+            if (OptionalDocument2 != null)
+            {
+                var opt2Name = await SaveFileAsync(OptionalDocument2);
+                if (opt2Name != null) RecordFileUpload(formEntry.Id, OptionalDocument2.FileName, opt2Name, AttachmentType.OptionalDoc2, OptionalDocument2.ContentType, OptionalDocument2.Length);
             }
 
             await _context.SaveChangesAsync();

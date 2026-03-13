@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -9,6 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="MSTest" Version="4.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\University Grant Application System\University Grant Application System.csproj" />
   </ItemGroup>
 
   <ItemGroup>

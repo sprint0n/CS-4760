@@ -20,6 +20,19 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
 
         public List<ApprovedGrant> ToReviewGrants { get; set; } = new();
 
+        public string GetStatusDisplay(string status)
+        {
+            return status switch
+            {
+                "PendingDeptChair" => "Pending Department Chair Approval",
+                "PendingCommittee" => "Pending Committee Approval",
+                "PendingDeanApproval" => "Pending Dean Approval",
+                "approved" => "Approved",
+                "rejected" => "Rejected",
+                _ => status
+            };
+        }
+
 
         public async Task OnGetAsync()
         {

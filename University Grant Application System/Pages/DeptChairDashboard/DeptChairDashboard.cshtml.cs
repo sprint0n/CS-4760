@@ -19,6 +19,20 @@ namespace University_Grant_Application_System.Pages.DeptChairDashboard
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
 
         public List<ApplicationCard> ApplicationToReview { get; set; } = new();
+
+        public string GetStatusDisplay(string status)
+        {
+            return status switch
+            {
+                "PendingDeptChair" => "Pending Department Chair Approval",
+                "PendingCommittee" => "Pending Committee Approval",
+                "PendingDeanApproval" => "Pending Dean Approval",
+                "approved" => "Approved",
+                "rejected" => "Rejected",
+                _ => status
+            };
+        }
+
         public async Task OnGetAsync()
         {
             // Get the logged-in user's email

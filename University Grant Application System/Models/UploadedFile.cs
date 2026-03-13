@@ -9,7 +9,8 @@ namespace University_Grant_Application_System.Models
     {
         IRB,
         SupportingDoc,
-        OptionalDoc,
+        OptionalDoc1,
+        OptionalDoc2,
         Budget,
     }
     public class UploadedFile

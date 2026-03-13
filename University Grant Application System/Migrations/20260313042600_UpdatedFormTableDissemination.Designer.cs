@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University_Grant_Application_System.Data;
 
@@ -11,9 +12,11 @@ using University_Grant_Application_System.Data;
 namespace University_Grant_Application_System.Migrations
 {
     [DbContext(typeof(University_Grant_Application_SystemContext))]
-    partial class University_Grant_Application_SystemContextModelSnapshot : ModelSnapshot
+    [Migration("20260313042600_UpdatedFormTableDissemination")]
+    partial class UpdatedFormTableDissemination
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,13 +79,13 @@ namespace University_Grant_Application_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("RSPGAmount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -190,16 +193,16 @@ namespace University_Grant_Application_System.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("Amount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("FormTableId")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("OtherExpenseName")
                         .HasColumnType("nvarchar(max)");
@@ -220,7 +223,7 @@ namespace University_Grant_Application_System.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("Amount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -229,16 +232,16 @@ namespace University_Grant_Application_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("TaxedAmount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -313,13 +316,13 @@ namespace University_Grant_Application_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("OtherAmount1")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("OtherAmount2")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("RSPGAmount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TravelName")
                         .HasColumnType("nvarchar(max)");

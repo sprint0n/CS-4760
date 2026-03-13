@@ -1,5 +1,6 @@
 ﻿@page
 @model University_Grant_Application_System.Pages.ApplicationPageModel
+@using University_Grant_Application_System.Models
 @{
     ViewData["Title"] = "Grant Application";
     if (User.HasClaim("IsAdmin", "True"))
@@ -192,17 +193,34 @@
             <span asp-validation-for="RequiredDocument" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="OptionalDocument1" class="form-label"></label>
-            <input asp-for="OptionalDocument1" type="file" class="form-control" />
-            <span asp-validation-for="OptionalDocument1" class="text-danger"></span>
-        </div>
+           <div class="mb-3">
+                <label asp-for="OptionalDocument1" class="form-label"></label>
+                @{
+                    var existingOpt1 = Model.ExistingFiles.FirstOrDefault(f => f.Category == AttachmentType.OptionalDoc1);
+                }
+                @if (existingOpt1 != null)
+                {
+                    <div class="text-success mb-1">
+                        <i class="bi bi-check-circle"></i> <small>Attached: @existingOpt1.FileName</small>
+                    </div>
+                }
+                <input asp-for="OptionalDocument1" type="file" class="form-control" />
+            </div>
 
-        <div class="mb-3">
-            <label asp-for="OptionalDocument2" class="form-label"></label>
-            <input asp-for="OptionalDocument2" type="file" class="form-control" />
-            <span asp-validation-for="OptionalDocument2" class="text-danger"></span>
-        </div>
+
+            <div class="mb-3">
+                <label asp-for="OptionalDocument2" class="form-label"></label>
+                @{
+                    var existingOpt2 = Model.ExistingFiles.FirstOrDefault(f => f.Category == AttachmentType.OptionalDoc2);
+                }
+                @if (existingOpt2 != null)
+                {
+                    <div class="text-success mb-1">
+                        <i class="bi bi-check-circle"></i> <small>Attached: @existingOpt2.FileName</small>
+                    </div>
+                }
+                <input asp-for="OptionalDocument2" type="file" class="form-control" />
+            </div>
 
         <h4>Other Sources of Funding (Max 4)</h4>
         <div class="income-section mb-4">
@@ -211,7 +229,12 @@
                 {
                     <div class="income-source mb-3 border p-3" data-index="@i">
                         <label>Source Name</label>
-                        <input asp-for="IncomeSources[@i].SourceName" class="form-control" value="" placeholder=""/>
+                        @if (Model.IncomeSources[i].SourceName != "RSPG") 
+                        {
+                         <button type="button" class="btn btn-sm btn-outline-danger remove-source-btn float-end">Remove</button>
+                        }
+                       
+                        <input asp-for="IncomeSources[@i].SourceName" class="form-control"/>
 
                         <label>Amount ($)</label>
                         <input asp-for="IncomeSources[@i].Amount"
@@ -253,7 +276,7 @@
         });
     </script>
     
-    @* Add Income Source dynamic inputs *@
+   
     <script>
         const maxSources = 4;
 
@@ -283,8 +306,47 @@
                        type="number"
                        step="0.01" />
             `;
+            div.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <label>Source Name</label>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-source-btn">Remove</button>
+                </div>
+                <input name="IncomeSources[${newIndex}].SourceName" class="form-control" />
+
+                <label class="mt-2">Amount ($)</label>
+                <input name="IncomeSources[${newIndex}].Amount"
+                       class="form-control"
+                       type="number"
+                       step="0.01" />
+            `;
 
             container.appendChild(div);
         });
     </script>
+    <script>
+        document.addEventListener('click', function (e) {
+    if (e.target && e.target.classList.contains('remove-source-btn')) {
+        const rowToRemove = e.target.closest('.income-source');
+        const container = rowToRemove.parentElement;
+        
+        rowToRemove.remove();
+
+        const rows = container.querySelectorAll('.income-source');
+        rows.forEach((row, index) => {
+            row.setAttribute('data-index', index);
+            row.querySelectorAll('input').forEach(input => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${index}]`));
+                }
+                const id = input.getAttribute('id');
+                if (id) {
+                    input.setAttribute('id', id.replace(/_\d+__/, `_${index}__`));
+                }
+            });
+        });
+    }
+});
+    </script>
+    
 }

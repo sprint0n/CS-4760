@@ -19,8 +19,8 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
             _context = context;
         }
 
-        public IList<User> Users { get;set; } = default!;
-        
+        public IList<User> Users { get; set; } = default!;
+
         public IList<User> CommitteeMembers { get; set; }
 
         [BindProperty]
@@ -48,15 +48,15 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
 
         }
 
-        public async Task<IActionResult> OnPostAddToCommitteeAsync(int userId) 
-        { 
-            var user = await _context.Users.FindAsync(userId); 
-            if (user != null) 
-            { 
+        public async Task<IActionResult> OnPostAddToCommitteeAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
                 user.committeeMemberStatus = "member";
-                await _context.SaveChangesAsync(); 
-            } 
-            return RedirectToPage(); 
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostRemoveFromCommitteeAsync(int userId)
@@ -114,8 +114,8 @@ namespace University_Grant_Application_System.Pages.AdminDashboard
                     await UploadFile.CopyToAsync(stream);
                 }
 
-                // Show original filename to user
-                TempData["UploadSuccess"] = $"Successfully uploaded: {UploadFile.FileName}";
+                // Show original filename to user (COMMENTED OUT TO HIDE NOTIFICATION BAR)
+                // TempData["UploadSuccess"] = $"Successfully uploaded: {UploadFile.FileName}";
             }
             // Reload page after upload
             return RedirectToPage();

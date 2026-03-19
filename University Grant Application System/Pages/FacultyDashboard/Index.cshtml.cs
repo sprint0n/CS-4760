@@ -18,6 +18,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
         public List<ApplicationCard> SavedApplications { get; set; } = new();
         public List<ApplicationCard> InReviewApplications { get; set; } = new();
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
+        public List<ClosedGrant> ClosedGrants { get; set; } = new();
 
         public string GetStatusDisplay(string status)
         {
@@ -81,13 +82,24 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 })
                 .ToListAsync();
 
-            // Optional: Approved grants (if you have a separate table or flag)
+            // Approved grants (can file a report)
             ApprovedGrants = await _context.FormTable
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Approved")
                 .Select(f => new ApprovedGrant
                 {
+                    Id = f.Id,
                     Title = f.Title,
-                    Amount = f.TotalBudget ?? 0m // or your approved amount field
+                    Amount = f.TotalBudget ?? 0m
+                })
+                .ToListAsync();
+
+            // Closed grants (report submitted)
+            ClosedGrants = await _context.FormTable
+                .Where(f => f.UserId == userId && f.ApplicationStatus == "Closed")
+                .Select(f => new ClosedGrant
+                {
+                    Title = f.Title,
+                    Amount = f.TotalBudget ?? 0m
                 })
                 .ToListAsync();
 
@@ -139,6 +151,13 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
     }
 
     public class ApprovedGrant
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public decimal Amount { get; set; }
+    }
+
+    public class ClosedGrant
     {
         public string Title { get; set; } = "";
         public decimal Amount { get; set; }

@@ -98,7 +98,12 @@
                 {
                     <li class="approved-item">
                         <strong>@grant.Title</strong>
-                        <span class="amount">@grant.Amount.ToString("C")</span>
+                        <div class="approved-item-actions">
+                            <span class="amount">@grant.Amount.ToString("C")</span>
+                            <a asp-page="/GrantReport" asp-route-grantId="@grant.Id" class="btn btn-outline-primary btn-sm">
+                                File Report
+                            </a>
+                        </div>
                     </li>
                 }
             </ul>
@@ -107,6 +112,36 @@
         {
             <div class="empty-state">
                 <p class="text-muted">No approved grants yet.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Closed Grants -->
+<div class="card mb-4">
+    <div class="card-header">
+        <span class="section-title mb-0 border-0 pb-0">Closed Grants</span>
+    </div>
+    <div class="card-body">
+        @if (Model.ClosedGrants.Any())
+        {
+            <ul class="approved-list">
+                @foreach (var grant in Model.ClosedGrants)
+                {
+                    <li class="approved-item">
+                        <strong>@grant.Title</strong>
+                        <div class="approved-item-actions">
+                            <span class="amount">@grant.Amount.ToString("C")</span>
+                            <span class="badge badge-status-closed">Closed</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="empty-state">
+                <p class="text-muted">No closed grants yet.</p>
             </div>
         }
     </div>

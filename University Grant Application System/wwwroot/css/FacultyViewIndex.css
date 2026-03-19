@@ -179,3 +179,20 @@
     color: #991b1b;
     border-left-color: #ef4444;
 }
+
+/* Approved item actions (amount + button) */
+.approved-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Closed badge */
+.badge-status-closed {
+    background-color: #e2e8f0;
+    color: #475569;
+    font-size: 0.75rem;
+    padding: 0.25em 0.65em;
+    border-radius: 20px;
+    font-weight: 600;
+}

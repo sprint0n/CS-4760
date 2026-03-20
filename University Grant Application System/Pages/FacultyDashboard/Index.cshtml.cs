@@ -18,7 +18,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
         public List<ApplicationCard> SavedApplications { get; set; } = new();
         public List<ApplicationCard> InReviewApplications { get; set; } = new();
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
-        public List<ClosedGrant> ClosedGrants { get; set; } = new();
+        public List<ApprovedGrant> ClosedGrants { get; set; } = new();
 
         public string GetStatusDisplay(string status)
         {
@@ -28,7 +28,9 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 "PendingCommittee" => "Pending Committee Approval",
                 "PendingDeanApproval" => "Pending Dean Approval",
                 "approved" => "Approved",
+                "Approved" => "Approved",
                 "rejected" => "Rejected",
+                "Closed" => "Closed",
                 _ => status
             };
         }
@@ -82,7 +84,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 })
                 .ToListAsync();
 
-            // Approved grants (can file a report)
+            // Approved grants
             ApprovedGrants = await _context.FormTable
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Approved")
                 .Select(f => new ApprovedGrant
@@ -93,11 +95,12 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 })
                 .ToListAsync();
 
-            // Closed grants (report submitted)
+            // Closed grants (report completed)
             ClosedGrants = await _context.FormTable
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Closed")
-                .Select(f => new ClosedGrant
+                .Select(f => new ApprovedGrant
                 {
+                    Id = f.Id,
                     Title = f.Title,
                     Amount = f.TotalBudget ?? 0m
                 })
@@ -153,12 +156,6 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
     public class ApprovedGrant
     {
         public int Id { get; set; }
-        public string Title { get; set; } = "";
-        public decimal Amount { get; set; }
-    }
-
-    public class ClosedGrant
-    {
         public string Title { get; set; } = "";
         public decimal Amount { get; set; }
     }

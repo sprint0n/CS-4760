@@ -86,27 +86,32 @@
 </div>
 
 <!-- Approved Grants -->
-<div class="card">
+<div class="card mb-4">
     <div class="card-header">
         <span class="section-title mb-0 border-0 pb-0">Approved Grants</span>
     </div>
     <div class="card-body">
         @if (Model.ApprovedGrants.Any())
         {
-            <ul class="approved-list">
+            <div class="horizontal-scroll">
                 @foreach (var grant in Model.ApprovedGrants)
                 {
-                    <li class="approved-item">
-                        <strong>@grant.Title</strong>
-                        <div class="approved-item-actions">
-                            <span class="amount">@grant.Amount.ToString("C")</span>
-                            <a asp-page="/GrantReport" asp-route-grantId="@grant.Id" class="btn btn-outline-primary btn-sm">
-                                File Report
+                    <div class="application-card">
+                        <h4>@grant.Title</h4>
+                        <p class="card-status">
+                            <span class="badge badge-status-approved">Approved</span>
+                        </p>
+                        <p class="card-detail">
+                            <strong>Amount:</strong> @grant.Amount.ToString("C")
+                        </p>
+                        <div class="card-actions">
+                            <a asp-page="/ReportPage" asp-route-grantId="@grant.Id" class="btn btn-primary btn-sm">
+                                View Report
                             </a>
                         </div>
-                    </li>
+                    </div>
                 }
-            </ul>
+            </div>
         }
         else
         {
@@ -118,25 +123,32 @@
 </div>
 
 <!-- Closed Grants -->
-<div class="card mb-4">
+<div class="card">
     <div class="card-header">
         <span class="section-title mb-0 border-0 pb-0">Closed Grants</span>
     </div>
     <div class="card-body">
         @if (Model.ClosedGrants.Any())
         {
-            <ul class="approved-list">
+            <div class="horizontal-scroll">
                 @foreach (var grant in Model.ClosedGrants)
                 {
-                    <li class="approved-item">
-                        <strong>@grant.Title</strong>
-                        <div class="approved-item-actions">
-                            <span class="amount">@grant.Amount.ToString("C")</span>
+                    <div class="application-card">
+                        <h4>@grant.Title</h4>
+                        <p class="card-status">
                             <span class="badge badge-status-closed">Closed</span>
+                        </p>
+                        <p class="card-detail">
+                            <strong>Amount:</strong> @grant.Amount.ToString("C")
+                        </p>
+                        <div class="card-actions">
+                            <a asp-page="/ReportPage" asp-route-grantId="@grant.Id" class="btn btn-outline-secondary btn-sm">
+                                View Report
+                            </a>
                         </div>
-                    </li>
+                    </div>
                 }
-            </ul>
+            </div>
         }
         else
         {

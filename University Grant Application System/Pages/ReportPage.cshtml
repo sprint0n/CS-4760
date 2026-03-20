@@ -1,0 +1,225 @@
+@page
+@model University_Grant_Application_System.Pages.ReportPageModel
+@{
+    ViewData["Title"] = "Grant Report";
+
+    if (User.HasClaim("IsAdmin", "True"))
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (User.HasClaim("CommitteeStatus", "chair"))
+    {
+        Layout = "_CommitteeLayout";
+    }
+    else if (User.HasClaim("CommitteeStatus", "member"))
+    {
+        Layout = "_ComMemberLayout";
+    }
+    else if (User.HasClaim("UserType", "chair"))
+    {
+        Layout = "_DeptChairLayout";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
+    <style>
+        .report-header {
+            background: #fff;
+            border: 1px solid var(--border, #e2e8f0);
+            border-left: 4px solid var(--accent, #c8a951);
+            border-radius: var(--radius, 8px);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.75rem;
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+        }
+        .report-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary, #1e3a5f);
+            margin: 0 0 0.25rem 0;
+        }
+        .report-header .report-status {
+            font-size: 0.85rem;
+        }
+        .grant-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .grant-detail-item label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted, #64748b);
+            margin-bottom: 0.15rem;
+            display: block;
+        }
+        .grant-detail-item p {
+            font-size: 0.95rem;
+            color: var(--primary, #1e3a5f);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        html[data-theme="dark"] .report-header {
+            background: var(--bg-card, #1e293b);
+            border-color: var(--border, #334155);
+            border-left-color: var(--accent, #c8a951);
+        }
+        html[data-theme="dark"] .report-header h2 {
+            color: var(--primary, #e2e8f0);
+        }
+        html[data-theme="dark"] .grant-detail-item p {
+            color: var(--primary, #e2e8f0);
+        }
+    </style>
+}
+
+<!-- Report Header -->
+<div class="report-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h2>@Model.GrantTitle</h2>
+            <span class="report-status">
+                @if (Model.IsClosed)
+                {
+                    <span class="badge badge-status-closed">Closed</span>
+                }
+                else
+                {
+                    <span class="badge badge-status-approved">Approved</span>
+                }
+            </span>
+        </div>
+        <a asp-page="@Model.DashboardPage" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+    </div>
+</div>
+
+<!-- Grant Details -->
+<div class="card mb-4">
+    <div class="card-header">
+        <span class="section-title mb-0 border-0 pb-0">Grant Details</span>
+    </div>
+    <div class="card-body">
+        <div class="grant-details-grid">
+            <div class="grant-detail-item">
+                <label>Grant Type</label>
+                <p>@Model.GrantType</p>
+            </div>
+            <div class="grant-detail-item">
+                <label>Total Budget</label>
+                <p>@Model.GrantAmount.ToString("C")</p>
+            </div>
+            <div class="grant-detail-item">
+                <label>Principal Investigator</label>
+                <p>@Model.PrincipalInvestigator</p>
+            </div>
+            <div class="grant-detail-item">
+                <label>Status</label>
+                <p>@Model.ApplicationStatus</p>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <hr />
+            <div class="grant-detail-item">
+                <label>Description</label>
+                <p style="font-weight: 400;">@Model.Description</p>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.Timeline))
+        {
+            <div class="grant-detail-item mt-3">
+                <label>Timeline</label>
+                <p style="font-weight: 400;">@Model.Timeline</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Report Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <span class="section-title mb-0 border-0 pb-0">
+            @(Model.IsClosed ? "Submitted Report" : "Submit Report")
+        </span>
+    </div>
+    <div class="card-body">
+        @if (Model.IsClosed)
+        {
+            <div class="alert alert-success">
+                This grant report has been submitted and the grant is now closed.
+            </div>
+
+            @if (Model.ExistingReportDoc1 != null || Model.ExistingReportDoc2 != null)
+            {
+                <h6 class="mt-3 mb-2" style="font-weight: 700; color: var(--primary, #1e3a5f);">Uploaded Documents</h6>
+                <ul class="list-unstyled">
+                    @if (Model.ExistingReportDoc1 != null)
+                    {
+                        <li class="mb-2">
+                            <strong>Report Document 1:</strong>
+                            <a href="~/uploads/@Model.ExistingReportDoc1.StoredFileName" target="_blank">
+                                @Model.ExistingReportDoc1.FileName
+                            </a>
+                        </li>
+                    }
+                    @if (Model.ExistingReportDoc2 != null)
+                    {
+                        <li class="mb-2">
+                            <strong>Report Document 2:</strong>
+                            <a href="~/uploads/@Model.ExistingReportDoc2.StoredFileName" target="_blank">
+                                @Model.ExistingReportDoc2.FileName
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+        }
+        else
+        {
+            <form method="post" asp-page-handler="SubmitReport" enctype="multipart/form-data">
+                <input type="hidden" asp-for="GrantId" />
+
+                <div class="mb-3">
+                    <label for="ReportSummary" class="form-label">Report Summary</label>
+                    <textarea asp-for="ReportSummary" class="form-control" rows="4"
+                              placeholder="Provide a summary of the work completed under this grant..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ReportOutcomes" class="form-label">Outcomes & Results</label>
+                    <textarea asp-for="ReportOutcomes" class="form-control" rows="4"
+                              placeholder="Describe the outcomes and results achieved..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ReportExpenditures" class="form-label">Expenditure Summary</label>
+                    <textarea asp-for="ReportExpenditures" class="form-control" rows="4"
+                              placeholder="Summarize how the grant funds were spent..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ReportFile1" class="form-label">Report Document 1</label>
+                    <input type="file" asp-for="ReportFile1" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="ReportFile2" class="form-label">Report Document 2</label>
+                    <input type="file" asp-for="ReportFile2" class="form-control" />
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Submit Report & Close Grant</button>
+                    <a asp-page="@Model.DashboardPage" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        }
+    </div>
+</div>

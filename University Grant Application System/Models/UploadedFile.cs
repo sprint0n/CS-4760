@@ -13,6 +13,8 @@ namespace University_Grant_Application_System.Models
         OptionalDoc1,
         OptionalDoc2,
         Budget,
+        ReportDoc1,
+        ReportDoc2,
     }
     public class UploadedFile
     {

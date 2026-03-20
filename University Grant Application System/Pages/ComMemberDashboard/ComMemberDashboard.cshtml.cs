@@ -17,6 +17,7 @@ namespace University_Grant_Application_System.Pages.ComMemberDashboard
         public List<ApplicationCard> SavedApplications { get; set; } = new();
         public List<ApplicationCard> InReviewApplications { get; set; } = new();
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
+        public List<ApprovedGrant> ClosedGrants { get; set; } = new();
 
         public List<ApprovedGrant> ToReviewGrants { get; set; } = new();
 
@@ -101,6 +102,21 @@ namespace University_Grant_Application_System.Pages.ComMemberDashboard
                     .Where(u => u.UserId == f.PrincipalInvestigatorID)
                     .Select(u => u.FirstName + " " + u.LastName)
                     .FirstOrDefault() ?? "N/A"
+                })
+                .ToListAsync();
+
+            // Closed grants (report completed)
+            ClosedGrants = await _context.FormTable
+                .Where(f => f.UserId == userId && f.ApplicationStatus == "Closed")
+                .Select(f => new ApprovedGrant
+                {
+                    ApplicationId = f.Id,
+                    Title = f.Title,
+                    Amount = f.TotalBudget ?? 0m,
+                    PrimaryInvestigator = _context.Users
+                        .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "N/A"
                 })
                 .ToListAsync();
 

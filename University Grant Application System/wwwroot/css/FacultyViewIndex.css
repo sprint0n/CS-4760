@@ -140,6 +140,26 @@
     white-space: nowrap;
 }
 
+/* Badge: approved */
+.badge-status-approved {
+    background: #d1fae5;
+    color: #065f46;
+    font-size: 0.75rem;
+    padding: 0.2em 0.6em;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Badge: closed */
+.badge-status-closed {
+    background: #e0e7ff;
+    color: #3730a3;
+    font-size: 0.75rem;
+    padding: 0.2em 0.6em;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
 /* Card detail text */
 .card-detail {
     margin: 0;

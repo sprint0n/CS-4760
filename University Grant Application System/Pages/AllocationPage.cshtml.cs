@@ -54,7 +54,7 @@ namespace University_Grant_Application_System.Pages
                                   join s in scoresQuery
                                       on f.Id equals s.FormTableId into scoreGroup
                                   from sg in scoreGroup.DefaultIfEmpty()
-                                  where f.ApplicationStatus == "PendingDeanApproval"
+                                  where f.ApplicationStatus == "PendingAllocation"
                                   select new AllocationRowViewModel
                                   {
                                       Id = f.Id,

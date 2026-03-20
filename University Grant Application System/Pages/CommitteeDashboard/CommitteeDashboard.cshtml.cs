@@ -26,7 +26,7 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
             {
                 "PendingDeptChair" => "Pending Department Chair Approval",
                 "PendingCommittee" => "Pending Committee Approval",
-                "PendingDeanApproval" => "Pending Dean Approval",
+                "PendingAllocation" => "Pending Allocation",
                 "approved" => "Approved",
                 "rejected" => "Rejected",
                 _ => status
@@ -82,7 +82,7 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
 
             // Retrieve submitted / in-review applications
             InReviewApplications = await _context.FormTable
-                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee"))
+                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee" || f.ApplicationStatus == "PendingAllocation"))
                 .Select(f => new ApplicationCard
                 {
                     Title = f.Title,

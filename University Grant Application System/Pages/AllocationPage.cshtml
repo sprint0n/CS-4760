@@ -666,7 +666,7 @@
                 let matched = false;
                 for (const c of criteriaList) {
                     if (score >= c.min && score < c.max) {
-                        const allocAmount = Math.round(rspg * (c.allocPercent / 100));
+                        const allocAmount = Number((rspg * (c.allocPercent / 100)).toFixed(2));
                         setAllocatedFunds(row, allocAmount);
                         const body = document.getElementById(c.tableBodyId);
                         if (body) body.appendChild(row);
@@ -680,7 +680,7 @@
                 }
             }
 
-            updateRemainingBudgetDisplay();
+                    updateRemainingBudgetDisplay();
         }
 
         function sumAllocated() {

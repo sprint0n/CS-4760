@@ -666,7 +666,7 @@
                 let matched = false;
                 for (const c of criteriaList) {
                     if (score >= c.min && score < c.max) {
-                        const allocAmount = Math.round(rspg * (c.allocPercent / 100));
+                        const allocAmount = Number((rspg * (c.allocPercent / 100)).toFixed(2));
                         setAllocatedFunds(row, allocAmount);
                         const body = document.getElementById(c.tableBodyId);
                         if (body) body.appendChild(row);
@@ -679,6 +679,66 @@
                     applicationsBody.appendChild(row);
                 }
             }
+
+                    // ---------------------------------------------
+            // REDISTRIBUTE REMAINING FUNDS TO LOWEST BRACKET (CENTS-SAFE)
+            // ---------------------------------------------
+            const allocatedSoFar = sumAllocated(); // returns dollars
+            let remaining = totalMoneyAvailable - allocatedSoFar; // dollars
+
+            // Convert to cents
+            let remainingCents = Math.round(remaining * 100);
+
+            // Find lowest partial bracket
+            const partialsOnly = criteriaList.filter(c => c.type === "partial");
+
+            if (partialsOnly.length > 0) {
+                const lowest = partialsOnly[partialsOnly.length - 1];
+                const lowestBody = document.getElementById(lowest.tableBodyId);
+                const lowestRows = Array.from(lowestBody.querySelectorAll("tr"));
+
+                if (lowestRows.length > 0) {
+
+                    // Calculate normal allocation total in cents
+                    let normalTotalCents = 0;
+                    const normalAmounts = lowestRows.map(row => {
+                        const rspg = getRspgTotalFromRow(row);
+                        const amt = Number((rspg * (lowest.allocPercent / 100)).toFixed(2));
+                        const amtCents = Math.round(amt * 100);
+                        normalTotalCents += amtCents;
+                        return { row, amtCents };
+                    });
+
+                    // If remaining is insufficient
+                    if (remainingCents < normalTotalCents) {
+
+                        // Refund normal allocations
+                        remainingCents += normalTotalCents;
+
+                        // Even base amount in cents
+                        const baseCents = Math.floor(remainingCents / lowestRows.length);
+
+                        // Remainder cents
+                        let remainderCents = remainingCents - (baseCents * lowestRows.length);
+
+                        // Apply even distribution + remainder
+                        for (const { row } of normalAmounts) {
+                            let finalCents = baseCents;
+
+                            if (remainderCents > 0) {
+                                finalCents += 1;
+                                remainderCents -= 1;
+                            }
+
+                            setAllocatedFunds(row, finalCents / 100);
+                        }
+
+                        remainingCents = 0;
+                    }
+                }
+            }
+
+
 
             updateRemainingBudgetDisplay();
         }

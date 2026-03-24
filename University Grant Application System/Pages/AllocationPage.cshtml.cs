@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
+using University_Grant_Application_System.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace University_Grant_Application_System.Pages
@@ -51,8 +52,13 @@ namespace University_Grant_Application_System.Pages
                 });
 
             Applications = await (from f in _context.FormTable
+                                  .Include(f => f.PersonnelExpenses)
+                                  .Include(f => f.EquipmentExpenses)
+                                  .Include(f => f.TravelExpenses)
+                                  .Include(f => f.OtherExpenses)
                                   join s in scoresQuery
                                       on f.Id equals s.FormTableId into scoreGroup
+                                  
                                   from sg in scoreGroup.DefaultIfEmpty()
                                   where f.ApplicationStatus == "PendingDeanApproval"
                                   select new AllocationRowViewModel
@@ -91,7 +97,39 @@ namespace University_Grant_Application_System.Pages
                                         (decimal)(f.OtherFunding1Amount ?? 0) +
                                         (decimal)(f.OtherFunding2Amount ?? 0) +
                                         (decimal)(f.OtherFunding3Amount ?? 0) +
-                                        (decimal)(f.OtherFunding4Amount ?? 0),
+                                        (decimal)(f.OtherFunding4Amount ?? 0) +
+                                        (decimal)(f.PersonnelExpenses
+                                        .Where(p => p.FormTableId == f.Id)
+                                        .Select(p => p.OtherAmount1)
+                                        .FirstOrDefault() ?? 0) +
+                                        (decimal)(f.PersonnelExpenses
+                                        .Where(p => p.FormTableId == f.Id)
+                                        .Select(p => p.OtherAmount2)
+                                        .FirstOrDefault() ?? 0) +
+                                        (decimal)(f.TravelExpenses
+                                        .Where(t => t.FormTableId == f.Id)
+                                        .Select(t => t.OtherAmount1)
+                                        .FirstOrDefault() ?? 0) +
+                                        (decimal)(f.TravelExpenses
+                                        .Where(t => t.FormTableId == f.Id)
+                                        .Select(t => t.OtherAmount2)
+                                        .FirstOrDefault() ?? 0) +
+                                        (decimal)(f.EquipmentExpenses
+                                        .Where(e => e.FormTableId == f.Id)
+                                        .Select(e => e.OtherAmount1)
+                                        .FirstOrDefault() ?? 0) +
+                                        (decimal)(f.EquipmentExpenses
+                                        .Where(e => e.FormTableId == f.Id)
+                                        .Select(e => e.OtherAmount2)
+                                        .FirstOrDefault() ?? 0) +
+                                        (decimal)(f.OtherExpenses
+                                        .Where(o => o.FormTableId == f.Id)
+                                        .Select(o => o.OtherAmount1)
+                                        .FirstOrDefault() ?? 0) +
+                                        (decimal)(f.OtherExpenses
+                                        .Where(o => o.FormTableId == f.Id)
+                                        .Select(o => o.OtherAmount2)
+                                        .FirstOrDefault() ?? 0),
 
                                       OverallScore = sg != null
                                         ? (sg.AverageScore / 100.0)
@@ -99,7 +137,7 @@ namespace University_Grant_Application_System.Pages
                                   }
                                   ).ToListAsync();
 
-            TotalMoneyAvailable = 100_000m; // static value
+            TotalMoneyAvailable = 10_000m; // static value
 
             TotalMoneyRequested = Applications.Sum(a => a.RspgTotal);
         }

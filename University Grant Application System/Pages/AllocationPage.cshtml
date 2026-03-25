@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Allocation Page";
     Layout = "_CommitteeLayout";
+    
 }
 @section Styles {
     <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
@@ -159,9 +160,12 @@
         </div>
     </div>
 
-    <button id="downloadExcelBtn" class="btn btn-success">
-        Download Funded Grants Excel
+    <form method="post" asp-page-handler="Finalize" id="finalizeForm">
+    <input type="hidden" id="selectedApplicationIds" name="SelectedApplicationIds" />
+    <button type="button" id="downloadExcelBtn" class="btn btn-success">
+        Download Funded Grants & Finalize
     </button>
+</form>
 
 </div>
 
@@ -187,7 +191,9 @@
                 <tbody id="applicationsTableBody">
                     @foreach (var app in Model.Applications)
                     {
-                        <tr data-score="@app.OverallScore"
+                        <tr 
+                            data-id="@app.Id"
+                            data-score="@app.OverallScore"
                             data-title="@app.Title"
                             data-firstname="@app.FirstName"
                             data-lastname="@app.LastName"
@@ -865,9 +871,10 @@
 
         const downloadExcelBtn = document.getElementById('downloadExcelBtn');
 
-        downloadExcelBtn.addEventListener('click', () => {
+        downloadExcelBtn.addEventListener('click', async () => {
 
             const rows = [];
+            const ids = []; 
 
             // Excel header row
             rows.push([
@@ -885,6 +892,10 @@
 
             fundedRows.forEach(row => {
 
+                const id = row.getAttribute('data-id'); 
+                if (id) {
+                    ids.push(id); 
+                }
                 const title = row.dataset.title;
                 const firstName = row.dataset.firstname;
                 const lastName = row.dataset.lastname;
@@ -910,6 +921,10 @@
 
             // Download file
             XLSX.writeFile(workbook, "FundedGrantApplications.xlsx");
+
+            document.getElementById('selectedApplicationIds').value = ids.join(',');
+            document.getElementById('finalizeForm').submit();
+           
         });
 
     </script>

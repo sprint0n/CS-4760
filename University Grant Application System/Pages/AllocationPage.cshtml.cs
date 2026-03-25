@@ -9,6 +9,7 @@ namespace University_Grant_Application_System.Pages
 {
     public class AllocationRowViewModel
     {
+
         public int Id { get; set; }
         public string Title { get; set; }
 
@@ -34,6 +35,9 @@ namespace University_Grant_Application_System.Pages
         {
             _context = context;
         }
+
+        [BindProperty]
+        public List<int> SelectedApplicationIds { get; set; }
 
         public decimal TotalMoneyAvailable { get; set; }
         public decimal TotalMoneyRequested { get; set; }
@@ -140,6 +144,26 @@ namespace University_Grant_Application_System.Pages
             TotalMoneyAvailable = 10_000m; // static value
 
             TotalMoneyRequested = Applications.Sum(a => a.RspgTotal);
+        }
+        public async Task<IActionResult> OnPostFinalizeAsync()
+        {
+            if (SelectedApplicationIds == null || !SelectedApplicationIds.Any())
+            {
+                return RedirectToPage();
+            }
+
+            var applications = await _context.FormTable
+                .Where(f => SelectedApplicationIds.Contains(f.Id) && f.ApplicationStatus == "PendingAllocation")
+                .ToListAsync();
+
+            foreach (var app in applications)
+            {
+                app.ApplicationStatus = "Approved";
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage();
         }
     }
 }

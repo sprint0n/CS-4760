@@ -17,6 +17,7 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
         public List<ApplicationCard> SavedApplications { get; set; } = new();
         public List<ApplicationCard> InReviewApplications { get; set; } = new();
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
+        public List<ApprovedGrant> ClosedGrants { get; set; } = new();
 
         public List<ApprovedGrant> ToReviewGrants { get; set; } = new();
 
@@ -26,7 +27,7 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
             {
                 "PendingDeptChair" => "Pending Department Chair Approval",
                 "PendingCommittee" => "Pending Committee Approval",
-                "PendingDeanApproval" => "Pending Dean Approval",
+                "PendingAllocation" => "Pending Allocation",
                 "approved" => "Approved",
                 "rejected" => "Rejected",
                 _ => status
@@ -82,7 +83,7 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
 
             // Retrieve submitted / in-review applications
             InReviewApplications = await _context.FormTable
-                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee"))
+                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee" || f.ApplicationStatus == "PendingAllocation"))
                 .Select(f => new ApplicationCard
                 {
                     Title = f.Title,
@@ -102,6 +103,21 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
                     .Where(u => u.UserId == f.PrincipalInvestigatorID)
                     .Select(u => u.FirstName + " " + u.LastName)
                     .FirstOrDefault() ?? "N/A"
+                })
+                .ToListAsync();
+
+            // Closed grants (report completed)
+            ClosedGrants = await _context.FormTable
+                .Where(f => f.UserId == userId && f.ApplicationStatus == "Closed")
+                .Select(f => new ApprovedGrant
+                {
+                    ApplicationId = f.Id,
+                    Title = f.Title,
+                    Amount = f.TotalBudget ?? 0m,
+                    PrimaryInvestigator = _context.Users
+                        .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "N/A"
                 })
                 .ToListAsync();
 

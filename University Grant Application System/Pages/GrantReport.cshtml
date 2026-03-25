@@ -1,0 +1,106 @@
+@page
+@model University_Grant_Application_System.Pages.GrantReportModel
+@{
+    ViewData["Title"] = "Grant Report";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/GrantReport.css" />
+}
+
+<div class="report-container">
+    <h2 class="report-heading">Grant Report</h2>
+    <p class="report-subheading">Complete the report below to close out your approved grant.</p>
+
+    <!-- Auto-populated Grant Info -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <span class="section-title mb-0 border-0 pb-0">Grant Information</span>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Grant Title</label>
+                    <p>@Model.GrantTitle</p>
+                </div>
+                <div class="info-item">
+                    <label>Grant Type</label>
+                    <p>@Model.GrantType</p>
+                </div>
+                <div class="info-item">
+                    <label>Awarded Amount</label>
+                    <p class="amount-display">@Model.GrantAmount.ToString("C")</p>
+                </div>
+                <div class="info-item full-width">
+                    <label>Original Description</label>
+                    <p>@(string.IsNullOrWhiteSpace(Model.OriginalDescription) ? "N/A" : Model.OriginalDescription)</p>
+                </div>
+                <div class="info-item full-width">
+                    <label>Original Fund Use / Purpose</label>
+                    <p>@(string.IsNullOrWhiteSpace(Model.OriginalFundingUse) ? "N/A" : Model.OriginalFundingUse)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editable Report Form -->
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="GrantId" value="@Model.FormTableId" />
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <span class="section-title mb-0 border-0 pb-0">Report Details</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label asp-for="NewDescription" class="form-label">Description</label>
+                    <textarea asp-for="NewDescription" class="form-control" rows="5"
+                              placeholder="Describe the outcomes and results of this grant..."></textarea>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="NewFundingUse" class="form-label">Fund Use</label>
+                    <textarea asp-for="NewFundingUse" class="form-control" rows="5"
+                              placeholder="Describe how the funds were used..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <span class="section-title mb-0 border-0 pb-0">File Uploads</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label asp-for="ReportFile1" class="form-label">Report Document 1</label>
+                    <input asp-for="ReportFile1" type="file" class="form-control" />
+                    @if (Model.ExistingReport?.ReportFiles?.Count > 0)
+                    {
+                        var file1 = Model.ExistingReport.ReportFiles.ElementAtOrDefault(0);
+                        if (file1 != null)
+                        {
+                            <small class="text-muted">Current: @file1.FileName</small>
+                        }
+                    }
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ReportFile2" class="form-label">Report Document 2</label>
+                    <input asp-for="ReportFile2" type="file" class="form-control" />
+                    @if (Model.ExistingReport?.ReportFiles?.Count > 1)
+                    {
+                        var file2 = Model.ExistingReport.ReportFiles.ElementAtOrDefault(1);
+                        if (file2 != null)
+                        {
+                            <small class="text-muted">Current: @file2.FileName</small>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a asp-page="/FacultyDashboard/Index" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Submit Report</button>
+        </div>
+    </form>
+</div>

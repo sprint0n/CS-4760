@@ -18,6 +18,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
         public List<ApplicationCard> SavedApplications { get; set; } = new();
         public List<ApplicationCard> InReviewApplications { get; set; } = new();
         public List<ApprovedGrant> ApprovedGrants { get; set; } = new();
+        public List<ApprovedGrant> ClosedGrants { get; set; } = new();
 
         public string GetStatusDisplay(string status)
         {
@@ -25,9 +26,11 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
             {
                 "PendingDeptChair" => "Pending Department Chair Approval",
                 "PendingCommittee" => "Pending Committee Approval",
-                "PendingDeanApproval" => "Pending Dean Approval",
+                "PendingAllocation" => "Pending Allocation",
                 "approved" => "Approved",
+                "Approved" => "Approved",
                 "rejected" => "Rejected",
+                "Closed" => "Closed",
                 _ => status
             };
         }
@@ -73,7 +76,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
 
             // Retrieve submitted / in-review applications
             InReviewApplications = await _context.FormTable
-                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee"))
+                .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee" || f.ApplicationStatus == "PendingAllocation"))
                 .Select(f => new ApplicationCard
                 {
                     Title = f.Title,
@@ -81,13 +84,25 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 })
                 .ToListAsync();
 
-            // Optional: Approved grants (if you have a separate table or flag)
+            // Approved grants
             ApprovedGrants = await _context.FormTable
                 .Where(f => f.UserId == userId && f.ApplicationStatus == "Approved")
                 .Select(f => new ApprovedGrant
                 {
+                    Id = f.Id,
                     Title = f.Title,
-                    Amount = f.TotalBudget ?? 0m // or your approved amount field
+                    Amount = f.TotalBudget ?? 0m
+                })
+                .ToListAsync();
+
+            // Closed grants (report completed)
+            ClosedGrants = await _context.FormTable
+                .Where(f => f.UserId == userId && f.ApplicationStatus == "Closed")
+                .Select(f => new ApprovedGrant
+                {
+                    Id = f.Id,
+                    Title = f.Title,
+                    Amount = f.TotalBudget ?? 0m
                 })
                 .ToListAsync();
 
@@ -140,6 +155,7 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
 
     public class ApprovedGrant
     {
+        public int Id { get; set; }
         public string Title { get; set; } = "";
         public decimal Amount { get; set; }
     }

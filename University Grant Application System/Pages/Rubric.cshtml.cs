@@ -88,7 +88,7 @@ namespace University_Grant_Application_System.Pages
                 var application = await _context.FormTable.FindAsync(ApplicationId);
                 if (application != null)
                 {
-                    application.ApplicationStatus = "PendingDeanApproval";
+                    application.ApplicationStatus = "PendingAllocation";
                     await _context.SaveChangesAsync();
                 }
             }

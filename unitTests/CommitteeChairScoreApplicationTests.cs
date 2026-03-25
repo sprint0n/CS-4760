@@ -156,7 +156,7 @@ namespace unitTests
 			await model.OnPostAsync();
 
 			var application = await context.FormTable.FindAsync(1);
-			Assert.AreEqual("PendingDeanApproval", application!.ApplicationStatus);
+			Assert.AreEqual("PendingAllocation", application!.ApplicationStatus);
 		}
 	}
 }

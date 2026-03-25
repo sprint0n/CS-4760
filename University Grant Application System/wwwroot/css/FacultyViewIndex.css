@@ -140,6 +140,26 @@
     white-space: nowrap;
 }
 
+/* Badge: approved */
+.badge-status-approved {
+    background: #d1fae5;
+    color: #065f46;
+    font-size: 0.75rem;
+    padding: 0.2em 0.6em;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Badge: closed */
+.badge-status-closed {
+    background: #e0e7ff;
+    color: #3730a3;
+    font-size: 0.75rem;
+    padding: 0.2em 0.6em;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
 /* Card detail text */
 .card-detail {
     margin: 0;
@@ -178,4 +198,21 @@
     background-color: #fee2e2;
     color: #991b1b;
     border-left-color: #ef4444;
+}
+
+/* Approved item actions (amount + button) */
+.approved-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Closed badge */
+.badge-status-closed {
+    background-color: #e2e8f0;
+    color: #475569;
+    font-size: 0.75rem;
+    padding: 0.25em 0.65em;
+    border-radius: 20px;
+    font-weight: 600;
 }

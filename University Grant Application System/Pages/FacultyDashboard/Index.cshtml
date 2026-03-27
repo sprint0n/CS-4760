@@ -56,10 +56,10 @@
     </div>
 </div>
 
-<!-- In Review Applications -->
+<!-- Submitted Applications -->
 <div class="card mb-4">
     <div class="card-header">
-        <span class="section-title mb-0 border-0 pb-0">In Review</span>
+        <span class="section-title mb-0 border-0 pb-0">Submitted Applications</span>
     </div>
     <div class="card-body">
         @if (Model.InReviewApplications.Any())
@@ -72,6 +72,8 @@
                         <p class="card-status">
                             <span class="badge badge-status-review">@Model.GetStatusDisplay(app.Status)</span>
                         </p>
+                        <p class="card-detail"><strong>PI:</strong> @app.PrimaryInvestigator</p>
+                        <p class="card-detail"><strong>RSPG Amount:</strong> @app.Amount.ToString("C")</p>
                     </div>
                 }
             </div>

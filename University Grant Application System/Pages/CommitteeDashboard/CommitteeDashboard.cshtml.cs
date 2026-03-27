@@ -87,7 +87,13 @@ namespace University_Grant_Application_System.Pages.CommitteeDashboard
                 .Select(f => new ApplicationCard
                 {
                     Title = f.Title,
-                    Status = f.ApplicationStatus
+                    Status = f.ApplicationStatus,
+                    Amount = f.TotalBudget,
+                    PrimaryInvestigator = _context.Users
+                        .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "N/A"
+
                 })
                 .ToListAsync();
 

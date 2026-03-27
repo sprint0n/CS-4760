@@ -79,8 +79,14 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
                 .Where(f => f.UserId == userId && (f.ApplicationStatus == "PendingDeptChair" || f.ApplicationStatus == "PendingCommittee" || f.ApplicationStatus == "PendingAllocation"))
                 .Select(f => new ApplicationCard
                 {
+                    Id = f.Id,
                     Title = f.Title,
-                    Status = f.ApplicationStatus
+                    Status = f.ApplicationStatus,
+                    Amount = f.TotalBudget ?? 0m,
+                    PrimaryInvestigator = _context.Users
+                        .Where(u => u.UserId == f.PrincipalInvestigatorID)
+                        .Select(u => u.FirstName + " " + u.LastName)
+                        .FirstOrDefault() ?? "N/A"
                 })
                 .ToListAsync();
 
@@ -151,6 +157,8 @@ namespace University_Grant_Application_System.Pages.FacultyDashboard
         public int Id { get; set; }
         public string Title { get; set; } = "";
         public string Status { get; set; } = "";
+        public decimal Amount { get; set; }
+        public string PrimaryInvestigator { get; set; } = "";
     }
 
     public class ApprovedGrant

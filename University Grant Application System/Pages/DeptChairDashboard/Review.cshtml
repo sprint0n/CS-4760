@@ -59,11 +59,38 @@
             <h5>Personnel</h5>
             <table class="table table-sm border mb-3">
                 <thead class="table-light">
-                    <tr><th>Role</th><th>Description</th><th>Amount</th></tr>
+                    <tr><th>Role</th><th>Description</th><th>Amount</th><th>Other</th><th>Other</th></tr>
                 </thead>
                 <tbody>
                     @foreach(var p in Model.Application.PersonnelExpenses) {
-                        <tr><td>@p.Role</td><td>@p.Description</td><td>@p.Amount?.ToString("C")</td></tr>
+                        <tr>
+                            <td>@p.Role</td>
+                            <td>@p.Description</td>
+                            <td>@p.Amount?.ToString("C")</td>
+                            <td>@((p.OtherAmount1 ?? 0).ToString("C"))</td>
+                            <td>@((p.OtherAmount2 ?? 0).ToString("C"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Model.Application.TravelExpenses.Any())
+        {
+            <h5>Travel Funding</h5>
+            <table class="table table-sm border mb-3">
+                <thead class="table-light">
+                    <tr><th>Travel Description</th><th>Amount</th><th>Other</th><th>Other</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Application.TravelExpenses)
+                    {
+                        <tr>
+                            <td>@t.TravelName</td>
+                            <td>@t.RSPGAmount?.ToString("C")</td>
+                            <td>@((t.OtherAmount1 ?? 0).ToString("C"))</td>
+                            <td>@((t.OtherAmount2 ?? 0).ToString("C"))</td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -74,11 +101,32 @@
             <h5>Equipment</h5>
             <table class="table table-sm border mb-3">
                 <thead class="table-light">
-                    <tr><th>Item</th><th>Amount</th></tr>
+                    <tr><th>Item</th><th>Amount</th><th>Other</th><th>Other</th></tr>
                 </thead>
                 <tbody>
                     @foreach(var e in Model.Application.EquipmentExpenses) {
-                        <tr><td>@e.EquipmentName</td><td>@e.RSPGAmount?.ToString("C")</td></tr>
+                        <tr>
+                            <td>@e.EquipmentName</td>
+                            <td>@e.RSPGAmount?.ToString("C")</td>
+                            <td>@((e.OtherAmount1 ?? 0).ToString("C"))</td>
+                            <td>@((e.OtherAmount2 ?? 0).ToString("C"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Model.Application.OtherExpenses.Any())
+        {
+            <h5>Other Funding</h5>
+            <table class="table table-sm border mb-3">
+                <thead class="table-light">
+                    <tr><th>Funding Name</th><th>Amount</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model.Application.OtherExpenses)
+                    {
+                        <tr><td>@o.OtherExpenseName</td><td>@o.Amount?.ToString("C")</td></tr>
                     }
                 </tbody>
             </table>

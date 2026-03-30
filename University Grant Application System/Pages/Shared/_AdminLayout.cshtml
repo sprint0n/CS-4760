@@ -1,3 +1,11 @@
+@functions {
+    string IsActive(string page)
+    {
+        var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+        return currentPage == page ? "active" : "";
+    }
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,21 +39,29 @@
                 <div class="navbar-collapse collapse" id="navbarContent">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/AdminDashboard/Index">Home</a>
+                            <a class="nav-link @IsActive("/AdminDashboard/Index")"
+                               asp-area="" asp-page="/AdminDashboard/Index">
+                                Home
+                            </a>
                         </li>
-
-                        @if (ViewContext.RouteData.Values["page"]?.ToString()?.EndsWith("/Index", StringComparison.OrdinalIgnoreCase) == true)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Colleges/Index">Colleges</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Schools/Index">Schools</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-page="/Departments/Index">Departments</a>
-                            </li>
-                        }
+                        <li class="nav-item">
+                            <a class="nav-link @IsActive("/Colleges/Index")"
+                                asp-area="" asp-page="/Colleges/Index">
+                                Colleges
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @IsActive("/Schools/Index")"
+                                asp-area="" asp-page="/Schools/Index">
+                                Schools
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @IsActive("/Departments/Index")"
+                                asp-area="" asp-page="/Departments/Index">
+                                Departments
+                            </a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav ms-auto align-items-center gap-2">
                         <li class="nav-item">

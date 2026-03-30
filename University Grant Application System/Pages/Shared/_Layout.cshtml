@@ -1,3 +1,11 @@
+@functions {
+    string IsActive(string page)
+    {
+        var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+        return currentPage == page ? "active" : "";
+    }
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,7 +40,7 @@
                 <div class="navbar-collapse collapse" id="navbarContent">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/FacultyDashboard/Index">Home</a>
+                            <a class="nav-link @IsActive("/FacultyDashboard/Index")" asp-area = "" asp-page = "/FacultyDashboard/Index" > Home</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto align-items-center gap-2">

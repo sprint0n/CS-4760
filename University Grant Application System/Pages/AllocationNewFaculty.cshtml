@@ -1,0 +1,931 @@
+@page
+@model University_Grant_Application_System.Pages.NewFacultyAllocationPageModel
+@{
+    ViewData["Title"] = "New Faculty Allocation Page";
+    Layout = "_CommitteeLayout";
+    
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/FacultyViewIndex.css" />
+}
+<style>
+    .input-warning {
+        margin-top: 6px;
+        font-size: 0.9rem;
+        color: #991b1b;
+        background: #fee2e2;
+        padding: 6px 8px;
+        border-radius: var(--radius-sm, 4px);
+    }
+
+    .criteria-row {
+        display: grid;
+        grid-template-columns: 80px 80px 100px 80px;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .criteria-list {
+        margin-top: 8px;
+        max-height: 240px;
+        overflow-y: auto;
+        border: 1px solid var(--border, #e2e8f0);
+        padding: 8px;
+        border-radius: var(--radius, 8px);
+        background: var(--bg-card, #ffffff);
+    }
+
+    .criteria-item {
+        display: grid;
+        grid-template-columns: 80px 80px 100px 80px 80px;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    /* Dark mode support for allocation-specific styles */
+    html[data-theme="dark"] .input-warning {
+        color: #fca5a5;
+        background: #2d1515;
+    }
+
+    html[data-theme="dark"] .criteria-list {
+        border-color: var(--border, #334155);
+        background: var(--bg-card, #1e293b);
+    }
+</style>
+
+<!-- Page Header -->
+<div class="dashboard-header">
+    <div>
+        <div class="due-date-label">Fund Allocation</div>
+        <p class="due-date-value">Distribute Funding to Approved Applications</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button id="openCriteriaBtn" class="btn btn-primary">Set Funding Criteria</button>
+        <button id="reopenCriteriaBtn" class="btn btn-accent hidden">Edit Funding Criteria</button>
+    </div>
+</div>
+
+<!-- Budget Overview -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="section-title mb-0 border-0 pb-0">Budget Overview</span>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Total Money Available</label>
+                <input value="@Model.TotalMoneyAvailable.ToString("C")" class="form-control" readonly />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Total Money Requested (RSPG Totals)</label>
+                <input value="@Model.TotalMoneyRequested.ToString("C")" class="form-control" readonly />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Allocated Tables (shown after Apply) -->
+<div id="tablesContainer" class="hidden">
+    <!-- Full Funding table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <span class="section-title mb-0 border-0 pb-0">Full Funding</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitted By</th>
+                        <th>Principal Investigator</th>
+                        <th><strong>RSPG Total</strong></th>
+                        <th>Other Total</th>
+                        <th>Average Score</th>
+                        <th>Allocated Funds</th>
+                    </tr>
+                </thead>
+                <tbody id="fullFundingTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Partial tables container (dynamically generated) -->
+    <div id="partialFundingTablesContainer"></div>
+
+    <!-- No Funding table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <span class="section-title mb-0 border-0 pb-0">No Funding</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitted By</th>
+                        <th>Principal Investigator</th>
+                        <th><strong>RSPG Total</strong></th>
+                        <th>Other Total</th>
+                        <th>Average Score</th>
+                        <th>Allocated Funds</th>
+                    </tr>
+                </thead>
+                <tbody id="noFundingTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Boost / Remaining -->
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+            <span class="section-title mb-0 border-0 pb-0">Budget Summary</span>
+        </div>
+        <div class="card-body">
+            <div class="d-flex gap-2 mb-3">
+                <button id="boostPartialFunding" class="btn btn-secondary">Boost Partial Funding (if possible)</button>
+                <button id="clearAllocationsBtn" class="btn btn-outline-danger">Clear Allocations & Reset View</button>
+            </div>
+
+            <div id="remainingBudgetText" class="fw-bold mb-2"></div>
+            <div class="progress" style="height: 20px;">
+                <div id="remainingBudgetBar" class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" asp-page-handler="Finalize" id="finalizeForm">
+    <input type="hidden" id="selectedApplicationIds" name="SelectedApplicationIds" />
+    <button type="button" id="downloadExcelBtn" class="btn btn-success">
+        Download Funded Grants & Finalize
+    </button>
+</form>
+
+</div>
+
+<!-- Original unsorted applications table (shown until Apply) -->
+<div id="originalApplicationsContainer">
+    <div class="card mb-4">
+        <div class="card-header">
+            <span class="section-title mb-0 border-0 pb-0">Non-sorted Applications</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitted By</th>
+                        <th>Principal Investigator</th>
+                        <th><strong>RSPG Total</strong></th>
+                        <th>Other Total</th>
+                        <th>Average Score</th>
+                        <th>Allocated Funds</th>
+                    </tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                    @foreach (var app in Model.Applications)
+                    {
+                        <tr 
+                            data-id="@app.Id"
+                            data-score="@app.OverallScore"
+                            data-title="@app.Title"
+                            data-firstname="@app.FirstName"
+                            data-lastname="@app.LastName"
+                            data-accountindex="@app.AccountIndex">
+
+                            <td>@app.Title</td>
+                            <td>@app.SubmittedBy</td>
+                            <td>@app.PrincipalInvestigator</td>
+                            <td><strong>@app.RspgTotal.ToString("C")</strong></td>
+                            <td>@app.OtherTotal.ToString("C")</td>
+                            <td>@app.OverallScore.ToString("P1")</td>
+                            <td class="allocated-funds"></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Criteria Setup Modal -->
+<div class="modal" id="criteriaModal" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set Funding Criteria</h5>
+                <button type="button" class="btn-close" id="closeModalX" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Funding Minimum % (whole number)</label>
+                        <input id="modalFullMin" type="number" class="form-control" min="1" max="100" value="90" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">No Funding Cutoff % (whole number)</label>
+                        <input id="modalNoneMax" type="number" class="form-control" min="0" max="99" value="70" />
+                    </div>
+                </div>
+
+                <hr />
+
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Partial Funding Brackets</strong>
+                        <div>
+                            <input id="newMin" type="number" class="form-control d-inline-block" style="width:80px;" placeholder="Min" />
+                            <input id="newMax" type="number" class="form-control d-inline-block" style="width:80px; margin-left:6px;" placeholder="Max" />
+                            <input id="newAlloc" type="number" class="form-control d-inline-block" style="width:100px; margin-left:6px;" placeholder="Alloc %" />
+                            <button id="addBracketBtn" class="btn btn-sm btn-secondary" style="margin-left:8px;">Add</button>
+                        </div>
+                    </div>
+
+                    <div id="bracketsList" class="criteria-list">
+                        <!-- bracket rows injected here -->
+                    </div>
+
+                    <div id="modalValidationErrors" class="input-warning" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="me-auto text-muted">You can edit or delete brackets here before applying.</div>
+                <button id="cancelModalBtn" class="btn btn-outline-secondary">Cancel</button>
+                <button id="applyFundsModalBtn" class="btn btn-primary">Apply Funds</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!--Needed for excel-->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <script>
+        /* -------------------------
+           Data model and helpers
+           ------------------------- */
+        let criteriaModel = {
+            fullMin: 90,
+            noneMax: 70,
+            partials: [] // { id, min, max, allocPercent }
+        };
+
+        const totalMoneyAvailable = @Model.TotalMoneyAvailable;
+
+        function uid() {
+            return 'id_' + Math.random().toString(36).slice(2, 9);
+        }
+
+        function clampInt(v, min, max) {
+            v = parseInt(v, 10);
+            if (isNaN(v)) return null;
+            return Math.max(min, Math.min(max, v));
+        }
+
+        function formatCurrency(n) {
+            return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        }
+
+        /* -------------------------
+           Modal open/close and UI
+           ------------------------- */
+        const openCriteriaBtn = document.getElementById('openCriteriaBtn');
+        const reopenCriteriaBtn = document.getElementById('reopenCriteriaBtn');
+        const criteriaModal = document.getElementById('criteriaModal');
+        const closeModalX = document.getElementById('closeModalX');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+
+        const modalFullMin = document.getElementById('modalFullMin');
+        const modalNoneMax = document.getElementById('modalNoneMax');
+        const bracketsList = document.getElementById('bracketsList');
+        const addBracketBtn = document.getElementById('addBracketBtn');
+        const newMinInput = document.getElementById('newMin');
+        const newMaxInput = document.getElementById('newMax');
+        const newAllocInput = document.getElementById('newAlloc');
+        const modalValidationErrors = document.getElementById('modalValidationErrors');
+        const applyFundsModalBtn = document.getElementById('applyFundsModalBtn');
+
+        const tablesContainer = document.getElementById('tablesContainer');
+        const originalAppsContainer = document.getElementById('originalApplicationsContainer');
+
+        function showModal() {
+            // populate modal fields from model
+            modalFullMin.value = criteriaModel.fullMin;
+            modalNoneMax.value = criteriaModel.noneMax;
+            renderBracketsList();
+            modalValidationErrors.style.display = 'none';
+            criteriaModal.style.display = 'block';
+        }
+
+        function hideModal() {
+            criteriaModal.style.display = 'none';
+        }
+
+        openCriteriaBtn.addEventListener('click', () => {
+            // If tables are visible, user is starting fresh; keep existing model if any
+            showModal();
+        });
+        reopenCriteriaBtn.addEventListener('click', () => {
+            showModal();
+        });
+        closeModalX.addEventListener('click', hideModal);
+        cancelModalBtn.addEventListener('click', () => {
+            hideModal();
+        });
+
+        /* -------------------------
+           Bracket list management
+           ------------------------- */
+        function renderBracketsList() {
+            bracketsList.innerHTML = '';
+            if (!criteriaModel.partials || criteriaModel.partials.length === 0) {
+                const p = document.createElement('div');
+                p.style.fontStyle = 'italic';
+                p.textContent = 'No partial brackets added yet.';
+                bracketsList.appendChild(p);
+                return;
+            }
+
+            // sort by min ascending for editing clarity
+            const sorted = [...criteriaModel.partials].sort((a,b) => a.min - b.min);
+            for (const b of sorted) {
+                const row = document.createElement('div');
+                row.className = 'criteria-item';
+
+                const minInput = document.createElement('input');
+                minInput.type = 'number';
+                minInput.value = b.min;
+                minInput.className = 'form-control';
+                minInput.style.width = '80px';
+                minInput.addEventListener('change', () => {
+                    const v = clampInt(minInput.value, 0, 100);
+                    if (v === null) return;
+                    b.min = v;
+                });
+
+                const maxInput = document.createElement('input');
+                maxInput.type = 'number';
+                maxInput.value = b.max;
+                maxInput.className = 'form-control';
+                maxInput.style.width = '80px';
+                maxInput.addEventListener('change', () => {
+                    const v = clampInt(maxInput.value, 0, 100);
+                    if (v === null) return;
+                    b.max = v;
+                });
+
+                const allocInput = document.createElement('input');
+                allocInput.type = 'number';
+                allocInput.value = b.allocPercent;
+                allocInput.className = 'form-control';
+                allocInput.style.width = '100px';
+                allocInput.addEventListener('change', () => {
+                    const v = clampInt(allocInput.value, 1, 100);
+                    if (v === null) return;
+                    b.allocPercent = v;
+                });
+
+                const labelSpan = document.createElement('div');
+                labelSpan.textContent = `${b.min}% - ${b.max}%`;
+                labelSpan.style.paddingTop = '6px';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-sm btn-outline-danger';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => {
+                    criteriaModel.partials = criteriaModel.partials.filter(x => x.id !== b.id);
+                    renderBracketsList();
+                });
+
+                row.appendChild(minInput);
+                row.appendChild(maxInput);
+                row.appendChild(allocInput);
+                row.appendChild(labelSpan);
+                row.appendChild(deleteBtn);
+
+                bracketsList.appendChild(row);
+            }
+        }
+
+        addBracketBtn.addEventListener('click', () => {
+            modalValidationErrors.style.display = 'none';
+            const min = clampInt(newMinInput.value, 0, 100);
+            const max = clampInt(newMaxInput.value, 0, 100);
+            const alloc = clampInt(newAllocInput.value, 1, 100);
+
+            if (min === null || max === null || alloc === null) {
+                showModalError('Min, Max, and Allocation must be whole numbers.');
+                return;
+            }
+            if (min >= max) {
+                showModalError('Min must be less than Max.');
+                return;
+            }
+
+            // enforce min >= noneMax and max <= fullMin at add time for UX (but final validation runs on Apply)
+            const fullMinVal = clampInt(modalFullMin.value, 1, 100);
+            const noneMaxVal = clampInt(modalNoneMax.value, 0, 99);
+            if (min < noneMaxVal || max > fullMinVal) {
+                showModalError(`Bracket must be within cutoff (${noneMaxVal}%) and full min (${fullMinVal}%).`);
+                return;
+            }
+
+            const newBracket = { id: uid(), min, max, allocPercent: alloc };
+            criteriaModel.partials.push(newBracket);
+            newMinInput.value = '';
+            newMaxInput.value = '';
+            newAllocInput.value = '';
+            renderBracketsList();
+        });
+
+        /* -------------------------
+           Validation logic (on Apply)
+           ------------------------- */
+        function showModalError(msg) {
+            modalValidationErrors.textContent = msg;
+            modalValidationErrors.style.display = 'block';
+        }
+
+        function validateCriteriaModel() {
+            modalValidationErrors.style.display = 'none';
+
+            // read full and none from modal inputs (allow user to change before apply)
+            const fullMin = clampInt(modalFullMin.value, 1, 100);
+            const noneMax = clampInt(modalNoneMax.value, 0, 99);
+
+            if (fullMin === null || noneMax === null) {
+                showModalError('Full Funding and No Funding must be whole numbers.');
+                return { ok: false };
+            }
+            if (noneMax >= fullMin) {
+                showModalError('No Funding cutoff must be less than Full Funding minimum.');
+                return { ok: false };
+            }
+
+            // copy partials and ensure integer constraints
+            const partials = criteriaModel.partials.map(p => ({
+                id: p.id,
+                min: clampInt(p.min, 0, 100),
+                max: clampInt(p.max, 0, 100),
+                allocPercent: clampInt(p.allocPercent, 1, 100)
+            }));
+
+            // basic checks
+            for (const p of partials) {
+                if (p.min === null || p.max === null || p.allocPercent === null) {
+                    showModalError('All bracket values must be whole numbers.');
+                    return { ok: false };
+                }
+                if (p.min >= p.max) {
+                    showModalError(`Bracket ${p.min}% - ${p.max}% invalid: Min must be less than Max.`);
+                    return { ok: false };
+                }
+                if (p.min < noneMax || p.max > fullMin) {
+                    showModalError(`Bracket ${p.min}% - ${p.max}% must lie between cutoff (${noneMax}%) and full min (${fullMin}%).`);
+                    return { ok: false };
+                }
+            }
+
+            // check overlaps and coverage between noneMax and fullMin
+            // sort by min ascending
+            partials.sort((a,b) => a.min - b.min);
+
+            // check for overlaps and gaps
+            let cursor = noneMax;
+            for (let i = 0; i < partials.length; i++) {
+                const p = partials[i];
+                if (p.min > cursor) {
+                    // gap
+                    showModalError(`Gap detected: ${cursor}% to ${p.min}% is not covered.`);
+                    return { ok: false };
+                }
+                if (p.min < cursor) {
+                    // overlap with previous
+                    showModalError(`Overlap detected at ${p.min}% in bracket ${p.min}% - ${p.max}%.`);
+                    return { ok: false };
+                }
+                // advance cursor to p.max
+                cursor = p.max;
+            }
+
+            if (cursor < fullMin) {
+                showModalError(`Gap detected: ${cursor}% to ${fullMin}% is not covered.`);
+                return { ok: false };
+            }
+
+            // all good
+            return { ok: true, fullMin, noneMax, partials };
+        }
+
+        /* -------------------------
+           Allocation engine & table generation
+           ------------------------- */
+        const applicationsBody = document.getElementById('applicationsTableBody');
+        const fullBody = document.getElementById('fullFundingTableBody');
+        const partialTablesContainer = document.getElementById('partialFundingTablesContainer');
+        const noBody = document.getElementById('noFundingTableBody');
+        const boostBtn = document.getElementById('boostPartialFunding');
+        const clearAllocationsBtn = document.getElementById('clearAllocationsBtn');
+        const remainingText = document.getElementById('remainingBudgetText');
+        const remainingBar = document.getElementById('remainingBudgetBar');
+
+        function clearAllTables() {
+            // move all rows back to original applications body and clear allocations
+            const allRows = document.querySelectorAll('#fullFundingTableBody tr, #noFundingTableBody tr, #partialFundingTablesContainer tbody tr');
+            allRows.forEach(r => {
+                setAllocatedFunds(r, 0);
+                applicationsBody.appendChild(r);
+            });
+            // clear table bodies
+            fullBody.innerHTML = '';
+            noBody.innerHTML = '';
+            partialTablesContainer.innerHTML = '';
+        }
+
+        function setAllocatedFunds(row, amount) {
+            const cell = row.querySelector('td:nth-child(7)');
+            if (!cell) return;
+            if (!amount || amount <= 0) {
+                cell.textContent = '$0.00';
+            } else {
+                cell.textContent = formatCurrency(amount);
+            }
+        }
+
+        function getRspgTotalFromRow(row) {
+            const cell = row.querySelector('td:nth-child(4)');
+            if (!cell) return 0;
+            const text = cell.textContent.replace(/[^0-9.\-]/g, '');
+            const v = parseFloat(text);
+            return isNaN(v) ? 0 : v;
+        }
+
+        function getScoreFromRow(row) {
+            const attr = row.getAttribute('data-score');
+            if (attr != null) {
+                const v = parseFloat(attr);
+                if (!isNaN(v)) return v * 100;
+            }
+            const cell = row.querySelector('td:nth-child(6)');
+            if (!cell) return 0;
+            const text = cell.textContent.replace('%', '').trim();
+            const v = parseFloat(text);
+            return isNaN(v) ? 0 : v;
+        }
+
+        function makeTableForPartial(p) {
+            // Create card wrapper matching the design system
+            const card = document.createElement('div');
+            card.className = 'card mb-4';
+
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'card-header';
+            const headerSpan = document.createElement('span');
+            headerSpan.className = 'section-title mb-0 border-0 pb-0';
+            headerSpan.textContent = `Partial: ${p.min}% - ${p.max}% (${p.allocPercent}% allocation)`;
+            cardHeader.appendChild(headerSpan);
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-0';
+
+            const table = document.createElement('table');
+            table.className = 'table mb-0';
+
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Title</th>
+                    <th>Submitted By</th>
+                    <th>Principal Investigator</th>
+                    <th><strong>RSPG Total</strong></th>
+                    <th>Other Total</th>
+                    <th>Average Score</th>
+                    <th>Allocated Funds</th>
+                </tr>
+            `;
+
+            const tbody = document.createElement('tbody');
+            tbody.id = `range_${p.min}_${p.max}`;
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            cardBody.appendChild(table);
+            card.appendChild(cardHeader);
+            card.appendChild(cardBody);
+
+            partialTablesContainer.appendChild(card);
+
+            return tbody.id;
+        }
+
+        function applyCriteriaAndRenderTables(validated) {
+            // validated: { fullMin, noneMax, partials }
+            // clear any previous tables and allocations
+            clearAllTables();
+
+            // show containers
+            tablesContainer.classList.remove('hidden');
+            reopenCriteriaBtn.classList.remove('hidden');
+
+            // hide non-sorted container
+            originalAppsContainer.classList.add('hidden');
+
+            // create full and none criteria entries
+            const fullCriterion = { type: 'full', min: validated.fullMin, max: 100, tableBodyId: 'fullFundingTableBody', allocPercent: 100 };
+            const noneCriterion = { type: 'none', min: 0, max: validated.noneMax, tableBodyId: 'noFundingTableBody', allocPercent: 0 };
+
+            // create partial criteria sorted by min descending for table order
+            validated.partials.sort((a,b) => {
+                if (b.min !== a.min) return b.min - a.min;
+                return b.max - a.max;
+            });
+
+            const partialCriteria = validated.partials.map(p => ({
+                type: 'partial',
+                min: p.min,
+                max: p.max,
+                allocPercent: p.allocPercent,
+                tableBodyId: makeTableForPartial(p)
+            }));
+
+
+            // build criteria list in order: full, partials..., none
+            const criteriaList = [fullCriterion, ...partialCriteria, noneCriterion];
+
+            // move rows from original applications into appropriate table and set allocations
+            // gather all original rows (they are in applicationsBody)
+            const rows = Array.from(applicationsBody.querySelectorAll('tr'));
+            // sort rows by score descending
+            rows.sort((a,b) => getScoreFromRow(b) - getScoreFromRow(a));
+
+            for (const row of rows) {
+                const score = getScoreFromRow(row);
+                const rspg = getRspgTotalFromRow(row);
+                let matched = false;
+                for (const c of criteriaList) {
+                    if (score >= c.min && score < c.max) {
+                        const allocAmount = Number((rspg * (c.allocPercent / 100)).toFixed(2));
+                        setAllocatedFunds(row, allocAmount);
+                        const body = document.getElementById(c.tableBodyId);
+                        if (body) body.appendChild(row);
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    // If no match (shouldn't happen), leave in original table
+                    applicationsBody.appendChild(row);
+                }
+            }
+
+                    // ---------------------------------------------
+            // REDISTRIBUTE REMAINING FUNDS TO LOWEST BRACKET (CENTS-SAFE)
+            // ---------------------------------------------
+            const allocatedSoFar = sumAllocated(); // returns dollars
+            let remaining = totalMoneyAvailable - allocatedSoFar; // dollars
+
+            // Convert to cents
+            let remainingCents = Math.round(remaining * 100);
+
+            // Find lowest partial bracket
+            const partialsOnly = criteriaList.filter(c => c.type === "partial");
+
+            if (partialsOnly.length > 0) {
+                const lowest = partialsOnly[partialsOnly.length - 1];
+                const lowestBody = document.getElementById(lowest.tableBodyId);
+                const lowestRows = Array.from(lowestBody.querySelectorAll("tr"));
+
+                if (lowestRows.length > 0) {
+
+                    // Calculate normal allocation total in cents
+                    let normalTotalCents = 0;
+                    const normalAmounts = lowestRows.map(row => {
+                        const rspg = getRspgTotalFromRow(row);
+                        const amt = Number((rspg * (lowest.allocPercent / 100)).toFixed(2));
+                        const amtCents = Math.round(amt * 100);
+                        normalTotalCents += amtCents;
+                        return { row, amtCents };
+                    });
+
+                    // If remaining is insufficient
+                    if (remainingCents < normalTotalCents) {
+
+                        // Refund normal allocations
+                        remainingCents += normalTotalCents;
+
+                        // Even base amount in cents
+                        const baseCents = Math.floor(remainingCents / lowestRows.length);
+
+                        // Remainder cents
+                        let remainderCents = remainingCents - (baseCents * lowestRows.length);
+
+                        // Apply even distribution + remainder
+                        for (const { row } of normalAmounts) {
+                            let finalCents = baseCents;
+
+                            if (remainderCents > 0) {
+                                finalCents += 1;
+                                remainderCents -= 1;
+                            }
+
+                            setAllocatedFunds(row, finalCents / 100);
+                        }
+
+                        remainingCents = 0;
+                    }
+                }
+            }
+
+
+
+            updateRemainingBudgetDisplay();
+        }
+
+        function sumAllocated() {
+            let total = 0;
+            const allocatedRows = document.querySelectorAll('#fullFundingTableBody tr, #partialFundingTablesContainer tbody tr');
+            allocatedRows.forEach(r => {
+                const cell = r.querySelector('td:nth-child(7)');
+                if (!cell || cell.textContent.trim() == "$0.00") return;
+                const text = cell.textContent.replace(/[^0-9.\-]/g, '');
+                const v = parseFloat(text);
+                if (!isNaN(v)) total += v;
+            });
+            return total;
+        }
+
+        function updateRemainingBudgetDisplay() {
+            const allocated = sumAllocated();
+            const remaining = totalMoneyAvailable - allocated;
+            remainingText.textContent = `Remaining Budget: ${formatCurrency(remaining)}`;
+            let pct = 100;
+            if (totalMoneyAvailable > 0) pct = Math.max(0, Math.min(100, (remaining / totalMoneyAvailable) * 100));
+            remainingBar.style.width = pct + '%';
+            if (remaining < 0) {
+                remainingBar.classList.remove('bg-success');
+                remainingBar.classList.add('bg-danger');
+            } else {
+                remainingBar.classList.remove('bg-danger');
+                remainingBar.classList.add('bg-success');
+            }
+        }
+
+        /* -------------------------
+           Boost logic
+           ------------------------- */
+        boostBtn.addEventListener('click', () => {
+            // collect all partial rows and compute extra needed to bring them to 100%
+            const partialBodies = Array.from(document.querySelectorAll('#partialFundingTablesContainer tbody'));
+            let partialRows = [];
+            partialBodies.forEach(b => partialRows = partialRows.concat(Array.from(b.querySelectorAll('tr'))));
+
+            if (partialRows.length === 0) {
+                updateRemainingBudgetDisplay();
+                return;
+            }
+
+            const allocatedBefore = sumAllocated();
+            const remainingBefore = totalMoneyAvailable - allocatedBefore;
+
+            let extraNeeded = 0;
+            const rowsToUpgrade = [];
+
+            for (const row of partialRows) {
+                const rspg = getRspgTotalFromRow(row);
+                const cell = row.querySelector('td:nth-child(7)');
+                let current = 0;
+                if (cell && cell.textContent.trim() !== '$0.00') {
+                    const text = cell.textContent.replace(/[^0-9.\-]/g, '');
+                    const v = parseFloat(text);
+                    if (!isNaN(v)) current = v;
+                }
+                const diff = rspg - current;
+                if (diff > 0) {
+                    extraNeeded += diff;
+                    rowsToUpgrade.push({ row, fullAmount: rspg });
+                }
+            }
+
+            if (extraNeeded <= remainingBefore) {
+                for (const info of rowsToUpgrade) {
+                    setAllocatedFunds(info.row, info.fullAmount);
+                }
+            }
+
+            updateRemainingBudgetDisplay();
+        });
+
+        /* -------------------------
+           Clear / Reset view
+           ------------------------- */
+        clearAllocationsBtn.addEventListener('click', () => {
+            // move all rows back to original and hide tables
+            clearAllTables();
+            tablesContainer.classList.add('hidden');
+            reopenCriteriaBtn.classList.add('hidden');
+
+            // show non-sorted table
+            originalAppsContainer.classList.remove('hidden');
+        });
+
+        /* -------------------------
+           Apply button inside modal
+           ------------------------- */
+        applyFundsModalBtn.addEventListener('click', () => {
+            // update model from modal inputs
+            criteriaModel.fullMin = clampInt(modalFullMin.value, 1, 100);
+            criteriaModel.noneMax = clampInt(modalNoneMax.value, 0, 99);
+
+            const validation = validateCriteriaModel();
+            if (!validation.ok) return;
+
+            // apply and render tables
+            applyCriteriaAndRenderTables(validation);
+            hideModal();
+        });
+
+        /* -------------------------
+           Initialization
+           ------------------------- */
+        document.addEventListener('DOMContentLoaded', () => {
+            // initial state: hide tables and original apps (they will be shown after Apply)
+            tablesContainer.classList.add('hidden');
+            reopenCriteriaBtn.classList.add('hidden');
+
+            // ensure model defaults
+            criteriaModel.fullMin = clampInt(modalFullMin.value, 1, 100);
+            criteriaModel.noneMax = clampInt(modalNoneMax.value, 0, 99);
+            criteriaModel.partials = [];
+
+            // render empty brackets list
+            renderBracketsList();
+        });
+
+        const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+
+        downloadExcelBtn.addEventListener('click', async () => {
+
+            const rows = [];
+            const ids = []; 
+
+            // Excel header row
+            rows.push([
+                "Grant Title",
+                "First Name",
+                "Last Name",
+                "AccountIndex",
+                "Total"
+            ]);
+
+            // Get all funded rows (full + partial)
+            const fundedRows = document.querySelectorAll(
+                '#fullFundingTableBody tr, #partialFundingTablesContainer tbody tr'
+            );
+
+            fundedRows.forEach(row => {
+
+                const id = row.getAttribute('data-id'); 
+                if (id) {
+                    ids.push(id); 
+                }
+                const title = row.dataset.title;
+                const firstName = row.dataset.firstname;
+                const lastName = row.dataset.lastname;
+                const accountIndex = row.dataset.accountindex;
+
+                const total = row.querySelector('td:nth-child(7)').textContent.trim();
+
+                rows.push([
+                    title,
+                    firstName,
+                    lastName,
+                    accountIndex,
+                    total
+                ]);
+            });
+
+            // Convert rows → worksheet
+            const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+            // Create workbook
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Funded Grants");
+
+            // Download file
+            XLSX.writeFile(workbook, "FundedGrantApplications.xlsx");
+
+            document.getElementById('selectedApplicationIds').value = ids.join(',');
+            document.getElementById('finalizeForm').submit();
+           
+        });
+
+    </script>
+}

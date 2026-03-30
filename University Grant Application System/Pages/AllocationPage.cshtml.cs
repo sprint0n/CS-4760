@@ -65,6 +65,7 @@ namespace University_Grant_Application_System.Pages
                                   
                                   from sg in scoreGroup.DefaultIfEmpty()
                                   where f.ApplicationStatus == "PendingAllocation"
+                                  && f.staffTypeSelection.Trim() != "3"
                                   select new AllocationRowViewModel
                                   {
                                       Id = f.Id,

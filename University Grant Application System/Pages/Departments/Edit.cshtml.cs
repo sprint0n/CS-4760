@@ -54,7 +54,7 @@ namespace University_Grant_Application_System.Pages.Departments
                 .ToList();
 
             ViewData["ChairIdList"] = new SelectList(deptUsers, "UserId", "FullName");
-            ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolId");
+            ViewData["SchoolId"] = new SelectList(_context.Schools, "SchoolId", "SchoolName");
             return Page();
         }
 

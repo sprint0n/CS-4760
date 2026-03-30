@@ -45,23 +45,25 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Users.LastName)
         </dd>
+         <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Users.College)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Users.College?.CollegeName
+        </dd>
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Users.School)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Users.School)
+            @Model.Users.School?.SchoolName
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Users.College)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Users.College)
-        </dd>
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Users.Department)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Users.Department)
+            @Model.Users.Department?.DepartmentName
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Users.Email)

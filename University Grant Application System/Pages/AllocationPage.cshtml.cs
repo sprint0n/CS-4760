@@ -37,7 +37,7 @@ namespace University_Grant_Application_System.Pages
         }
 
         [BindProperty]
-        public List<int> SelectedApplicationIds { get; set; }
+        public string SelectedApplicationIds { get; set; }
 
         public decimal TotalMoneyAvailable { get; set; }
         public decimal TotalMoneyRequested { get; set; }
@@ -148,13 +148,25 @@ namespace University_Grant_Application_System.Pages
         }
         public async Task<IActionResult> OnPostFinalizeAsync()
         {
-            if (SelectedApplicationIds == null || !SelectedApplicationIds.Any())
+            if (string.IsNullOrEmpty(SelectedApplicationIds))
+            {
+                return RedirectToPage();
+            }
+
+            // Convert "1,2,3" → List<int>
+            var ids = SelectedApplicationIds
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(int.Parse)
+                .ToList();
+
+            if (!ids.Any())
             {
                 return RedirectToPage();
             }
 
             var applications = await _context.FormTable
-                .Where(f => SelectedApplicationIds.Contains(f.Id) && f.ApplicationStatus == "PendingAllocation")
+                .Where(f => ids.Contains(f.Id) &&
+                            f.ApplicationStatus == "PendingAllocation")
                 .ToListAsync();
 
             foreach (var app in applications)

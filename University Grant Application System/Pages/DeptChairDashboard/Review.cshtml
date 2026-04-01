@@ -121,12 +121,17 @@
             <h5>Other Funding</h5>
             <table class="table table-sm border mb-3">
                 <thead class="table-light">
-                    <tr><th>Funding Name</th><th>Amount</th></tr>
+                    <tr><th>Funding Name</th><th>Amount</th><th>Other</th><th>Other</th></tr>
                 </thead>
                 <tbody>
                     @foreach (var o in Model.Application.OtherExpenses)
                     {
-                        <tr><td>@o.OtherExpenseName</td><td>@o.Amount?.ToString("C")</td></tr>
+                        <tr>
+                            <td>@o.OtherExpenseName</td>
+                            <td>@o.Amount?.ToString("C")</td>
+                            <td>@((o.OtherAmount1 ?? 0).ToString("C"))</td>
+                            <td>@((o.OtherAmount2 ?? 0).ToString("C"))</td>
+                        </tr>
                     }
                 </tbody>
             </table>

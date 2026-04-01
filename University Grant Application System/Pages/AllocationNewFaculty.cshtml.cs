@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using University_Grant_Application_System.Data;
 using University_Grant_Application_System.Models;
-using System.Diagnostics;
 
 namespace University_Grant_Application_System.Pages
 {
@@ -149,8 +148,6 @@ namespace University_Grant_Application_System.Pages
         }
         public async Task<IActionResult> OnPostFinalizeAsync()
         {
-            Debug.WriteLine("Here");
-
             if (string.IsNullOrEmpty(SelectedApplicationIds))
             {
                 return RedirectToPage();
